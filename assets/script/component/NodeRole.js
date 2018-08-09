@@ -31,9 +31,9 @@ export default class NodeRole extends cc.Component {
             if (cc.dataMgr.userData.roleDieType == 3) {
                 cc.audioMgr.playEffect("prop_empy");
 
-                this.node.runAction(cc.fadeOut(0.6));
-                let moveBy = cc.moveBy(0.8, cc.v2(0, -360));
-                moveBy.easing(cc.easeIn(0.8));
+                this.node.runAction(cc.fadeOut(1.2));
+                let moveBy = cc.moveBy(1.2, cc.v2(0, -360));
+                moveBy.easing(cc.easeIn(1.2));
                 this.node.runAction(cc.sequence(moveBy, cc.callFunc(this.callEnd, this)));
             } else if (cc.dataMgr.userData.roleDieType == 1) {
                 cc.audioMgr.playEffect("prop_empy");

@@ -4,6 +4,8 @@ const {
 } = cc._decorator;
 @ccclass
 export default class NodeBox extends cc.Component {
+    @property(cc.Node)
+    spr_box = null;
     @property(cc.Node) //障碍物的下一级方块
     spr_block = null;
     @property(cc.Node) //道具
@@ -16,9 +18,7 @@ export default class NodeBox extends cc.Component {
     _isAlive = true;
     _boxType = null; //有三个值:box、prop(道具)、"block"
 
-    onLoad() {
-
-    }
+    onLoad() {}
 
     initBox(countBox, aimPos, isLeft, boxType) {
         //console.log("-- countBox:" + countBox + " -- " + isLeft + " -- " + boxType);
@@ -53,6 +53,9 @@ export default class NodeBox extends cc.Component {
                 this.spr_prop.y = (randNum > 0.5 ? this._block1Y : this._block2Y);
 
                 this.spr_block.setPosition(cc.v2((isLeft ? -1 : 1) * cc.dataMgr.boxX, cc.dataMgr.boxY));
+
+                this.spr_prop.scale = 0;
+                this.spr_prop.runAction(cc.sequence(cc.delayTime(0.2), cc.scaleTo(0.2, 1)));
             } else {
                 this.spr_block.active = false;
                 this.spr_prop.active = false;
@@ -63,7 +66,7 @@ export default class NodeBox extends cc.Component {
     //角色碰到 道具
     touchProp() {
         this.spr_prop.runAction(cc.sequence(cc.delayTime(0.1), cc.hide()));
-        
+
         cc.audioMgr.playEffect("prop_score");
     }
 
@@ -84,10 +87,15 @@ export default class NodeBox extends cc.Component {
                 }
             }
 
-            let moveBy = cc.moveBy(0.8, cc.v2(0, -420));
-            moveBy.easing(cc.easeIn(0.8));
-            this.node.runAction(cc.fadeOut(0.6));
+            let moveBy = cc.moveBy(1.2, cc.v2(0, -420));
+            moveBy.easing(cc.easeIn(1.2));
+            this.node.runAction(cc.fadeOut(1.2));
             this.node.runAction(cc.sequence(moveBy, cc.removeSelf(), cc.callFunc(this.callDestory, this)));
+
+            //溶解
+            this.spr_box.getComponent("EDissolve").useDissolve();
+            if (this.spr_block.active)
+                this.spr_block.getComponent("EDissolve").useDissolve();
         }
     }
 

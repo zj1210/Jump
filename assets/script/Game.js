@@ -7,6 +7,9 @@ export default class Game extends cc.Component {
     @property(cc.SpriteAtlas)
     atlas_game = null;
 
+    @property(cc.SpriteFrame)
+    noiseTexture = null;
+
     @property(cc.Prefab) //预置box
     pre_box = null;
 
@@ -231,9 +234,9 @@ export default class Game extends cc.Component {
             cc.dataMgr.userData.roleDieType = data.dieType;
             cc.dataMgr.userData.onGaming = false;
             let roleJs = this.node_role.getComponent("NodeRole");
-            this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), cc.dataMgr.boxY, 1), cc.callFunc(roleJs.toDie, roleJs)));
+            this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), cc.dataMgr.boxY*1.5, 1), cc.callFunc(roleJs.toDie, roleJs)));
         } else {
-            this.node_role.runAction(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), cc.dataMgr.boxY, 1));
+            this.node_role.runAction(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), cc.dataMgr.boxY*1.5, 1));
         }
 
         cc.dataMgr.userData.aimRoleX = aimX;
@@ -327,6 +330,15 @@ export default class Game extends cc.Component {
             let btnN = event.target.name;
             if (btnN == "btn_home") {
                 this.showPanel("node_main");
+            } else if (btnN == "btn_store") {
+                console.log("--- btn_store ---");
+                //溶解试验
+                // let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg");
+                // if(spr_bg){
+                //     let sprJs = spr_bg.getComponent("EDissolve");
+                //     if(sprJs)
+                //     sprJs.useDissolve();
+                // }
             }
         }
     }
