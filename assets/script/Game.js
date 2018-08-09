@@ -193,9 +193,7 @@ export default class Game extends cc.Component {
 
                 this.node_game.active = false;
 
-                let lab_begin = nodePanel.getChildByName("lab_begin");
-                lab_begin.runAction(cc.repeatForever(cc.sequence(cc.scaleTo(0.4, 1.2), cc.scaleTo(0.6, 1))));
-            } else if (nodeName == "node_end") {
+                } else if (nodeName == "node_end") {
                 cc.dataMgr.userData.gameReady = true;
                 let lab_reBegin = nodePanel.getChildByName("lab_begin");
                 lab_reBegin.runAction(cc.repeatForever(cc.sequence(cc.scaleTo(0.4, 1.2), cc.scaleTo(0.6, 1))));
@@ -223,6 +221,7 @@ export default class Game extends cc.Component {
         let aimX = (isLeft ? -1 : 1) * cc.dataMgr.boxX + cc.dataMgr.userData.aimRoleX;
 
         this.node_role.scaleX = (isLeft ? -1 : 1);
+        this.node_role.stopAllActions();
 
         //获取目标点是否有 box 及其类型, 并矫正Y
         let data = this.getAimPos_o(cc.v2(aimX, aimY));
@@ -234,9 +233,9 @@ export default class Game extends cc.Component {
             cc.dataMgr.userData.roleDieType = data.dieType;
             cc.dataMgr.userData.onGaming = false;
             let roleJs = this.node_role.getComponent("NodeRole");
-            this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), cc.dataMgr.boxY*1.5, 1), cc.callFunc(roleJs.toDie, roleJs)));
+            this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.5, 1), cc.callFunc(roleJs.toDie, roleJs)));
         } else {
-            this.node_role.runAction(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), cc.dataMgr.boxY*1.5, 1));
+            this.node_role.runAction(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.5, 1));
         }
 
         cc.dataMgr.userData.aimRoleX = aimX;

@@ -12,7 +12,7 @@ export default class NodeRole extends cc.Component {
 
     initRole(posBegin) {
         this._isAlive = true;
-        this.node.setLocalZOrder(0);
+        this.node.setLocalZOrder(1);
         this.node.stopAllActions();
         if (!posBegin)
             posBegin = cc.v2(0, 0);
