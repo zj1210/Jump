@@ -54,7 +54,7 @@ export default class NodeRole extends cc.Component {
         this.node.active = false;
         let gameJs = cc.find("Canvas").getComponent("Game");
         if (gameJs) {
-            gameJs.showPanel("node_relive");
+            gameJs.showRelive();
         }
     }
 }

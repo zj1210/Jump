@@ -53,6 +53,7 @@ export default class NodeBox extends cc.Component {
                 this.spr_prop.y = (randNum > 0.5 ? this._block1Y : this._block2Y);
 
                 this.spr_block.setPosition(cc.v2((isLeft ? -1 : 1) * cc.dataMgr.boxX, cc.dataMgr.boxY));
+                this.spr_block.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(cc.dataMgr.userData.boxName);
 
                 this.spr_prop.scale = 0;
                 this.spr_prop.runAction(cc.sequence(cc.delayTime(0.2), cc.scaleTo(0.2, 1)));
@@ -60,6 +61,16 @@ export default class NodeBox extends cc.Component {
                 this.spr_block.active = false;
                 this.spr_prop.active = false;
             }
+            this.spr_box.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(cc.dataMgr.userData.boxName);
+        }
+    }
+
+    setBoxFrame() {
+        let gameJs = cc.find("Canvas").getComponent("Game");
+        if (gameJs && this._isAlive) {
+            if (this.spr_block.active)
+                this.spr_block.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(cc.dataMgr.userData.boxName);
+            this.spr_box.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(cc.dataMgr.userData.boxName);
         }
     }
 
@@ -104,6 +115,7 @@ export default class NodeBox extends cc.Component {
     }
 
     killBox() {
+        this._isAlive = false;
         this.node.runAction(cc.sequence(cc.removeSelf(), cc.callFunc(this.callDestory, this)));
     }
 }

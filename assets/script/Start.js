@@ -6,6 +6,9 @@ const {
 } = cc._decorator;
 @ccclass
 export default class Start extends cc.Component {
+    /*
+        重要提示 数据在start onLoad 中初始化,启动游戏一定要打这开始启动
+    */
 
     onLoad() {
         console.log("--- onLoad Start ---");
@@ -14,13 +17,11 @@ export default class Start extends cc.Component {
             cc.dataMgr = new DataMgr();
             cc.dataMgr.initData();
         }
-        console.log(cc.dataMgr);
-
         if (!cc.audioMgr) {
             //let AudioMgr = require("AudioMgr");
             cc.audioMgr = new AudioMgr();
+            cc.audioMgr.init();
         }
-        cc.audioMgr.init();
     }
 
     start() {
@@ -40,6 +41,8 @@ export default class Start extends cc.Component {
 
     initStart() {
         //钻石数量
+        let lab_green = this.node.getChildByName("prop").getChildByName("prop_Label");
+        lab_green.getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
 
         //点击开始游戏
         let spr_begin = this.node.getChildByName("ziti_kaishiyouxi");
@@ -55,7 +58,7 @@ export default class Start extends cc.Component {
             } else if (btnN == "anniu_weixin") {
 
             } else if (btnN == "anniu_yinyue") {
-
+                cc.director.loadScene("store");
             } else if (btnN == "anniu_shezhi") {
 
             }

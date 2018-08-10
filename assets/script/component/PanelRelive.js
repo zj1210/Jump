@@ -47,10 +47,7 @@ export default class PanelRelive extends cc.Component {
     }
 
     callEnd() {
-        let gameJs = cc.find("Canvas").getComponent("Game");
-        if (gameJs) {
-            gameJs.showPanel("node_end");
-        }
+        cc.director.loadScene("end");
     }
 
     onClickBtn(event, customeData) {

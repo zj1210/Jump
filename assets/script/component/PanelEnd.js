@@ -8,9 +8,7 @@ const {
 export default class PanelEnd extends cc.Component {
 
     onLoad() {
-        cc.aduioMgr.init();
 
-        this.showEnd();
     }
 
     start() {
@@ -24,17 +22,23 @@ export default class PanelEnd extends cc.Component {
             onTouchMoved: function (touch, event) {},
             onTouchEnded: function (touch, event) {}
         }, self.node);
+
+        this.initEnd();
     }
 
-    showEnd() {
-
+    initEnd() {
+        this.node.getChildByName("now_Label").getComponent(cc.Label).string = cc.dataMgr.userData.countJump;
+        this.node.getChildByName("best").getChildByName("best_Label").getComponent(cc.Label).string = cc.dataMgr.getBestScore_i(cc.dataMgr.userData.countJump);
+        this.node.getChildByName("prop").getChildByName("prop_Label").getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
     }
 
     onClickBtn(event, customeData) {
         if (event.target) {
             cc.audioMgr.playEffect("btn_click");
             let btnN = event.target.name;
-            if (btnN == "") {}
+            if (btnN == "anniu_zhuyie") {
+                cc.director.loadScene("start");
+            }
         }
     }
 }

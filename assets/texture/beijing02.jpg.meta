@@ -1,14 +1,14 @@
 {
   "ver": "1.0.0",
-  "uuid": "a8d0e8ef-3a57-4587-ac1c-e10bdff842c3",
+  "uuid": "28ebf269-bdf2-4e8b-beb2-01796daa1bcf",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
   "subMetas": {
-    "game_bg": {
+    "beijing02": {
       "ver": "1.0.3",
-      "uuid": "5229be22-0dc7-4660-939c-d3c140382138",
-      "rawTextureUuid": "a8d0e8ef-3a57-4587-ac1c-e10bdff842c3",
+      "uuid": "2b1df87f-f9a3-49b1-b3c0-3f79aee54a40",
+      "rawTextureUuid": "28ebf269-bdf2-4e8b-beb2-01796daa1bcf",
       "trimType": "auto",
       "trimThreshold": 1,
       "rotated": false,
@@ -16,10 +16,10 @@
       "offsetY": 0,
       "trimX": 0,
       "trimY": 0,
-      "width": 720,
-      "height": 1280,
-      "rawWidth": 720,
-      "rawHeight": 1280,
+      "width": 1080,
+      "height": 1920,
+      "rawWidth": 1080,
+      "rawHeight": 1920,
       "borderTop": 0,
       "borderBottom": 0,
       "borderLeft": 0,

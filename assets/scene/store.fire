@@ -65,20 +65,23 @@
         "__id__": 8
       },
       {
-        "__id__": 24
+        "__id__": 25
       },
       {
-        "__id__": 30
+        "__id__": 31
       },
       {
-        "__id__": 40
+        "__id__": 42
       }
     ],
     "_tag": -1,
     "_active": true,
     "_components": [
       {
-        "__id__": 43
+        "__id__": 46
+      },
+      {
+        "__id__": 47
       }
     ],
     "_prefab": null,
@@ -182,7 +185,7 @@
     },
     "_enabled": true,
     "_spriteFrame": {
-      "__uuid__": "5229be22-0dc7-4660-939c-d3c140382138"
+      "__uuid__": "301bcfd4-8b13-4d74-af68-4630a3aef8f1"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -474,7 +477,7 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": 0,
+      "x": 10,
       "y": 0
     },
     "_skewX": 0,
@@ -940,13 +943,26 @@
     "horizontal": true,
     "vertical": false,
     "inertia": true,
-    "brake": 0.75,
+    "brake": 1,
     "elastic": true,
-    "bounceDuration": 0.23,
-    "scrollEvents": [],
+    "bounceDuration": 0.05,
+    "scrollEvents": [
+      {
+        "__id__": 24
+      }
+    ],
     "cancelInnerEvents": true,
     "_N$horizontalScrollBar": null,
     "_N$verticalScrollBar": null
+  },
+  {
+    "__type__": "cc.ClickEvent",
+    "target": {
+      "__id__": 2
+    },
+    "component": "PanelStore",
+    "handler": "scrollEvent",
+    "customEventData": ""
   },
   {
     "__type__": "cc.Node",
@@ -957,17 +973,17 @@
     },
     "_children": [
       {
-        "__id__": 25
+        "__id__": 26
       },
       {
-        "__id__": 27
+        "__id__": 28
       }
     ],
     "_tag": -1,
     "_active": true,
     "_components": [
       {
-        "__id__": 29
+        "__id__": 30
       }
     ],
     "_prefab": null,
@@ -1012,14 +1028,14 @@
     "_name": "prop_Label",
     "_objFlags": 0,
     "_parent": {
-      "__id__": 24
+      "__id__": 25
     },
     "_children": [],
     "_tag": -1,
     "_active": true,
     "_components": [
       {
-        "__id__": 26
+        "__id__": 27
       }
     ],
     "_prefab": null,
@@ -1064,7 +1080,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 25
+      "__id__": 26
     },
     "_enabled": true,
     "_useOriginalSize": false,
@@ -1086,14 +1102,14 @@
     "_name": "tuboao_zuanshi",
     "_objFlags": 0,
     "_parent": {
-      "__id__": 24
+      "__id__": 25
     },
     "_children": [],
     "_tag": -1,
     "_active": true,
     "_components": [
       {
-        "__id__": 28
+        "__id__": 29
       }
     ],
     "_prefab": null,
@@ -1138,7 +1154,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 27
+      "__id__": 28
     },
     "_enabled": true,
     "_spriteFrame": {
@@ -1166,7 +1182,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 24
+      "__id__": 25
     },
     "_enabled": true,
     "isAlignOnce": true,
@@ -1196,16 +1212,16 @@
     },
     "_children": [
       {
-        "__id__": 31
-      },
-      {
-        "__id__": 34
+        "__id__": 32
       },
       {
         "__id__": 36
       },
       {
         "__id__": 38
+      },
+      {
+        "__id__": 40
       }
     ],
     "_tag": -1,
@@ -1253,17 +1269,17 @@
     "_name": "kuangti_tongyong01",
     "_objFlags": 0,
     "_parent": {
-      "__id__": 30
+      "__id__": 31
     },
     "_children": [],
     "_tag": -1,
     "_active": true,
     "_components": [
       {
-        "__id__": 32
+        "__id__": 33
       },
       {
-        "__id__": 33
+        "__id__": 34
       }
     ],
     "_prefab": null,
@@ -1308,7 +1324,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 31
+      "__id__": 32
     },
     "_enabled": true,
     "_spriteFrame": {
@@ -1336,7 +1352,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 31
+      "__id__": 32
     },
     "_enabled": true,
     "transition": 3,
@@ -1356,7 +1372,11 @@
     },
     "duration": 0.1,
     "zoomScale": 1.2,
-    "clickEvents": [],
+    "clickEvents": [
+      {
+        "__id__": 35
+      }
+    ],
     "_N$interactable": true,
     "_N$enableAutoGrayEffect": false,
     "_N$normalColor": {
@@ -1380,22 +1400,31 @@
     "hoverSprite": null,
     "_N$disabledSprite": null,
     "_N$target": {
-      "__id__": 30
+      "__id__": 31
     }
+  },
+  {
+    "__type__": "cc.ClickEvent",
+    "target": {
+      "__id__": 2
+    },
+    "component": "PanelStore",
+    "handler": "onClickBtn",
+    "customEventData": ""
   },
   {
     "__type__": "cc.Node",
     "_name": "tuboao_zuanshi",
     "_objFlags": 0,
     "_parent": {
-      "__id__": 30
+      "__id__": 31
     },
     "_children": [],
     "_tag": -1,
     "_active": true,
     "_components": [
       {
-        "__id__": 35
+        "__id__": 37
       }
     ],
     "_prefab": null,
@@ -1440,7 +1469,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 34
+      "__id__": 36
     },
     "_enabled": true,
     "_spriteFrame": {
@@ -1468,14 +1497,14 @@
     "_name": "ziti_goumai",
     "_objFlags": 0,
     "_parent": {
-      "__id__": 30
+      "__id__": 31
     },
     "_children": [],
     "_tag": -1,
     "_active": true,
     "_components": [
       {
-        "__id__": 37
+        "__id__": 39
       }
     ],
     "_prefab": null,
@@ -1520,7 +1549,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 36
+      "__id__": 38
     },
     "_enabled": true,
     "_spriteFrame": {
@@ -1548,14 +1577,14 @@
     "_name": "buy_Label",
     "_objFlags": 0,
     "_parent": {
-      "__id__": 30
+      "__id__": 31
     },
     "_children": [],
     "_tag": -1,
     "_active": true,
     "_components": [
       {
-        "__id__": 39
+        "__id__": 41
       }
     ],
     "_prefab": null,
@@ -1600,7 +1629,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 38
+      "__id__": 40
     },
     "_enabled": true,
     "_useOriginalSize": false,
@@ -1629,10 +1658,10 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 41
+        "__id__": 43
       },
       {
-        "__id__": 42
+        "__id__": 44
       }
     ],
     "_prefab": null,
@@ -1677,7 +1706,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 40
+      "__id__": 42
     },
     "_enabled": true,
     "_spriteFrame": {
@@ -1705,7 +1734,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 40
+      "__id__": 42
     },
     "_enabled": true,
     "transition": 3,
@@ -1725,7 +1754,11 @@
     },
     "duration": 0.1,
     "zoomScale": 1.2,
-    "clickEvents": [],
+    "clickEvents": [
+      {
+        "__id__": 45
+      }
+    ],
     "_N$interactable": true,
     "_N$enableAutoGrayEffect": false,
     "_N$normalColor": {
@@ -1749,8 +1782,17 @@
     "hoverSprite": null,
     "_N$disabledSprite": null,
     "_N$target": {
-      "__id__": 40
+      "__id__": 42
     }
+  },
+  {
+    "__type__": "cc.ClickEvent",
+    "target": {
+      "__id__": 2
+    },
+    "component": "PanelStore",
+    "handler": "onClickBtn",
+    "customEventData": ""
   },
   {
     "__type__": "cc.Canvas",
@@ -1767,5 +1809,23 @@
     },
     "_fitWidth": true,
     "_fitHeight": false
+  },
+  {
+    "__type__": "e7472+bpBVPPr6RSt7+GA1y",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 2
+    },
+    "_enabled": true,
+    "node_content": {
+      "__id__": 10
+    },
+    "lab_buy": {
+      "__id__": 40
+    },
+    "spr_goumai": {
+      "__id__": 38
+    }
   }
 ]

@@ -4,17 +4,23 @@ const {
 } = cc._decorator;
 @ccclass
 export default class Game extends cc.Component {
-    @property(cc.SpriteAtlas)
+    @property(cc.SpriteAtlas) //图集
     atlas_game = null;
 
-    @property(cc.SpriteFrame)
+    @property(cc.SpriteFrame) //溶解所需
     noiseTexture = null;
+
+    //游戏中的背景
+    @property(cc.SpriteFrame)
+    beijing01 = null;
+    @property(cc.SpriteFrame)
+    beijing02 = null;
 
     @property(cc.Prefab) //预置box
     pre_box = null;
 
-    @property(cc.Node) //主界面 提示界面
-    node_panel = null;
+    @property(cc.Node) //复活界面
+    node_relive = null;
     @property(cc.Node) //提示界面
     node_hint = null;
 
@@ -38,12 +44,12 @@ export default class Game extends cc.Component {
         // let DataMgr = require("DataMgr");
         // cc.dataMgr = new DataMgr();
 
-        cc.dataMgr = this.node.getComponent("DataMgr");
-        //读取本地储存的 玩家闯关的信息
-        cc.dataMgr.initData();
+        // cc.dataMgr = this.node.getComponent("DataMgr");
+        // //读取本地储存的 玩家闯关的信息
+        // cc.dataMgr.initData();
 
-        cc.audioMgr = this.node.getComponent("AudioMgr");
-        cc.audioMgr.init();
+        // cc.audioMgr = this.node.getComponent("AudioMgr");
+        // cc.audioMgr.init();
     }
 
     start() {
@@ -54,10 +60,7 @@ export default class Game extends cc.Component {
                 let touchPos = touch.getLocation();
                 if (cc.dataMgr.userData.pauseGame)
                     return true;
-                if (cc.dataMgr.userData.gameReady) {
-                    cc.dataMgr.userData.gameReady = false;
-                    self.initGame(false);
-                } else if (cc.dataMgr.userData.onGaming) {
+                if (cc.dataMgr.userData.onGaming) {
                     self.jumpRole(touchPos.x < 360);
                 } else if (self._isInitGame) {
                     self._isInitGame = false;
@@ -74,7 +77,7 @@ export default class Game extends cc.Component {
         //背景音乐
         cc.audioMgr.playBg();
 
-        this.showPanel("node_main");
+        this.initGame(false);
     }
 
     //这里是初始游戏,再点击就开始跳了(是否为复活)
@@ -85,6 +88,10 @@ export default class Game extends cc.Component {
             cc.dataMgr.userData.lastBoxX = cc.dataMgr.boxX;
             cc.dataMgr.userData.lastBoxY = -cc.dataMgr.boxY;
             cc.dataMgr.userData.countBox = 0;
+
+            cc.dataMgr.userData.gameBgIdx = 0;
+            cc.dataMgr.userData.boxName = "box1";
+
             cc.dataMgr.userData.aimRoleX = 0;
             cc.dataMgr.userData.aimRoleY = 0;
             cc.dataMgr.userData.roleDieType = 0;
@@ -101,7 +108,7 @@ export default class Game extends cc.Component {
             }
 
             //界面及角色 显示
-            this.hidePanel();
+            this.hideRelive();
             this.node_game.active = true;
             this.node_game.getChildByName("node_hint").active = true;
             this.node_role.active = true;
@@ -109,6 +116,9 @@ export default class Game extends cc.Component {
 
             this.node_ui.getChildByName("lab_score").active = true;
             this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = cc.dataMgr.userData.countJump;
+
+            //改变背景 和 boxName
+            this.changeToNextBg();
 
             //初始化
             for (let i = 0; i < 6; ++i)
@@ -160,7 +170,7 @@ export default class Game extends cc.Component {
             this.getAimPos_o(posBegin);
 
             //界面及角色 显示
-            this.hidePanel();
+            this.hideRelive();
             this.node_game.active = true;
             this.node_game.getChildByName("node_hint").active = true;
             this.node_role.active = true;
@@ -181,40 +191,24 @@ export default class Game extends cc.Component {
         }
     }
 
-    showPanel(nodeName) {
-        for (let i = 0; i < this.node_panel.children.length; ++i)
-            this.node_panel.children[i].active = false;
+    showRelive() {
+        this.node_relive.active = true;
+        this.node_relive.getComponent("PanelRelive").showRelive();
 
-        let nodePanel = this.node_panel.getChildByName(nodeName);
-        if (nodePanel) {
-            nodePanel.active = true;
-            if (nodeName == "node_main") {
-                cc.dataMgr.userData.gameReady = true;
-
-                this.node_game.active = false;
-
-                } else if (nodeName == "node_end") {
-                cc.dataMgr.userData.gameReady = true;
-                let lab_reBegin = nodePanel.getChildByName("lab_begin");
-                lab_reBegin.runAction(cc.repeatForever(cc.sequence(cc.scaleTo(0.4, 1.2), cc.scaleTo(0.6, 1))));
-
-                //得分显示
-                this.node_ui.getChildByName("lab_score").active = false;
-                nodePanel.getChildByName("lab_score").getComponent(cc.Label).string = ("得分:" + cc.dataMgr.userData.countJump); //propGreenNum;
-            } else if (nodeName == "node_relive") {
-                nodePanel.getComponent("PanelRelive").showRelive();
-            }
-        }
+        cc.dataMgr.saveData();
     }
 
-    hidePanel() {
-        for (let i = 0; i < this.node_panel.children.length; ++i)
-            this.node_panel.children[i].active = false;
+    hideRelive() {
+        this.node_relive.active = false;
     }
 
     //是否向左跳
     jumpRole(isLeft) {
         ++cc.dataMgr.userData.countJump;
+        //判断是否可以替换场景图片
+        if (cc.dataMgr.userData.countJump > 0 && cc.dataMgr.userData.countJump % cc.dataMgr.userData.changeNum == 0)
+            this.changeToNextBg();
+
         this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = cc.dataMgr.userData.countJump;
 
         let aimY = cc.dataMgr.boxY + cc.dataMgr.userData.aimRoleY;
@@ -227,7 +221,7 @@ export default class Game extends cc.Component {
         let data = this.getAimPos_o(cc.v2(aimX, aimY));
         aimY = data.aimPosY;
         //落到空 box 上才有声音
-        // if (data && data.boxType == "box")
+        // if (data && data.boxType == "box") 
         //     cc.audioMgr.playEffect("role_jump1");
         if (data.dieType > 0) {
             cc.dataMgr.userData.roleDieType = data.dieType;
@@ -276,6 +270,49 @@ export default class Game extends cc.Component {
         cc.dataMgr.userData.lastBoxY = posY;
     }
 
+    //改变一下游戏场景 背景及砖块样式
+    changeToNextBg() {
+        //console.log("--- 变色了 ---");
+        //判断确定 idx
+        let lastBgName = null;
+        if (cc.dataMgr.userData.countJump == 0)
+            cc.dataMgr.userData.gameBgIdx = 0;
+        else {
+            lastBgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
+
+            ++cc.dataMgr.userData.gameBgIdx;
+            if (cc.dataMgr.userData.gameBgIdx >= cc.dataMgr.boxName.length)
+                cc.dataMgr.userData.gameBgIdx = 0;
+        }
+        cc.dataMgr.userData.boxName = cc.dataMgr.boxName[cc.dataMgr.userData.gameBgIdx];
+
+        let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
+        let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
+        spr_bg.opacity = 0;
+        spr_bg.getComponent(cc.Sprite).spriteFrame = this[bgName];
+
+        console.log("--- " + bgName + " -- " + lastBgName);
+        if (lastBgName) {
+            let spr_bg2 = this.node.getChildByName("node_bg").getChildByName("spr_bg2");
+            spr_bg2.getComponent(cc.Sprite).spriteFrame = this[lastBgName];
+            spr_bg2.opacity = 255;
+            spr_bg2.runAction(cc.sequence(cc.callFunc(this.callShowBg, this), cc.fadeOut(0.8)));
+        } else
+            spr_bg.opacity = 255;
+
+        for (let i = 0; i < this.root_box.children.length; ++i) {
+            let nodeN = this.root_box.children[i];
+            if (nodeN)
+                nodeN.getComponent("NodeBox").setBoxFrame();
+        }
+    }
+
+    callShowBg() {
+        let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
+        spr_bg.opacity = 255;
+    }
+
+    //获取目标位置的砖块
     getAimPos_o(aimPos) {
         let data = {
             dieType: 1,
@@ -316,10 +353,11 @@ export default class Game extends cc.Component {
         cc.dataMgr.pauseGame = isPause;
     }
 
+    //获取精灵图片
     getGameFrame_sf(name) {
         let sf = this.atlas_game.getSpriteFrame(name);
         if (!sf)
-            sf = this.atlas_game.getSpriteFrame("box");
+            sf = this.atlas_game.getSpriteFrame("box1");
         return sf;
     }
 
@@ -327,18 +365,7 @@ export default class Game extends cc.Component {
         if (event.target) {
             cc.audioMgr.playEffect("btn_click");
             let btnN = event.target.name;
-            if (btnN == "btn_home") {
-                this.showPanel("node_main");
-            } else if (btnN == "btn_store") {
-                console.log("--- btn_store ---");
-                //溶解试验
-                // let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg");
-                // if(spr_bg){
-                //     let sprJs = spr_bg.getComponent("EDissolve");
-                //     if(sprJs)
-                //     sprJs.useDissolve();
-                // }
-            }
+            if (btnN == "") {}
         }
     }
 

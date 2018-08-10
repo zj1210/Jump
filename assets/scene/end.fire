@@ -78,7 +78,10 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 23
+        "__id__": 24
+      },
+      {
+        "__id__": 25
       }
     ],
     "_prefab": null,
@@ -182,7 +185,7 @@
     },
     "_enabled": true,
     "_spriteFrame": {
-      "__uuid__": "5229be22-0dc7-4660-939c-d3c140382138"
+      "__uuid__": "301bcfd4-8b13-4d74-af68-4630a3aef8f1"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -905,7 +908,11 @@
     },
     "duration": 0.1,
     "zoomScale": 1.2,
-    "clickEvents": [],
+    "clickEvents": [
+      {
+        "__id__": 23
+      }
+    ],
     "_N$interactable": true,
     "_N$enableAutoGrayEffect": false,
     "_N$normalColor": {
@@ -933,6 +940,15 @@
     }
   },
   {
+    "__type__": "cc.ClickEvent",
+    "target": {
+      "__id__": 2
+    },
+    "component": "PanelEnd",
+    "handler": "onClickBtn",
+    "customEventData": ""
+  },
+  {
     "__type__": "cc.Canvas",
     "_name": "",
     "_objFlags": 0,
@@ -947,5 +963,14 @@
     },
     "_fitWidth": true,
     "_fitHeight": false
+  },
+  {
+    "__type__": "4deedi3aSNFd49dJ6qGstvj",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 2
+    },
+    "_enabled": true
   }
 ]

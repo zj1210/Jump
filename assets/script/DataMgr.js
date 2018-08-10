@@ -9,7 +9,6 @@ export default class DataMgr extends cc.Component {
 
     userData = {
         pauseGame: false, //暂停游戏
-        gameReady: true, //游戏准备完成(在主界面 和 结束界面时为true)
         onGaming: false, //游戏正在进行中(砖块 下落 和 场景移动))
 
         //移动相机相关变量(相机的目标位置即是角色的目标位置 aimRoleX aimRoleY)
@@ -18,9 +17,17 @@ export default class DataMgr extends cc.Component {
 
         dropPosY: 200, //当方块位置 小于摄像机位置这么多时消失
 
+        //用户相关需要储存的数据
+        bestScore: 0,
+
+        //游戏 game 中需要的数据
         lastBoxX: this.boxX, //最近生成的个 方块的X Y
         lastBoxY: -this.boxY, //确保第一个在 (0,0);
         countBox: 0, //盒子计数
+
+        changeNum: 40, //跳多少次变一下场景
+        gameBgIdx: 0, //游戏中背景和箱子的图片下标
+        boxName: "box1", //当前所出箱子的图片名称
 
         aimRoleX: 0, //角色的目标位置
         aimRoleY: 0,
@@ -31,7 +38,62 @@ export default class DataMgr extends cc.Component {
         propGreenNum: 0, //获得道具个数
     }
 
-    initData() {
+    //场景资源的图片 名称
+    gameBgName = ["beijing01", "beijing02"];
 
+    //砖块的图片 名称(顺序和出场顺序是一致的)
+    boxName = ["box1", "box2"];
+
+    playerData = [{
+            name: "plaeyr1",
+            price: 100
+        },
+        {
+            name: "plaeyr2",
+            price: 200
+        },
+        {
+            name: "plaeyr3",
+            price: 300
+        },
+        {
+            name: "plaeyr4",
+            price: 400
+        },
+        {
+            name: "plaeyr5",
+            price: 500
+        }
+    ];
+
+    initData() {
+        console.log("--- initData ---");
+        let score = cc.sys.localStorage.getItem("bestScore");
+        if (!score)
+            cc.sys.localStorage.setItem("bestScore", 0);
+        else
+            this.userData.bestScore = score;
+
+        let propNum = cc.sys.localStorage.getItem("propGreenNum");
+        if (!propNum)
+            cc.sys.localStorage.setItem("propGreenNum", 0);
+        else
+            this.userData.propGreenNum = parseInt(propNum);
+
+        console.log(this.userData);
+    }
+
+    //重大改变之前 如扣钱口金币等 要保存数据 
+    saveData() {
+        cc.sys.localStorage.setItem("propGreenNum", this.userData.propGreenNum);
+    }
+
+    //比较储存历史最高纪录
+    getBestScore_i(nowScore) {
+        if (nowScore > parseInt(this.userData.bestScore)) {
+            this.userData.bestScore = nowScore;
+            cc.sys.localStorage.setItem("bestScore", nowScore);
+        }
+        return this.userData.bestScore;
     }
 }
