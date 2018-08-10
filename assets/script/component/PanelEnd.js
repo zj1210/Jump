@@ -12,17 +12,6 @@ export default class PanelEnd extends cc.Component {
     }
 
     start() {
-        let self = this;
-        cc.eventManager.addListener({
-            event: cc.EventListener.TOUCH_ONE_BY_ONE,
-            onTouchBegan: function (touch, event) {
-                cc.director.loadScene("game");
-                return true;
-            },
-            onTouchMoved: function (touch, event) {},
-            onTouchEnded: function (touch, event) {}
-        }, self.node);
-
         this.initEnd();
     }
 
@@ -38,6 +27,8 @@ export default class PanelEnd extends cc.Component {
             let btnN = event.target.name;
             if (btnN == "anniu_zhuyie") {
                 cc.director.loadScene("start");
+            } else if (btnN == "kuangti_tongyong01") {
+                cc.director.loadScene("game");
             }
         }
     }
