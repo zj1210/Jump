@@ -4,6 +4,14 @@ const {
 } = cc._decorator;
 @ccclass
 export default class NodeRole extends cc.Component {
+    @property(cc.Prefab)
+    pre_particle = null;
+
+    @property(cc.Node)
+    spr_role = null;
+    @property(cc.Node)
+    node_particle = null;
+
     _isAlive = true;
 
     onLoad() {
@@ -12,12 +20,20 @@ export default class NodeRole extends cc.Component {
 
     initRole(posBegin) {
         this._isAlive = true;
-        this.node.setLocalZOrder(0);
+        this.node.setLocalZOrder(1);
         this.node.stopAllActions();
         if (!posBegin)
             posBegin = cc.v2(0, 0);
         this.node.setPosition(posBegin);
         this.node.runAction(cc.fadeIn(0.1));
+
+        this.spr_role.active = true;
+        for (let i = 0; i < this.node_particle.children.length; ++i) {
+            let nodeN = this.node_particle.children[i];
+            if (cc.isValid(nodeN))
+                nodeN.destroy();
+        }
+        this.node_particle.removeAllChildren(true);
     }
 
     toDie() {
@@ -46,15 +62,17 @@ export default class NodeRole extends cc.Component {
             } else {
                 this.callEnd();
                 cc.audioMgr.playEffect("prop_block");
+                let parN = cc.instantiate(this.pre_particle);
+                this.node_particle.addChild(parN);
             }
         }
     }
 
     callEnd() {
-        this.node.active = false;
+        this.spr_role.active = false;
         let gameJs = cc.find("Canvas").getComponent("Game");
         if (gameJs) {
-            gameJs.showPanel("node_relive");
+            gameJs.showRelive();
         }
     }
 }
