@@ -97,6 +97,8 @@ export default class Game extends cc.Component {
             cc.dataMgr.userData.roleDieType = 0;
             cc.dataMgr.userData.countJump = 0;
 
+            cc.dataMgr.userData.reliveTimes = 0;
+
             //保证角色在中心点下两个 方块高度
             this.node_camera.position = cc.v2(0, 2 * cc.dataMgr.boxY);
 
@@ -129,16 +131,8 @@ export default class Game extends cc.Component {
         } else {
             //这里是复活(有些数据不需要初始化)
             cc.dataMgr.userData.onGaming = false;
-            //cc.dataMgr.userData.lastBoxX = cc.dataMgr.boxX;
-            //cc.dataMgr.userData.lastBoxY = -cc.dataMgr.boxY;
-            //cc.dataMgr.userData.countBox = 0;
-            //cc.dataMgr.userData.aimRoleX = 0;
-            //cc.dataMgr.userData.aimRoleY = 0;
             cc.dataMgr.userData.roleDieType = 0;
-            //cc.dataMgr.userData.countJump = 0;
-
-            //保证角色在中心点下两个 方块高度
-            //this.node_camera.position = cc.v2(0, 2 * cc.dataMgr.boxY);
+            ++cc.dataMgr.userData.reliveTimes;
 
             console.log("--- initGame relive ---");
             console.log(cc.dataMgr.userData);
@@ -194,7 +188,6 @@ export default class Game extends cc.Component {
     showRelive() {
         this.node_relive.active = true;
         this.node_relive.getComponent("PanelRelive").showRelive();
-
         cc.dataMgr.saveData();
     }
 

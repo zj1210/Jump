@@ -29,35 +29,34 @@ export default class AudioMgr extends cc.Component {
             cc.audioEngine.resumeAll();
         });
 
-
         let self = this;
-        cc.loader.loadRes("sound/bg.mp3", cc.AudioClip, function (err, clip) {
+        cc.loader.loadRes("sound/bg", cc.AudioClip, function (err, clip) {
             if (!err) {
                 self._audioSource_o.bg = clip;
                 self.playBg();
             }
         });
-        cc.loader.loadRes("sound/btn_click.mp3", cc.AudioClip, function (err, clip) {
+        cc.loader.loadRes("sound/btn_click", cc.AudioClip, function (err, clip) {
             if (!err)
                 self._audioSource_o.btn_click = clip;
         });
-        cc.loader.loadRes("sound/prop_block.mp3", cc.AudioClip, function (err, clip) {
+        cc.loader.loadRes("sound/prop_block", cc.AudioClip, function (err, clip) {
             if (!err)
                 self._audioSource_o.prop_block = clip;
         });
-        cc.loader.loadRes("sound/prop_empy.mp3", cc.AudioClip, function (err, clip) {
+        cc.loader.loadRes("sound/prop_empy", cc.AudioClip, function (err, clip) {
             if (!err)
                 self._audioSource_o.prop_empy = clip;
         });
-        cc.loader.loadRes("sound/prop_score.mp3", cc.AudioClip, function (err, clip) {
+        cc.loader.loadRes("sound/prop_score", cc.AudioClip, function (err, clip) {
             if (!err)
                 self._audioSource_o.prop_score = clip;
         });
-        cc.loader.loadRes("sound/role_jump1.mp3", cc.AudioClip, function (err, clip) {
+        cc.loader.loadRes("sound/role_jump1", cc.AudioClip, function (err, clip) {
             if (!err)
                 self._audioSource_o.role_jump1 = clip;
         });
-        cc.loader.loadRes("sound/role_jump1.mp3", cc.AudioClip, function (err, clip) {
+        cc.loader.loadRes("sound/role_jump1", cc.AudioClip, function (err, clip) {
             if (!err)
                 self._audioSource_o.role_jump1 = clip;
         });
