@@ -12,15 +12,20 @@ export default class DataMgr extends cc.Component {
         onGaming: false, //游戏正在进行中(砖块 下落 和 场景移动))
 
         //移动相机相关变量(相机的目标位置即是角色的目标位置 aimRoleX aimRoleY)
+        baseSpeedY: 160, //相机移动的基础度
         cameraSpeedX: 50, //相机的移动的基础速度
-        cameraSpeedY: 160, //相机的移动的基础速度
+        cameraSpeedY: 160, //相机的移动的Y速度
 
         dropPosY: 200, //当方块位置 小于摄像机位置这么多时消失
 
         //用户相关需要储存的数据
         bestScore: 0, //最高纪录
         reliveNum: 0, //复活币数目
-        propGreenNum: 0, //获得道具个数
+        propGreenNum: 0, //获得游戏币道具个数
+        propSpeedNum: 6, //加速道具的个数
+        propCutNum: 6, //减速道具的个数
+        useFootIdx: 1, //当前使用的脚印下标 默认:prop_foot1
+        useRoleIdx: 1, //当前使用的角色下标  默认:role_right1
 
         //游戏 game 中需要的数据
         lastBoxX: this.boxX, //最近生成的个 方块的X Y
@@ -29,11 +34,14 @@ export default class DataMgr extends cc.Component {
 
         changeNum: 40, //跳多少次变一下场景
         gameBgIdx: 0, //游戏中背景和箱子的图片下标
-        boxName: "box1", //当前所出箱子的图片名称
+        boxName: "zz01", //当前所出箱子的图片名称
+
+        speedNum: 0, //当前加速的的数量
+        nextSpeedPos: (parseInt(Math.random() * 40) + 15), //下一次一次出现 Speed 的位置
 
         aimRoleX: 0, //角色的目标位置
         aimRoleY: 0,
-        jumpTime: 0.1, //角色跳动的时间(相机的移动要在这个时间内完成)
+        jumpTime: 0.12, //角色跳动的时间(相机的移动要在这个时间内完成)
         roleDieType: 0, //1 跳空结束、2碰撞钉子结束、3 box下坠结束
         countJump: 0, //统计跳跃次数
 
@@ -41,10 +49,10 @@ export default class DataMgr extends cc.Component {
     }
 
     //场景资源的图片 名称
-    gameBgName = ["beijing01", "beijing02"];
+    gameBgName = ["cj01", "cj02", "cj03", "cj04", "cj05"];
 
     //砖块的图片 名称(顺序和出场顺序是一致的)
-    boxName = ["box1", "box2"];
+    boxName = ["zz01", "zz02", "zz03", "zz04", "zz05"];
 
     playerData = [{
             name: "plaeyr1",

@@ -87,7 +87,6 @@ export default class AudioMgr extends cc.Component {
 
     playBg() {
         let source = this._audioSource_o["bg"];
-        console.log("-- playBg: " + source);
         if (source) {
             cc.audioEngine.playMusic(source, true);
             cc.audioEngine.setMusicVolume(0.64);

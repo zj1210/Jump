@@ -11,9 +11,10 @@ export default class NodeBox extends cc.Component {
     @property(cc.Node) //道具
     spr_prop = null;
 
-    _greenY = -4; //绿色菱型偏移量
-    _block1Y = -23; //钉子偏移量
-    _block2Y = -10; //钉子偏移量
+    _footY = -4; //脚印的偏移量
+    _propY = -20; //障碍物、道具 的偏移量
+
+    _blockMaxNum = 5; //障碍物当前的最大个数
 
     _isAlive = true;
     _boxType = null; //有三个值:box、prop(道具)、"block"
@@ -41,16 +42,16 @@ export default class NodeBox extends cc.Component {
                 this.spr_block.active = false;
                 this.spr_prop.active = true;
 
-                this.spr_prop.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf("prop_green");
-                this.spr_prop.y = this._greenY;
+                this.spr_prop.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf("daoju_zuanshi");
+                this.spr_prop.y = this._propY;
             } else if (this._boxType == "block") {
                 this.spr_block.active = true;
                 this.spr_prop.active = true;
 
-                let randNum = Math.random();
-                let blockName = (randNum > 0.5 ? "prop_block1" : "prop_block2")
+                let randNum = parseInt(Math.random() * this._blockMaxNum) + 1;
+                let blockName = "zhangai0" + randNum;
                 this.spr_prop.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(blockName);
-                this.spr_prop.y = (randNum > 0.5 ? this._block1Y : this._block2Y);
+                this.spr_prop.y = this._propY;
 
                 this.spr_block.setPosition(cc.v2((isLeft ? -1 : 1) * cc.dataMgr.boxX, cc.dataMgr.boxY));
                 this.spr_block.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(cc.dataMgr.userData.boxName);
@@ -62,6 +63,19 @@ export default class NodeBox extends cc.Component {
                 this.spr_prop.active = false;
             }
             this.spr_box.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(cc.dataMgr.userData.boxName);
+
+            //触发 生成加速道具
+            if (countBox == cc.dataMgr.userData.nextSpeedPos) {
+                cc.dataMgr.userData.nextSpeedPos += (parseInt(Math.random() * cc.dataMgr.userData.changeNum) + 10);
+                if (this._boxType == "box") {
+                    this._boxType = "speed";
+                    this.spr_prop.active = true;
+                    this.spr_prop.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf("daoju_speed");
+                    this.spr_prop.y = this._propY;
+                }
+            } else if (countBox - cc.dataMgr.userData.nextSpeedPos > cc.dataMgr.userData.changeNum) {
+                cc.dataMgr.userData.nextSpeedPos = countBox + 12;
+            }
         }
     }
 
@@ -74,11 +88,28 @@ export default class NodeBox extends cc.Component {
         }
     }
 
-    //角色碰到 道具
-    touchProp() {
-        this.spr_prop.runAction(cc.sequence(cc.delayTime(0.1), cc.hide()));
+    //角色向左边跳的
+    leaveBox(isLeft) {
+        if (cc.dataMgr.userData.useFootIdx > 0 && this._boxType != "block") {
+            this.spr_prop.active = true;
+            this.spr_prop.scaleX = (isLeft ? -1 : 1);
+            let gameJs = cc.find("Canvas").getComponent("Game");
+            if (gameJs)
+                this.spr_prop.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf("jiaoyin0" + cc.dataMgr.userData.useFootIdx);
+            this.spr_prop.y = this._footY;
+        }
+    }
 
-        cc.audioMgr.playEffect("prop_score");
+    //角色碰到 砖块了
+    touchBox() {
+        if (this._boxType == "prop") {
+            ++cc.dataMgr.userData.propGreenNum;
+            cc.audioMgr.playEffect("prop_score");
+            this.spr_prop.active = false;
+        } else if (this._boxType == "speed") {
+            cc.dataMgr.userData.speedNum = parseInt(Math.random() * 10 + 10);
+            this.spr_prop.active = false;
+        }
     }
 
     toDie() {
