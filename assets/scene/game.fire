@@ -3,7 +3,7 @@
     "__type__": "cc.SceneAsset",
     "_name": "",
     "_objFlags": 0,
-    "_native": "",
+    "_rawFiles": null,
     "scene": {
       "__id__": 1
     }
@@ -262,7 +262,7 @@
       "__id__": 4
     },
     "_enabled": true,
-    "alignMode": 0,
+    "isAlignOnce": true,
     "_target": {
       "__id__": 2
     },
@@ -371,7 +371,7 @@
       "__id__": 7
     },
     "_enabled": true,
-    "alignMode": 0,
+    "isAlignOnce": true,
     "_target": {
       "__id__": 2
     },
@@ -411,7 +411,7 @@
     ],
     "_prefab": null,
     "_id": "99RukDFSdMp7l8rZFPI9UF",
-    "_opacity": 0,
+    "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
       "r": 255,
@@ -436,8 +436,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": -360,
-      "y": 640
+      "x": 370,
+      "y": 340
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -455,7 +455,6 @@
     },
     "_enabled": true,
     "_custom": true,
-    "_file": null,
     "_texture": {
       "__uuid__": "733bd5b4-0d9f-492b-a074-039c0a860487"
     },
@@ -463,11 +462,11 @@
     "_dstBlendFactor": 771,
     "playOnLoad": true,
     "_autoRemoveOnFinish": true,
-    "_totalParticles": 40,
+    "_totalParticles": 50,
     "_duration": -1,
-    "_emissionRate": 20,
+    "_emissionRate": 25,
     "_life": 1,
-    "_lifeVar": 8,
+    "_lifeVar": 10,
     "_startColor": {
       "__type__": "cc.Color",
       "r": 255,
@@ -477,31 +476,31 @@
     },
     "_startColorVar": {
       "__type__": "cc.Color",
-      "r": 61,
-      "g": 180,
+      "r": 0,
+      "g": 0,
       "b": 0,
-      "a": 180
+      "a": 120
     },
     "_endColor": {
       "__type__": "cc.Color",
-      "r": 247,
-      "g": 247,
-      "b": 120,
-      "a": 0
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
     },
     "_endColorVar": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 204,
+      "r": 0,
+      "g": 0,
       "b": 0,
-      "a": 0
+      "a": 142
     },
-    "_angle": -45,
-    "_angleVar": 45,
-    "_startSize": 10,
-    "_startSizeVar": 10,
-    "_endSize": 5,
-    "_endSizeVar": 20,
+    "_angle": 225,
+    "_angleVar": 0,
+    "_startSize": 6,
+    "_startSizeVar": 3,
+    "_endSize": 3,
+    "_endSizeVar": 1,
     "_startSpin": 0,
     "_startSpinVar": 0,
     "_endSpin": 0,
@@ -514,18 +513,18 @@
     "_posVar": {
       "__type__": "cc.Vec2",
       "x": 30,
-      "y": 10
+      "y": 700
     },
     "_positionType": 0,
     "_emitterMode": 0,
     "_gravity": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": -100
+      "y": 0
     },
     "_speed": 120,
     "_speedVar": 50,
-    "_tangentialAccel": 50,
+    "_tangentialAccel": 0,
     "_tangentialAccelVar": 0,
     "_radialAccel": 0,
     "_radialAccelVar": 0,
@@ -546,14 +545,14 @@
       "__id__": 10
     },
     "_enabled": true,
-    "alignMode": 0,
+    "isAlignOnce": true,
     "_target": {
       "__id__": 2
     },
-    "_alignFlags": 9,
-    "_left": 0,
-    "_right": 0,
-    "_top": 0,
+    "_alignFlags": 33,
+    "_left": 722,
+    "_right": -10,
+    "_top": 300,
     "_bottom": 0,
     "_verticalCenter": 0,
     "_horizontalCenter": 0,
