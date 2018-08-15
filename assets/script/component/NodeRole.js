@@ -19,6 +19,8 @@ export default class NodeRole extends cc.Component {
     }
 
     initRole(posBegin) {
+        console.log("--- initRole ---" + this.node_particle.children.length);
+
         this._isAlive = true;
         this.node.setLocalZOrder(1);
         this.node.stopAllActions();
@@ -28,12 +30,21 @@ export default class NodeRole extends cc.Component {
         this.node.runAction(cc.fadeIn(0.1));
 
         this.spr_role.active = true;
-        for (let i = 0; i < this.node_particle.children.length; ++i) {
-            let nodeN = this.node_particle.children[i];
-            if (cc.isValid(nodeN))
-                nodeN.destroy();
-        }
-        this.node_particle.removeAllChildren(true);
+        // for (let i = 0; i < this.node_particle.children.length; ++i) {
+        //     let nodeN = this.node_particle.children[i];
+        //     if (cc.isValid(nodeN))
+        //         nodeN.destroy();
+        // }
+        // this.node_particle.removeAllChildren(true);
+        this.node_particle.active = false;
+    }
+
+    blinkRole() {
+        this.spr_role.runAction(cc.sequence(cc.blink(1.2, 3), cc.callFunc(this.callBlinkEnd, this)));
+    }
+
+    callBlinkEnd() {
+        this.spr_role.opacity = 255;
     }
 
     toDie() {
@@ -62,6 +73,7 @@ export default class NodeRole extends cc.Component {
             } else {
                 this.callEnd();
                 cc.audioMgr.playEffect("prop_block");
+                this.node_particle.active = true;
                 let parN = cc.instantiate(this.pre_particle);
                 this.node_particle.addChild(parN);
             }

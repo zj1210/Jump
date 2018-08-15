@@ -3,10 +3,12 @@
     "__type__": "cc.Prefab",
     "_name": "",
     "_objFlags": 0,
-    "_rawFiles": null,
+    "_native": "",
     "data": {
       "__id__": 1
-    }
+    },
+    "optimizationPolicy": 0,
+    "asyncLoadAssets": false
   },
   {
     "__type__": "cc.Node",
@@ -69,6 +71,7 @@
     },
     "_enabled": true,
     "_custom": true,
+    "_file": null,
     "_texture": {
       "__uuid__": "733bd5b4-0d9f-492b-a074-039c0a860487"
     },
@@ -77,7 +80,7 @@
     "playOnLoad": true,
     "_autoRemoveOnFinish": true,
     "_totalParticles": 150,
-    "_duration": -1,
+    "_duration": 3,
     "_emissionRate": 18,
     "_life": 1,
     "_lifeVar": 0,
@@ -157,7 +160,7 @@
       "__id__": 1
     },
     "asset": {
-      "__id__": 0
+      "__uuid__": "28b97ae3-2307-4b9a-b973-05f8763e8eb0"
     },
     "fileId": "7a8U62q4xIVrDj2DIfmKH+",
     "sync": false

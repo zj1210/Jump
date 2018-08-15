@@ -14,9 +14,7 @@ export default class PanelEnd extends cc.Component {
     }
 
     initEnd() {
-        this.node.getChildByName("now_Label").getComponent(cc.Label).string = cc.dataMgr.userData.countJump;
-        this.node.getChildByName("best").getChildByName("best_Label").getComponent(cc.Label).string = cc.dataMgr.getBestScore_i(cc.dataMgr.userData.countJump);
-        this.node.getChildByName("prop").getChildByName("prop_Label").getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
+        //this.node.getChildByName("best").getChildByName("best_Label").getComponent(cc.Label).string = cc.dataMgr.getBestScore_i(cc.dataMgr.userData.countJump);
 
         //背景颜色
         let frame = cc.dataMgr.getBgFrame_sf(null);
@@ -30,11 +28,10 @@ export default class PanelEnd extends cc.Component {
         if (event.target) {
             cc.audioMgr.playEffect("btn_click");
             let btnN = event.target.name;
-            if (btnN == "anniu_zhuyie") {
-                cc.director.loadScene("start");
-            } else if (btnN == "kuangti_tongyong01") {
-                cc.director.loadScene("game");
+            if (btnN == "anniu_weixin") {
+                this.shareFriend();
             }
         }
     }
+
 }

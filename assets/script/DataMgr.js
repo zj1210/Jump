@@ -27,10 +27,17 @@ export default class DataMgr extends cc.Component {
         useFootIdx: 1, //当前使用的脚印下标 默认:prop_foot1
         useRoleIdx: 1, //当前使用的角色下标  默认:role_right1
 
+        addHpMax: 5, //可添加的生命值 最大值
+        //addHpNow:5,//可添加的生命值 (翻倍也是翻这个数) 用 reliveNum 代替了。。
+
         //游戏 game 中需要的数据
         lastBoxX: this.boxX, //最近生成的个 方块的X Y
         lastBoxY: -this.boxY, //确保第一个在 (0,0);
         countBox: 0, //盒子计数
+
+        baseHp: 5, //基础生命值
+        reliveHp: 0, //这一局游戏的命数
+        shareDouble: 0, //分享获得的翻倍次数
 
         changeNum: 40, //跳多少次变一下场景
         gameBgIdx: 0, //游戏中背景和箱子的图片下标
@@ -92,6 +99,12 @@ export default class DataMgr extends cc.Component {
         else
             this.userData.propGreenNum = parseInt(propNum);
 
+        let addHpMax = cc.sys.localStorage.getItem("addHpMax");
+        if (!addHpMax)
+            cc.sys.localStorage.setItem("addHpMax", 5);
+        else
+            this.userData.addHpMax = parseInt(addHpMax);
+
         let reliveNum = cc.sys.localStorage.getItem("reliveNum");
         if (!reliveNum)
             cc.sys.localStorage.setItem("reliveNum", 0);
@@ -101,22 +114,24 @@ export default class DataMgr extends cc.Component {
         let reliveTime = cc.sys.localStorage.getItem("reliveTime")
         if (!reliveTime) {
             cc.sys.localStorage.setItem("reliveTime", parseInt(Date.now() / 1000));
-            cc.sys.localStorage.setItem("reliveNum", 15);
-            this.userData.reliveNum = 15;
+            cc.sys.localStorage.setItem("reliveNum", this.userData.addHpMax);
+            this.userData.reliveNum = this.userData.addHpMax;
         } else {
             reliveTime = parseInt(reliveTime);
             let timeNow = parseInt(Date.now() / 1000);
             let num = parseInt((timeNow - reliveTime) / 1800);
             if (num > 0) {
-                if (num > 15) {
-                    num = 15;
+                if (num + this.userData.reliveNum > this.userData.addHpMax) {
+                    this.userData.reliveNum = this.userData.addHpMax;
                     cc.sys.localStorage.setItem("reliveTime", parseInt(Date.now() / 1000));
                 } else {
+                    this.userData.reliveNum += (num);
                     cc.sys.localStorage.setItem("reliveTime", reliveTime + num * 1800);
                 }
-                this.userData.reliveNum += (num + 20);
+                cc.sys.localStorage.setItem("reliveNum", this.userData.reliveNum);
             }
         }
+
         console.log(this.userData);
 
         //加载图片资源
@@ -147,6 +162,7 @@ export default class DataMgr extends cc.Component {
     //重大改变之前 如扣钱口金币等 要保存数据 
     saveData() {
         cc.sys.localStorage.setItem("propGreenNum", this.userData.propGreenNum);
+        cc.sys.localStorage.setItem("addHpMax", this.userData.addHpMax);
         cc.sys.localStorage.setItem("reliveNum", this.userData.reliveNum);
     }
 
@@ -225,5 +241,11 @@ export default class DataMgr extends cc.Component {
                 });
             }
         }
+    }
+
+    //这是分享成功给玩家的奖励 回满reliveNum 和 下局双倍
+    shareSuccess(){
+        this.userData.reliveNum = this.userData.addHpMax;
+        this.userData.shareDouble = 2;
     }
 }

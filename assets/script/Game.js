@@ -22,6 +22,8 @@ export default class Game extends cc.Component {
     root_box = null;
     @property(cc.Node) //角色
     node_role = null;
+    @property(cc.Node) //拖尾效果实验
+    node_streak = null;
     @property(cc.Node)
     node_ui = null;
     @property(cc.Node) //相机
@@ -98,6 +100,17 @@ export default class Game extends cc.Component {
 
             cc.dataMgr.userData.reliveTimes = 0;
 
+            if (cc.dataMgr.userData.shareDouble > 0) {
+                cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.reliveNum * 2 + cc.dataMgr.userData.baseHp;
+                cc.dataMgr.userData.shareDouble--;
+            } else
+                cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.baseHp + cc.dataMgr.userData.reliveNum;
+            cc.dataMgr.userData.reliveNum = 0;
+
+            //暂时加的 设置上限为 30
+            if (cc.dataMgr.userData.reliveHp > 30)
+                cc.dataMgr.userData.reliveHp = 30;
+
             //保证角色在中心点下两个 方块高度
             this.node_camera.position = cc.v2(0, 2 * cc.dataMgr.boxY);
 
@@ -117,6 +130,7 @@ export default class Game extends cc.Component {
 
             this.node_ui.getChildByName("lab_score").active = true;
             this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = ("得分：" + cc.dataMgr.userData.countJump);
+            this.node_ui.getChildByName("lab_hp").getComponent(cc.Label).string = cc.dataMgr.userData.reliveHp;
 
             //改变背景 和 boxName
             this.changeToNextBg();
@@ -176,9 +190,11 @@ export default class Game extends cc.Component {
             this.node_game.getChildByName("node_hint").active = true;
             this.node_role.active = true;
             this.node_role.getComponent("NodeRole").initRole(posBegin);
+            this.node_role.getComponent("NodeRole").blinkRole();
 
             this.node_ui.getChildByName("lab_score").active = true;
             this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = ("得分：" + cc.dataMgr.userData.countJump);
+            this.node_ui.getChildByName("lab_hp").getComponent(cc.Label).string = cc.dataMgr.userData.reliveHp;
 
             //补充台阶数
             let supr = parseInt((cc.dataMgr.userData.lastBoxY - posBegin.y) / cc.dataMgr.boxY);
@@ -190,6 +206,7 @@ export default class Game extends cc.Component {
             //标识初始化完成 再点击屏幕可以开始跳跃了
             this._isInitGame = true;
         }
+        cc.dataMgr.saveData();
     }
 
     //开局加速
@@ -202,11 +219,18 @@ export default class Game extends cc.Component {
     }
 
     showRelive() {
-        this.subPostMessage("submit");
+        // this.subPostMessage("submit");
 
-        this.node_relive.active = true;
-        this.node_relive.getComponent("PanelRelive").showRelive();
-        cc.dataMgr.saveData();
+        // this.node_relive.active = true;
+        // this.node_relive.getComponent("PanelRelive").showRelive();
+        // cc.dataMgr.saveData();
+        if (cc.dataMgr.userData.reliveHp > 0) {
+            cc.dataMgr.userData.reliveHp--;
+            this.initGame(true);
+        } else {
+            //直接结束游戏
+            cc.director.loadScene("end");
+        }
     }
 
     hideRelive() {
@@ -262,7 +286,8 @@ export default class Game extends cc.Component {
         if (cc.dataMgr.userData.speedNum > 0)
             --cc.dataMgr.userData.speedNum;
 
-        if (cc.dataMgr.userData.countJump % 5 == 0)
+        //不是在加速状态 且跳过了五个台阶提交子域超过好友
+        if (cc.dataMgr.userData.countJump % 5 == 0 && cc.dataMgr.userData.speedNum <= 0)
             this.subPostMessage("nextBeyond");
     }
 
@@ -474,6 +499,7 @@ export default class Game extends cc.Component {
                     nodeN.getComponent("NodeBox").toDie();
                 }
             }
+            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 80);
         }
     }
 

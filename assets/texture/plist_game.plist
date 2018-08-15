@@ -69,6 +69,19 @@
                 <key>sourceSize</key>
                 <string>{88,127}</string>
             </dict>
+            <key>spr_hp.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{78,923},{64,56}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{64,56}}</string>
+                <key>sourceSize</key>
+                <string>{64,56}</string>
+            </dict>
             <key>zhangai01.png</key>
             <dict>
                 <key>frame</key>
@@ -209,7 +222,7 @@
             <key>size</key>
             <string>{512,1024}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:8dc1acd7fce32f0a9babb16395592337$</string>
+            <string>$TexturePacker:SmartUpdate:ba41913d66a00d7e3ae3bfaf563b7be8$</string>
             <key>textureFileName</key>
             <string>plist_game.png</string>
         </dict>

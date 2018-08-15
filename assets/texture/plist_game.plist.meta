@@ -118,6 +118,28 @@
       "spriteType": "normal",
       "subMetas": {}
     },
+    "spr_hp.png": {
+      "ver": "1.0.3",
+      "uuid": "001a4faa-a3ce-48c0-a988-13174d4ab4a8",
+      "rawTextureUuid": "60385e96-7a2e-4d97-8bcf-9a7e2a6eadee",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": true,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 78,
+      "trimY": 923,
+      "width": 64,
+      "height": 56,
+      "rawWidth": 64,
+      "rawHeight": 56,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "spriteType": "normal",
+      "subMetas": {}
+    },
     "zhangai01.png": {
       "ver": "1.0.3",
       "uuid": "c290062b-8f11-4ad7-904e-c6061ad8ab92",
