@@ -10,18 +10,6 @@ export default class Game extends cc.Component {
     @property(cc.SpriteFrame) //溶解所需
     noiseTexture = null;
 
-    //游戏中的背景
-    @property(cc.SpriteFrame)
-    cj01 = null;
-    @property(cc.SpriteFrame)
-    cj02 = null;
-    @property(cc.SpriteFrame)
-    cj03 = null;
-    @property(cc.SpriteFrame)
-    cj04 = null;
-    @property(cc.SpriteFrame)
-    cj05 = null;
-
     @property(cc.Prefab) //预置box
     pre_box = null;
 
@@ -38,6 +26,9 @@ export default class Game extends cc.Component {
     node_ui = null;
     @property(cc.Node) //相机
     node_camera = null;
+
+    @property(cc.Node) //微信子域显示下一个好友
+    subCanvas = null;
 
     _isInitGame = false; //游戏是否初始化完成(完成后点击就开始跳了)
 
@@ -84,7 +75,8 @@ export default class Game extends cc.Component {
 
         this.initGame(false);
 
-        //this.node.runAction(cc.sequence(cc.delayTime(4.5), cc.callFunc(this.callShowWind, this)));
+        //微信子域
+        this.initSubCanvas();
     }
 
     //这里是初始游戏,再点击就开始跳了(是否为复活)
@@ -210,6 +202,8 @@ export default class Game extends cc.Component {
     }
 
     showRelive() {
+        this.subPostMessage("submit");
+
         this.node_relive.active = true;
         this.node_relive.getComponent("PanelRelive").showRelive();
         cc.dataMgr.saveData();
@@ -267,6 +261,9 @@ export default class Game extends cc.Component {
             this.createBox(null);
         if (cc.dataMgr.userData.speedNum > 0)
             --cc.dataMgr.userData.speedNum;
+
+        if (cc.dataMgr.userData.countJump % 5 == 0)
+            this.subPostMessage("nextBeyond");
     }
 
     //开局加速会停下来 其它不会
@@ -329,12 +326,16 @@ export default class Game extends cc.Component {
         let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
         let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
         spr_bg.opacity = 0;
-        spr_bg.getComponent(cc.Sprite).spriteFrame = this[bgName];
+        let frameBg = cc.dataMgr.getBgFrame_sf(bgName);
+        if (frameBg)
+            spr_bg.getComponent(cc.Sprite).spriteFrame = frameBg;
 
         //console.log("--- " + bgName + " -- " + lastBgName);
         if (lastBgName) {
             let spr_bg2 = this.node.getChildByName("node_bg").getChildByName("spr_bg2");
-            spr_bg2.getComponent(cc.Sprite).spriteFrame = this[lastBgName];
+            let frameLast = cc.dataMgr.getBgFrame_sf(lastBgName);
+            if (frameLast)
+                spr_bg2.getComponent(cc.Sprite).spriteFrame = frameLast;
             spr_bg2.opacity = 255;
             spr_bg2.runAction(cc.sequence(cc.callFunc(this.callShowBg, this), cc.fadeOut(0.8)));
         } else
@@ -472,6 +473,57 @@ export default class Game extends cc.Component {
                 if (nodeN.y + cc.dataMgr.userData.dropPosY < posCamera) {
                     nodeN.getComponent("NodeBox").toDie();
                 }
+            }
+        }
+    }
+
+    //------ 微信子域游戏内所有操作 ------
+
+    //初始化子域信息
+    initSubCanvas() {
+        this.tex = new cc.Texture2D();
+        if (CC_WECHATGAME) {
+            console.log("-- WECHAT Game.js initSubCanvas --");
+            window.sharedCanvas.width = 720;
+            window.sharedCanvas.height = 1280;
+
+            this.subPostMessage("gameBegin");
+        }
+    }
+
+    updataSubCanvas() {
+        if (CC_WECHATGAME) {
+            //console.log("-- WECHAT Game.js updataSubCanvas --");
+            this.tex.initWithElement(window.sharedCanvas);
+            this.tex.handleLoadedTexture();
+            this.subCanvas.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
+        }
+    }
+
+    //这里type: gameBegin(游戏开始请求好友数据)、nextBeyond(将要超越的好友)
+    subPostMessage(type) {
+        if (CC_WECHATGAME) {
+            console.log("-- WECHAT Game.js subPostMessage --" + type);
+            if (type == "submit") {
+                window.wx.postMessage({
+                    messageType: 2,
+                    MAIN_MENU_NUM: "user_best_score",
+                    myScore: cc.dataMgr.userData.countJump
+                });
+            } else if (type == "gameBegin") {
+                window.wx.postMessage({
+                    messageType: 6,
+                    MAIN_MENU_NUM: "user_best_score",
+                    myScore: cc.dataMgr.userData.countJump
+                });
+            } else if (type == "nextBeyond") {
+                console.log("-- nextBeyond --" + type);
+                window.wx.postMessage({
+                    messageType: 8,
+                    MAIN_MENU_NUM: "user_best_score",
+                    myScore: cc.dataMgr.userData.countJump
+                });
+                this.updataSubCanvas();
             }
         }
     }

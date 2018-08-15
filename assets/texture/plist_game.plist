@@ -7,15 +7,15 @@
             <key>daoju_speed.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{101,688},{90,47}}</string>
+                <string>{{370,174},{111,108}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{90,47}}</string>
+                <string>{{0,0},{111,108}}</string>
                 <key>sourceSize</key>
-                <string>{90,47}</string>
+                <string>{111,108}</string>
             </dict>
             <key>daoju_zuanshi.png</key>
             <dict>
@@ -98,11 +98,11 @@
             <key>zhangai03.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,688},{86,97}}</string>
+                <string>{{2,824},{86,97}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
-                <true/>
+                <false/>
                 <key>sourceColorRect</key>
                 <string>{{0,0},{86,97}}</string>
                 <key>sourceSize</key>
@@ -124,7 +124,7 @@
             <key>zhangai05.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{193,688},{74,79}}</string>
+                <string>{{2,923},{74,79}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -150,11 +150,11 @@
             <key>zz02.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,476},{104,268}}</string>
+                <string>{{370,554},{104,268}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
-                <true/>
+                <false/>
                 <key>sourceColorRect</key>
                 <string>{{0,0},{104,268}}</string>
                 <key>sourceSize</key>
@@ -163,11 +163,11 @@
             <key>zz03.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{370,444},{104,268}}</string>
+                <string>{{2,476},{104,268}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
-                <false/>
+                <true/>
                 <key>sourceColorRect</key>
                 <string>{{0,0},{104,268}}</string>
                 <key>sourceSize</key>
@@ -189,7 +189,7 @@
             <key>zz05.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{370,174},{104,268}}</string>
+                <string>{{370,284},{104,268}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -209,7 +209,7 @@
             <key>size</key>
             <string>{512,1024}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:84c129a4e65ad59833ad993515c6edec$</string>
+            <string>$TexturePacker:SmartUpdate:8dc1acd7fce32f0a9babb16395592337$</string>
             <key>textureFileName</key>
             <string>plist_game.png</string>
         </dict>

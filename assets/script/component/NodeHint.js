@@ -12,7 +12,7 @@ export default class NodeRole extends cc.Component {
 
     //减速 冲刺等 提示
     showHint(type) {
-        console.log("--- hint --- " + type);
+        //console.log("--- hint --- " + type);
         this.node.active = true;
         if (type == "speedBegin") {
             //提示开始开局冲刺
