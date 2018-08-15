@@ -10,19 +10,11 @@ export default class Game extends cc.Component {
     @property(cc.SpriteFrame) //溶解所需
     noiseTexture = null;
 
-    //游戏中的背景
-    @property(cc.SpriteFrame)
-    beijing01 = null;
-    @property(cc.SpriteFrame)
-    beijing02 = null;
-
     @property(cc.Prefab) //预置box
     pre_box = null;
 
     @property(cc.Node) //复活界面
     node_relive = null;
-    @property(cc.Node) //提示界面
-    node_hint = null;
 
     @property(cc.Node) //游戏节点
     node_game = null;
@@ -34,6 +26,9 @@ export default class Game extends cc.Component {
     node_ui = null;
     @property(cc.Node) //相机
     node_camera = null;
+
+    @property(cc.Node) //微信子域显示下一个好友
+    subCanvas = null;
 
     _isInitGame = false; //游戏是否初始化完成(完成后点击就开始跳了)
 
@@ -60,7 +55,8 @@ export default class Game extends cc.Component {
                 let touchPos = touch.getLocation();
                 if (cc.dataMgr.userData.pauseGame)
                     return true;
-                if (cc.dataMgr.userData.onGaming) {
+                //在游戏中 且 不在加速状态 才能自由选择前进方向。
+                if (cc.dataMgr.userData.onGaming && cc.dataMgr.userData.speedNum <= 0) {
                     self.jumpRole(touchPos.x < 360);
                 } else if (self._isInitGame) {
                     self._isInitGame = false;
@@ -78,6 +74,9 @@ export default class Game extends cc.Component {
         cc.audioMgr.playBg();
 
         this.initGame(false);
+
+        //微信子域
+        this.initSubCanvas();
     }
 
     //这里是初始游戏,再点击就开始跳了(是否为复活)
@@ -117,7 +116,7 @@ export default class Game extends cc.Component {
             this.node_role.getComponent("NodeRole").initRole(null);
 
             this.node_ui.getChildByName("lab_score").active = true;
-            this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = cc.dataMgr.userData.countJump;
+            this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = ("得分：" + cc.dataMgr.userData.countJump);
 
             //改变背景 和 boxName
             this.changeToNextBg();
@@ -127,7 +126,15 @@ export default class Game extends cc.Component {
                 this.createBox(null);
 
             //标识初始化完成 再点击屏幕可以开始跳跃了
-            this._isInitGame = true;
+            //this._isInitGame = true;
+
+            //开局自动使用道具
+            this.usePropSpeedOrCut();
+            if (cc.dataMgr.userData.speedNum > 0) {
+                this.node.runAction(cc.sequence(cc.delayTime(1.2), cc.callFunc(this.callBeginSpeed, this)));
+            } else
+                this._isInitGame = true;
+
         } else {
             //这里是复活(有些数据不需要初始化)
             cc.dataMgr.userData.onGaming = false;
@@ -160,7 +167,7 @@ export default class Game extends cc.Component {
             cc.dataMgr.userData.aimRoleX = posBegin.x;
             cc.dataMgr.userData.aimRoleY = posBegin.y;
 
-            //如果这个位置上有 道具用来消除道具
+            //如果这个位置上有道具 用来消除道具
             this.getAimPos_o(posBegin);
 
             //界面及角色 显示
@@ -171,21 +178,32 @@ export default class Game extends cc.Component {
             this.node_role.getComponent("NodeRole").initRole(posBegin);
 
             this.node_ui.getChildByName("lab_score").active = true;
-            this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = cc.dataMgr.userData.countJump;
+            this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = ("得分：" + cc.dataMgr.userData.countJump);
 
             //补充台阶数
             let supr = parseInt((cc.dataMgr.userData.lastBoxY - posBegin.y) / cc.dataMgr.boxY);
             for (let i = 0; i < 5 - supr; ++i)
                 this.createBox(null);
 
-            console.log("-- 补 " + supr + " --R " + posBegin.y + " --B " + cc.dataMgr.userData.lastBoxY + " --C " + this.node_camera.y);
+            //console.log("-- 补 " + supr + " --R " + posBegin.y + " --B " + cc.dataMgr.userData.lastBoxY + " --C " + this.node_camera.y);
 
             //标识初始化完成 再点击屏幕可以开始跳跃了
             this._isInitGame = true;
         }
     }
 
+    //开局加速
+    callBeginSpeed() {
+        this.jumpRole(true);
+        this._isInitGame = false;
+        cc.dataMgr.userData.onGaming = true;
+
+        this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speed");
+    }
+
     showRelive() {
+        this.subPostMessage("submit");
+
         this.node_relive.active = true;
         this.node_relive.getComponent("PanelRelive").showRelive();
         cc.dataMgr.saveData();
@@ -202,12 +220,11 @@ export default class Game extends cc.Component {
         if (cc.dataMgr.userData.countJump > 0 && cc.dataMgr.userData.countJump % cc.dataMgr.userData.changeNum == 0)
             this.changeToNextBg();
 
-        this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = cc.dataMgr.userData.countJump;
+        this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = ("得分：" + cc.dataMgr.userData.countJump);
 
         let aimY = cc.dataMgr.boxY + cc.dataMgr.userData.aimRoleY;
         let aimX = (isLeft ? -1 : 1) * cc.dataMgr.boxX + cc.dataMgr.userData.aimRoleX;
 
-        this.node_role.scaleX = (isLeft ? -1 : 1);
         this.node_role.stopAllActions();
 
         //获取目标点是否有 box 及其类型, 并矫正Y
@@ -217,13 +234,24 @@ export default class Game extends cc.Component {
         // if (data && data.boxType == "box") 
         //     cc.audioMgr.playEffect("role_jump1");
         if (data.dieType > 0) {
-            cc.dataMgr.userData.roleDieType = data.dieType;
-            cc.dataMgr.userData.onGaming = false;
-            let roleJs = this.node_role.getComponent("NodeRole");
-            this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.5, 1), cc.callFunc(roleJs.toDie, roleJs)));
+            //加速的时候是不让死的
+            if (cc.dataMgr.userData.speedNum > 0) {
+                isLeft = !isLeft;
+                aimX = (isLeft ? -1 : 1) * cc.dataMgr.boxX + cc.dataMgr.userData.aimRoleX;
+                this.getAimPos_o(cc.v2(aimX, aimY)); //加速的时候拾取道具
+                this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.35, 1), cc.callFunc(this.autoJump, this)));
+            } else {
+                cc.dataMgr.userData.roleDieType = data.dieType;
+                cc.dataMgr.userData.onGaming = false;
+                let roleJs = this.node_role.getComponent("NodeRole");
+                this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.35, 1), cc.callFunc(roleJs.toDie, roleJs)));
+            }
+        } else if (cc.dataMgr.userData.speedNum > 0) {
+            this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.35, 1), cc.callFunc(this.autoJump, this)));
         } else {
-            this.node_role.runAction(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.5, 1));
+            this.node_role.runAction(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.35, 1));
         }
+        this.node_role.scaleX = (isLeft ? -1 : 1);
 
         cc.dataMgr.userData.aimRoleX = aimX;
         cc.dataMgr.userData.aimRoleY = aimY;
@@ -231,6 +259,22 @@ export default class Game extends cc.Component {
         //最多比当前角色在的台阶高 5阶
         if (cc.dataMgr.userData.lastBoxY - cc.dataMgr.userData.aimRoleY < 5 * cc.dataMgr.boxY)
             this.createBox(null);
+        if (cc.dataMgr.userData.speedNum > 0)
+            --cc.dataMgr.userData.speedNum;
+
+        if (cc.dataMgr.userData.countJump % 5 == 0)
+            this.subPostMessage("nextBeyond");
+    }
+
+    //开局加速会停下来 其它不会
+    autoJump() {
+        if (cc.dataMgr.userData.speedNum > 0)
+            this.jumpRole(false);
+        else {
+            cc.dataMgr.userData.onGaming = !(this.node_game.getChildByName("node_hint").active);
+            this._isInitGame = this.node_game.getChildByName("node_hint").active;
+            this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedEnd");
+        }
     }
 
     //如果nodeN 存在只是初始化它的位置 及信息
@@ -282,12 +326,16 @@ export default class Game extends cc.Component {
         let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
         let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
         spr_bg.opacity = 0;
-        spr_bg.getComponent(cc.Sprite).spriteFrame = this[bgName];
+        let frameBg = cc.dataMgr.getBgFrame_sf(bgName);
+        if (frameBg)
+            spr_bg.getComponent(cc.Sprite).spriteFrame = frameBg;
 
-        console.log("--- " + bgName + " -- " + lastBgName);
+        //console.log("--- " + bgName + " -- " + lastBgName);
         if (lastBgName) {
             let spr_bg2 = this.node.getChildByName("node_bg").getChildByName("spr_bg2");
-            spr_bg2.getComponent(cc.Sprite).spriteFrame = this[lastBgName];
+            let frameLast = cc.dataMgr.getBgFrame_sf(lastBgName);
+            if (frameLast)
+                spr_bg2.getComponent(cc.Sprite).spriteFrame = frameLast;
             spr_bg2.opacity = 255;
             spr_bg2.runAction(cc.sequence(cc.callFunc(this.callShowBg, this), cc.fadeOut(0.8)));
         } else
@@ -305,7 +353,7 @@ export default class Game extends cc.Component {
         spr_bg.opacity = 255;
     }
 
-    //获取目标位置的砖块
+    //获取目标位置的砖块(同时找出要离开那一块砖)、同时判断道具拾取
     getAimPos_o(aimPos) {
         let data = {
             dieType: 1,
@@ -314,27 +362,58 @@ export default class Game extends cc.Component {
         }
         for (let i = 0; i < this.root_box.children.length; ++i) {
             let nodeN = this.root_box.children[i];
+
+            //当前踩的砖块 显示脚丫
+            if (Math.abs(aimPos.y - nodeN.y - cc.dataMgr.boxY) < 10 && cc.dataMgr.userData.useFootIdx > 0) {
+                let nodeNJs = nodeN.getComponent("NodeBox");
+                if (nodeNJs)
+                    nodeNJs.leaveBox(aimPos.x - cc.dataMgr.userData.aimRoleX < 0);
+            }
+
+            //目标砖块
             let dis = cc.pDistance(nodeN.position, aimPos);
             if (dis < 10) {
                 //判断是否为障碍物
                 let nodeNJs = nodeN.getComponent("NodeBox");
                 if (nodeNJs) {
                     let boxType = nodeNJs._boxType;
-                    if (boxType == "box")
-                        data.dieType = 0;
-                    else if (boxType == "prop") {
-                        data.dieType = 0;
-                        nodeNJs.touchProp();
-                        ++cc.dataMgr.userData.propGreenNum;
-                    } else
+                    if (boxType == "block")
                         data.dieType = 2;
+                    else {
+                        data.dieType = 0;
+                        nodeNJs.touchBox();
+                    }
                     data.boxType = boxType;
                 }
                 data.aimPosY = nodeN.y;
-                break;
             }
         }
         return data;
+    }
+
+    //开局使用加速道具 和 减速道具等
+    usePropSpeedOrCut() {
+        //加速道具
+        if (cc.dataMgr.userData.propSpeedNum > 0) {
+            cc.dataMgr.userData.propSpeedNum -= 1;
+            let numS = parseInt(Math.random() * 40 + 20);
+            cc.dataMgr.userData.speedNum = numS;
+        }
+
+        //减速道具
+        if (cc.dataMgr.userData.propCutNum > 0) {
+            cc.dataMgr.userData.propCutNum -= 1;
+            cc.dataMgr.userData.cameraSpeedY = cc.dataMgr.userData.baseSpeedY * (1 - Math.random() * 0.8);
+            this.node.runAction(cc.sequence(cc.delayTime(Math.random() * 10 + 10), cc.callFunc(this.callCameraSpeedY, this)));
+            this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedBegin");
+            this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("cut");
+        }
+        //console.log("-- speedNum:" + cc.dataMgr.userData.speedNum + " -- " + cc.dataMgr.userData.cameraSpeedY);
+    }
+
+    callCameraSpeedY() {
+        cc.dataMgr.userData.cameraSpeedY = cc.dataMgr.userData.baseSpeedY;
+        this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("cutEnd");
     }
 
     pauseGame(isPause) {
@@ -394,6 +473,57 @@ export default class Game extends cc.Component {
                 if (nodeN.y + cc.dataMgr.userData.dropPosY < posCamera) {
                     nodeN.getComponent("NodeBox").toDie();
                 }
+            }
+        }
+    }
+
+    //------ 微信子域游戏内所有操作 ------
+
+    //初始化子域信息
+    initSubCanvas() {
+        this.tex = new cc.Texture2D();
+        if (CC_WECHATGAME) {
+            console.log("-- WECHAT Game.js initSubCanvas --");
+            window.sharedCanvas.width = 720;
+            window.sharedCanvas.height = 1280;
+
+            this.subPostMessage("gameBegin");
+        }
+    }
+
+    updataSubCanvas() {
+        if (CC_WECHATGAME) {
+            //console.log("-- WECHAT Game.js updataSubCanvas --");
+            this.tex.initWithElement(window.sharedCanvas);
+            this.tex.handleLoadedTexture();
+            this.subCanvas.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
+        }
+    }
+
+    //这里type: gameBegin(游戏开始请求好友数据)、nextBeyond(将要超越的好友)
+    subPostMessage(type) {
+        if (CC_WECHATGAME) {
+            console.log("-- WECHAT Game.js subPostMessage --" + type);
+            if (type == "submit") {
+                window.wx.postMessage({
+                    messageType: 2,
+                    MAIN_MENU_NUM: "user_best_score",
+                    myScore: cc.dataMgr.userData.countJump
+                });
+            } else if (type == "gameBegin") {
+                window.wx.postMessage({
+                    messageType: 6,
+                    MAIN_MENU_NUM: "user_best_score",
+                    myScore: cc.dataMgr.userData.countJump
+                });
+            } else if (type == "nextBeyond") {
+                console.log("-- nextBeyond --" + type);
+                window.wx.postMessage({
+                    messageType: 8,
+                    MAIN_MENU_NUM: "user_best_score",
+                    myScore: cc.dataMgr.userData.countJump
+                });
+                this.updataSubCanvas();
             }
         }
     }

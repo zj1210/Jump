@@ -26,6 +26,13 @@ export default class PanelStore extends cc.Component {
         this._firstPosX = this.node_content.children[0].x;
         this.node.getChildByName("prop").getChildByName("prop_Label").getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
         this.checkContentPos();
+
+        //背景颜色
+        let frame = cc.dataMgr.getBgFrame_sf(null);
+        if (frame) {
+            let spr_bg = this.node.getChildByName("game_bg");
+            spr_bg.getComponent(cc.Sprite).spriteFrame = frame;
+        }
     }
 
     //检查content 位置使至少一个角色是亮的(每次滑动后都调用),并确定 _playerIdx;
@@ -51,12 +58,11 @@ export default class PanelStore extends cc.Component {
             }
         }
         //根据显示的更改钱数
-        if (this._showPlayerIdx < cc.dataMgr.playerData.length){
+        if (this._showPlayerIdx < cc.dataMgr.playerData.length) {
             this._showPlayerD = cc.dataMgr.playerData[this._showPlayerIdx];
             this.lab_buy.getComponent(cc.Label).string = this._showPlayerD.price;
             this.spr_goumai.active = true;
-        }
-        else{
+        } else {
             this._showPlayerD = null;
             this.lab_buy.getComponent(cc.Label).string = 0;
             this.spr_goumai.active = false;

@@ -47,6 +47,13 @@ export default class Start extends cc.Component {
         //点击开始游戏
         let spr_begin = this.node.getChildByName("ziti_kaishiyouxi");
         spr_begin.runAction(cc.repeatForever(cc.sequence(cc.scaleTo(0.4, 1.2), cc.scaleTo(0.6, 1))));
+
+        //背景颜色
+        let frame = cc.dataMgr.getBgFrame_sf(null);
+        if (frame) {
+            let spr_bg = this.node.getChildByName("game_bg");
+            spr_bg.getComponent(cc.Sprite).spriteFrame = frame;
+        }
     }
 
     onClickBtn(event, customeData) {

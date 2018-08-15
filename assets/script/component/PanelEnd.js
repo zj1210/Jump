@@ -1,5 +1,3 @@
-import DataMgr from 'DataMgr';
-import AudioMgr from 'AudioMgr';
 const {
     ccclass,
     property
@@ -19,6 +17,13 @@ export default class PanelEnd extends cc.Component {
         this.node.getChildByName("now_Label").getComponent(cc.Label).string = cc.dataMgr.userData.countJump;
         this.node.getChildByName("best").getChildByName("best_Label").getComponent(cc.Label).string = cc.dataMgr.getBestScore_i(cc.dataMgr.userData.countJump);
         this.node.getChildByName("prop").getChildByName("prop_Label").getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
+
+        //背景颜色
+        let frame = cc.dataMgr.getBgFrame_sf(null);
+        if (frame) {
+            let spr_bg = this.node.getChildByName("game_bg");
+            spr_bg.getComponent(cc.Sprite).spriteFrame = frame;
+        }
     }
 
     onClickBtn(event, customeData) {
