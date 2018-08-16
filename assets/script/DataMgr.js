@@ -42,7 +42,10 @@ export default class DataMgr extends cc.Component {
         changeNum: 40, //跳多少次变一下场景
         gameBgIdx: 0, //游戏中背景和箱子的图片下标
         boxName: "zz01", //当前所出箱子的图片名称
+        nextChangeTime: 12, //据下次变色的时间间隔
+        nextChangeIdx: 0, //当前变色的时间间隔下标
 
+        cutSpeed: 1, //减速中多少 0~1
         speedNum: 0, //当前加速的的数量
         nextSpeedPos: (parseInt(Math.random() * 40) + 15), //下一次一次出现 Speed 的位置
 
@@ -53,12 +56,18 @@ export default class DataMgr extends cc.Component {
         countJump: 0, //统计跳跃次数
 
         reliveTimes: 0, //已经连续复活的次数 在initGame 中初始化
+        isReliveDrop: false, //是否复活后 可以下落(角色达到安全距离后可下落)
     }
 
     //场景资源的图片 名称
     gameBgName = ["cj01", "cj02", "cj03", "cj04", "cj05"];
 
     bgFrame = {};
+
+    changeTime = [12, 11, 25, 23, 37, 23, 12, 30];
+    changeSpeed = [1, 1.2, 1.3, 2, 1.3, 1.2, 1.4, 1.3];
+    changeBg = [0, 1, 2, 4, 2, 1, 4, 3]
+
 
     //砖块的图片 名称(顺序和出场顺序是一致的)
     boxName = ["zz01", "zz02", "zz03", "zz04", "zz05"];
@@ -166,6 +175,19 @@ export default class DataMgr extends cc.Component {
         cc.sys.localStorage.setItem("reliveNum", this.userData.reliveNum);
     }
 
+    //只改变改变颜色的数据
+    changeToNextBg() {
+        ++this.userData.nextChangeIdx;
+        if (this.userData.nextChangeIdx >= this.changeTime.length) {
+            this.userData.nextChangeIdx = 0;
+            cc.audioMgr.playBg();
+        }
+        this.userData.nextChangeTime = this.changeTime[this.userData.nextChangeIdx];
+        this.userData.gameBgIdx = this.changeBg[this.userData.nextChangeIdx];
+        this.userData.cameraSpeedY = this.changeSpeed[this.userData.nextChangeIdx] * this.userData.baseSpeedY * this.userData.cutSpeed;
+        console.log("-- speed " + this.userData.cameraSpeedY + " -- " + this.userData.nextChangeIdx + " -- " + (this.userData.gameBgIdx + 1));
+    }
+
     //比较储存历史最高纪录
     getBestScore_i(nowScore) {
         if (nowScore > parseInt(this.userData.bestScore)) {
@@ -244,7 +266,7 @@ export default class DataMgr extends cc.Component {
     }
 
     //这是分享成功给玩家的奖励 回满reliveNum 和 下局双倍
-    shareSuccess(){
+    shareSuccess() {
         this.userData.reliveNum = this.userData.addHpMax;
         this.userData.shareDouble = 2;
     }

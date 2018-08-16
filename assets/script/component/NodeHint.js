@@ -6,35 +6,44 @@ const {
 export default class NodeRole extends cc.Component {
     //控件的透明度 都设置为0 用fadeIn等操作显示
 
+    @property(cc.Node)
+    node_speed = null;
+    @property(cc.Node)
+    node_cut = null;
+
     onLoad() {
         this.node.active = false;
     }
 
-    //减速 冲刺等 提示
+    //speedBegin 开局加速 speed 冲刺 cut 减速
     showHint(type) {
         //console.log("--- hint --- " + type);
         this.node.active = true;
         if (type == "speedBegin") {
-            //提示开始开局冲刺
-            let nodeN = this.node.getChildByName("lab_speed");
-            nodeN.active = true;
-            nodeN.getComponent(cc.Label).string = ("即将开始开局冲刺 x" + cc.dataMgr.userData.speedNum);
-            nodeN.runAction(cc.repeatForever(cc.sequence(cc.scaleTo(0.8, 1.2), cc.scaleTo(0.6, 1))));
+            //提示开局冲刺
+            this.node_speed.active = true;
+            this.node_speed.getChildByName("lab_title").getComponent(cc.Label).string = "开局冲刺 x";
+            this.node_speed.getChildByName("lab_speed").getComponent(cc.Label).string = cc.dataMgr.userData.speedNum;
+            //this.node_speed.runAction(cc.repeatForever(cc.sequence(cc.scaleTo(0.8, 1.2), cc.scaleTo(0.6, 1))));
         } else if (type == "speed") {
-            let nodeN = this.node.getChildByName("lab_speed");
-            nodeN.getComponent(cc.Label).string = ("开局冲刺 x" + cc.dataMgr.userData.speedNum);
+            this.node_speed.active = true;
+            this.node_speed.getChildByName("lab_title").getComponent(cc.Label).string = "加速冲刺 x";
+            this.node_speed.getChildByName("lab_speed").getComponent(cc.Label).string = cc.dataMgr.userData.speedNum;
         } else if (type == "speedEnd") {
-            let nodeN = this.node.getChildByName("lab_speed");
-            nodeN.stopAllActions();
-            nodeN.active = false;
+            this.node_speed.stopAllActions();
+            this.node_speed.active = false;
         } else if (type == "cut") {
-            let nodeN = this.node.getChildByName("lab_cut");
-            nodeN.active = true;
-            nodeN.runAction(cc.fadeIn(0.4));
+            this.node_cut.active = true;
+            this.node_cut.runAction(cc.fadeIn(0.4));
         } else if (type == "cutEnd") {
-            let nodeN = this.node.getChildByName("lab_cut");
-            nodeN.stopAllActions();
-            nodeN.active = false;
+            this.node_cut.stopAllActions();
+            this.node_cut.active = false;
+        }
+    }
+
+    changeNum(type) {
+        if (type == "speed") {
+            this.node_speed.getChildByName("lab_speed").getComponent(cc.Label).string = cc.dataMgr.userData.speedNum;
         }
     }
 

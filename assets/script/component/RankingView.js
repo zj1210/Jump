@@ -145,7 +145,7 @@ export default class RankingView extends cc.Component {
     shareFriend() {
         if (CC_WECHATGAME) {
             window.wx.shareAppMessage({
-                title: "我再这里，等你来超越。--境之边缘",
+                title: "我再这里，等你来。--境之边缘",
                 imageUrl: "https://bpw.blyule.com/res/raw-assets/Texture/shareImage0.a52e5.jpg",
                 success: (res) => {
                     cc.dataMgr.shareSuccess();

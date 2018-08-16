@@ -19,7 +19,7 @@ export default class NodeRole extends cc.Component {
     }
 
     initRole(posBegin) {
-        console.log("--- initRole ---" + this.node_particle.children.length);
+        //console.log("--- initRole ---" + this.node_particle.children.length);
 
         this._isAlive = true;
         this.node.setLocalZOrder(1);

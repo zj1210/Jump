@@ -6,7 +6,6 @@ const {
 export default class Game extends cc.Component {
     @property(cc.SpriteAtlas) //图集
     atlas_game = null;
-
     @property(cc.SpriteFrame) //溶解所需
     noiseTexture = null;
 
@@ -29,24 +28,28 @@ export default class Game extends cc.Component {
     @property(cc.Node) //相机
     node_camera = null;
 
-    @property(cc.Node) //微信子域显示下一个好友
+    //显示微信子域排行
+    @property(cc.Node)
+    node_start = null;
+    @property(cc.Node)
+    rankingView = null;
+    @property(cc.Node)
     subCanvas = null;
 
     _isInitGame = false; //游戏是否初始化完成(完成后点击就开始跳了)
 
+    //根据时间变颜色 相关
+    _countSecond = 0;
+    _countTime = 0;
+
     onLoad() {
         console.log("--- Game onLoad ---");
 
-        //TODO 这样加载在微信中报错了,查找原因,ES5 写法探究
+        //这样加载在微信中报错了,查找原因,ES5 写法探究 Start 中写法是正确的
         // let DataMgr = require("DataMgr");
         // cc.dataMgr = new DataMgr();
 
-        // cc.dataMgr = this.node.getComponent("DataMgr");
-        // //读取本地储存的 玩家闯关的信息
-        // cc.dataMgr.initData();
-
-        // cc.audioMgr = this.node.getComponent("AudioMgr");
-        // cc.audioMgr.init();
+        cc.audioMgr.pauseAll();
     }
 
     start() {
@@ -61,6 +64,12 @@ export default class Game extends cc.Component {
                 if (cc.dataMgr.userData.onGaming && cc.dataMgr.userData.speedNum <= 0) {
                     self.jumpRole(touchPos.x < 360);
                 } else if (self._isInitGame) {
+                    //背景音乐(两处播放音乐 一处这里 一处 在开局冲刺时)
+                    if (cc.dataMgr.userData.countJump == 0)
+                        cc.audioMgr.playBg();
+                    else
+                        cc.audioMgr.resumeAll();
+
                     self._isInitGame = false;
                     cc.dataMgr.userData.onGaming = true;
                     self.jumpRole(touchPos.x < 360);
@@ -72,9 +81,6 @@ export default class Game extends cc.Component {
             onTouchEnded: function (touch, event) {}
         }, self.node);
 
-        //背景音乐
-        cc.audioMgr.playBg();
-
         this.initGame(false);
 
         //微信子域
@@ -83,15 +89,20 @@ export default class Game extends cc.Component {
 
     //这里是初始游戏,再点击就开始跳了(是否为复活)
     initGame(isRelive) {
+        cc.audioMgr.pauseAll();
+        cc.dataMgr.userData.onGaming = false;
+
         if (!isRelive) {
             //初始化数据
-            cc.dataMgr.userData.onGaming = false;
             cc.dataMgr.userData.lastBoxX = cc.dataMgr.boxX;
             cc.dataMgr.userData.lastBoxY = -cc.dataMgr.boxY;
             cc.dataMgr.userData.countBox = 0;
 
             cc.dataMgr.userData.gameBgIdx = 0;
             cc.dataMgr.userData.boxName = "box1";
+            cc.dataMgr.userData.nextChangeTime = 12;
+            cc.dataMgr.userData.nextChangeIdx = 0;
+            cc.dataMgr.userData.cutSpeed = 1;
 
             cc.dataMgr.userData.aimRoleX = 0;
             cc.dataMgr.userData.aimRoleY = 0;
@@ -99,6 +110,7 @@ export default class Game extends cc.Component {
             cc.dataMgr.userData.countJump = 0;
 
             cc.dataMgr.userData.reliveTimes = 0;
+            cc.dataMgr.userData.isReliveDrop = true;
 
             if (cc.dataMgr.userData.shareDouble > 0) {
                 cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.reliveNum * 2 + cc.dataMgr.userData.baseHp;
@@ -145,34 +157,38 @@ export default class Game extends cc.Component {
             //开局自动使用道具
             this.usePropSpeedOrCut();
             if (cc.dataMgr.userData.speedNum > 0) {
-                this.node.runAction(cc.sequence(cc.delayTime(1.2), cc.callFunc(this.callBeginSpeed, this)));
-            } else
+                this.scheduleOnce(this.callBeginSpeed, 1.2);
+            } else {
                 this._isInitGame = true;
-
+            }
         } else {
+            //确定复活点目标位置Y
+            let aimY = cc.dataMgr.userData.aimRoleY - cc.dataMgr.boxX;
+
             //这里是复活(有些数据不需要初始化)
-            cc.dataMgr.userData.onGaming = false;
             cc.dataMgr.userData.roleDieType = 0;
             ++cc.dataMgr.userData.reliveTimes;
+            cc.dataMgr.userData.isReliveDrop = false;
 
-            console.log("--- initGame relive ---");
+            console.log("--- initGame relive ---" + aimY + " -- " + this.node_camera.y);
             console.log(cc.dataMgr.userData);
 
             //给角色找一个合理的位置
             let posBegin = cc.v2(0, 0);
-            let minDis = cc.dataMgr.boxY * 2;
-            let aimY = cc.dataMgr.userData.aimRoleY;
-            if (aimY <= this.node_camera.y)
-                aimY = this.node_camera.y;
+            let minDis = cc.dataMgr.boxY * 6;
+            // if (aimY <= this.node_camera.y)
+            //     aimY = this.node_camera.y;
             for (let i = 0; i < this.root_box.children.length; ++i) {
                 let nodeN = this.root_box.children[i];
                 let nodeNJs = nodeN.getComponent("NodeBox");
-                if (nodeN && nodeNJs && nodeN.y <= aimY) {
+                if (nodeN && nodeNJs /* && nodeN.y <= aimY*/ ) {
                     let disY = Math.abs(nodeN.y - aimY);
+                    //console.log("-- findPos : " + disY + " -- " + minDis);
                     //这种是可以 跳上去的砖块
                     if (nodeNJs._boxType == "box" || nodeNJs._boxType == "prop") {
                         if (disY < minDis) {
                             posBegin = nodeN.position;
+                            minDis = disY;
                         }
                     }
                 }
@@ -215,7 +231,8 @@ export default class Game extends cc.Component {
         this._isInitGame = false;
         cc.dataMgr.userData.onGaming = true;
 
-        this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speed");
+        //背景音乐
+        cc.audioMgr.playBg();
     }
 
     showRelive() {
@@ -224,7 +241,7 @@ export default class Game extends cc.Component {
         // this.node_relive.active = true;
         // this.node_relive.getComponent("PanelRelive").showRelive();
         // cc.dataMgr.saveData();
-        if (cc.dataMgr.userData.reliveHp > 0) {
+        if (cc.dataMgr.userData.reliveHp > 1) {
             cc.dataMgr.userData.reliveHp--;
             this.initGame(true);
         } else {
@@ -240,9 +257,11 @@ export default class Game extends cc.Component {
     //是否向左跳
     jumpRole(isLeft) {
         ++cc.dataMgr.userData.countJump;
+
         //判断是否可以替换场景图片
-        if (cc.dataMgr.userData.countJump > 0 && cc.dataMgr.userData.countJump % cc.dataMgr.userData.changeNum == 0)
-            this.changeToNextBg();
+        // if (cc.dataMgr.userData.countJump > 0 && cc.dataMgr.userData.countJump % cc.dataMgr.userData.changeNum == 0)
+        //     this.changeToNextBg();
+        //更改为根据时间变换颜色 在updata 中调用
 
         this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = ("得分：" + cc.dataMgr.userData.countJump);
 
@@ -251,12 +270,15 @@ export default class Game extends cc.Component {
 
         this.node_role.stopAllActions();
 
-        //获取目标点是否有 box 及其类型, 并矫正Y
+        //获取目标点是否有 box 及其类型, 并矫正 X Y
         let data = this.getAimPos_o(cc.v2(aimX, aimY));
+        aimX = data.aimPosX;
         aimY = data.aimPosY;
+
         //落到空 box 上才有声音
         // if (data && data.boxType == "box") 
         //     cc.audioMgr.playEffect("role_jump1");
+
         if (data.dieType > 0) {
             //加速的时候是不让死的
             if (cc.dataMgr.userData.speedNum > 0) {
@@ -280,6 +302,15 @@ export default class Game extends cc.Component {
         cc.dataMgr.userData.aimRoleX = aimX;
         cc.dataMgr.userData.aimRoleY = aimY;
 
+        //console.log("aimPos-- " + cc.dataMgr.userData.aimRoleX + " -- " + cc.dataMgr.userData.aimRoleY);
+
+        //判断角色复活后是否达到安全距离
+        if (!cc.dataMgr.userData.isReliveDrop) {
+            //console.log(this.node_camera.y + " -- " + cc.dataMgr.userData.aimRoleY);
+            if (this.node_camera.y < cc.dataMgr.userData.aimRoleY)
+                cc.dataMgr.userData.isReliveDrop = true;
+        }
+
         //最多比当前角色在的台阶高 5阶
         if (cc.dataMgr.userData.lastBoxY - cc.dataMgr.userData.aimRoleY < 5 * cc.dataMgr.boxY)
             this.createBox(null);
@@ -293,12 +324,19 @@ export default class Game extends cc.Component {
 
     //开局加速会停下来 其它不会
     autoJump() {
-        if (cc.dataMgr.userData.speedNum > 0)
+        if (cc.dataMgr.userData.speedNum > 0) {
             this.jumpRole(false);
-        else {
-            cc.dataMgr.userData.onGaming = !(this.node_game.getChildByName("node_hint").active);
+            this.node.getChildByName("node_hint").getComponent("NodeHint").changeNum("speed");
+        } else {
             this._isInitGame = this.node_game.getChildByName("node_hint").active;
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedEnd");
+
+            if (this._isInitGame) {
+                cc.audioMgr.pauseAll();
+                cc.dataMgr.userData.onGaming = false;
+            } else {
+                cc.dataMgr.userData.onGaming = true;
+            }
         }
     }
 
@@ -342,9 +380,11 @@ export default class Game extends cc.Component {
         else {
             lastBgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
 
-            ++cc.dataMgr.userData.gameBgIdx;
-            if (cc.dataMgr.userData.gameBgIdx >= cc.dataMgr.boxName.length)
-                cc.dataMgr.userData.gameBgIdx = 0;
+            //颜色要根据时间 
+            cc.dataMgr.changeToNextBg();
+            // ++cc.dataMgr.userData.gameBgIdx;
+            // if (cc.dataMgr.userData.gameBgIdx >= cc.dataMgr.boxName.length)
+            //     cc.dataMgr.userData.gameBgIdx = 0;
         }
         cc.dataMgr.userData.boxName = cc.dataMgr.boxName[cc.dataMgr.userData.gameBgIdx];
 
@@ -366,11 +406,12 @@ export default class Game extends cc.Component {
         } else
             spr_bg.opacity = 255;
 
-        for (let i = 0; i < this.root_box.children.length; ++i) {
-            let nodeN = this.root_box.children[i];
-            if (nodeN)
-                nodeN.getComponent("NodeBox").setBoxFrame();
-        }
+        //所有柱子变色
+        // for (let i = 0; i < this.root_box.children.length; ++i) {
+        //     let nodeN = this.root_box.children[i];
+        //     if (nodeN)
+        //         nodeN.getComponent("NodeBox").setBoxFrame();
+        // }
     }
 
     callShowBg() {
@@ -383,6 +424,7 @@ export default class Game extends cc.Component {
         let data = {
             dieType: 1,
             aimPosY: aimPos.y,
+            aimPosX: aimPos.x,
             boxType: "box"
         }
         for (let i = 0; i < this.root_box.children.length; ++i) {
@@ -411,6 +453,7 @@ export default class Game extends cc.Component {
                     data.boxType = boxType;
                 }
                 data.aimPosY = nodeN.y;
+                data.aimPosX = nodeN.x;
             }
         }
         return data;
@@ -424,12 +467,13 @@ export default class Game extends cc.Component {
             let numS = parseInt(Math.random() * 40 + 20);
             cc.dataMgr.userData.speedNum = numS;
         }
-
         //减速道具
         if (cc.dataMgr.userData.propCutNum > 0) {
             cc.dataMgr.userData.propCutNum -= 1;
-            cc.dataMgr.userData.cameraSpeedY = cc.dataMgr.userData.baseSpeedY * (1 - Math.random() * 0.8);
-            this.node.runAction(cc.sequence(cc.delayTime(Math.random() * 10 + 10), cc.callFunc(this.callCameraSpeedY, this)));
+            cc.dataMgr.userData.cutSpeed = 0.7;
+            cc.dataMgr.userData.cameraSpeedY = cc.dataMgr.userData.baseSpeedY * cc.dataMgr.userData.cutSpeed;
+
+            this.scheduleOnce(this.callCameraSpeedY, Math.random() * 8 + 12);
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedBegin");
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("cut");
         }
@@ -437,6 +481,7 @@ export default class Game extends cc.Component {
     }
 
     callCameraSpeedY() {
+        cc.dataMgr.userData.cutSpeed = 1;
         cc.dataMgr.userData.cameraSpeedY = cc.dataMgr.userData.baseSpeedY;
         this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("cutEnd");
     }
@@ -454,7 +499,7 @@ export default class Game extends cc.Component {
     getGameFrame_sf(name) {
         let sf = this.atlas_game.getSpriteFrame(name);
         if (!sf)
-            sf = this.atlas_game.getSpriteFrame("box1");
+            sf = this.atlas_game.getSpriteFrame("zz01");
         return sf;
     }
 
@@ -467,7 +512,8 @@ export default class Game extends cc.Component {
     }
 
     lateUpdate(dt) {
-        if (cc.dataMgr.userData.onGaming) {
+        //游戏中 和 复活达到安全距离可以下落
+        if (cc.dataMgr.userData.onGaming && cc.dataMgr.userData.isReliveDrop) {
             //相机的位置 和 角色位置的差值
             let suprX = cc.dataMgr.userData.aimRoleX - this.node_camera.x
             let suprY = (cc.dataMgr.userData.aimRoleY + 2 * cc.dataMgr.boxY) - this.node_camera.y;
@@ -499,7 +545,22 @@ export default class Game extends cc.Component {
                     nodeN.getComponent("NodeBox").toDie();
                 }
             }
-            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 80);
+            this.node_streak.active = (cc.dataMgr.userData.speedNum > 0);
+            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 48);
+        }
+
+        //统计变色相关
+        if (cc.dataMgr.userData.onGaming) {
+            this._countTime += dt;
+            if (this._countTime >= 1) {
+                this._countSecond++;
+                this._countTime -= 1;
+            }
+        }
+
+        if (this._countSecond >= cc.dataMgr.userData.nextChangeTime) {
+            this.changeToNextBg();
+            this._countSecond = 0;
         }
     }
 
@@ -507,6 +568,8 @@ export default class Game extends cc.Component {
 
     //初始化子域信息
     initSubCanvas() {
+        if (true)
+            return;
         this.tex = new cc.Texture2D();
         if (CC_WECHATGAME) {
             console.log("-- WECHAT Game.js initSubCanvas --");
@@ -518,6 +581,8 @@ export default class Game extends cc.Component {
     }
 
     updataSubCanvas() {
+        if (true)
+            return;
         if (CC_WECHATGAME) {
             //console.log("-- WECHAT Game.js updataSubCanvas --");
             this.tex.initWithElement(window.sharedCanvas);
@@ -528,6 +593,8 @@ export default class Game extends cc.Component {
 
     //这里type: gameBegin(游戏开始请求好友数据)、nextBeyond(将要超越的好友)
     subPostMessage(type) {
+        if (true)
+            return;
         if (CC_WECHATGAME) {
             console.log("-- WECHAT Game.js subPostMessage --" + type);
             if (type == "submit") {
