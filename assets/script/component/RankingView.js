@@ -8,8 +8,15 @@ export default class RankingView extends cc.Component {
     @property(cc.Node) //显示微信子域排行
     subCanvas = null;
 
-    onLoad() {
+    @property(cc.Node) //结束界面
+    node_end = null;
+    @property(cc.Node) //好友列表和 群列表对应按钮
+    node_list = null;
+    @property(cc.Node) //查看群排行按钮
+    btn_qun = null;
 
+    onLoad() {
+        this.showPanel("end");
     }
 
     start() {
@@ -21,6 +28,24 @@ export default class RankingView extends cc.Component {
         this.subPostMessage("end");
     }
 
+    //end friend group 三个对应的层级
+    showPanel(panelName) {
+        if (panelName == "end") {
+            this.node_end.active = true;
+            this.node_list.active = false;
+            this.node_end.getChildByName("now_Label").getComponent(cc.Label).string = ("得分:" + cc.dataMgr.userData.countJump);
+            this.node_end.getChildByName("prop").getChildByName("prop_Label").getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
+        } else if (panelName == "friend") {
+            this.node_end.active = false;
+            this.node_list.active = true;
+            this.btn_qun.active = true;
+        } else if (panelName == "group") {
+            this.node_end.active = false;
+            this.node_list.active = true;
+            this.btn_qun.active = false;
+        }
+    }
+
     onClickBtn(event, customeData) {
         if (event.target) {
             cc.audioMgr.playEffect("btn_click");
@@ -29,10 +54,15 @@ export default class RankingView extends cc.Component {
                 cc.director.loadScene("start");
             } else if (btnN == "kuangti_tongyong01") {
                 cc.director.loadScene("game");
-            } else if (btnN == "ziti_chakanqun") {
-
             } else if (btnN == "ziti_chakanhaoyou") {
-
+                this.subPostMessage("friend");
+            } else if (btnN == "ziti_chakanqun") {
+                this.shareGroup();
+            } else if (btnN == "anniu_backEnd") {
+                this.subPostMessage("end");
+            }
+            else if (btnN == "anniu_weixin") {
+                this.shareFriend();
             }
         }
     }
@@ -74,12 +104,14 @@ export default class RankingView extends cc.Component {
                     MAIN_MENU_NUM: "user_best_score",
                     myScore: cc.dataMgr.userData.countJump
                 });
+                this.showPanel("end")
             } else if (type == "friend") {
                 window.wx.postMessage({
                     messageType: 1,
                     MAIN_MENU_NUM: "user_best_score",
                     myScore: cc.dataMgr.userData.countJump
                 });
+                this.showPanel("friend");
             }
         }
     }
@@ -89,7 +121,7 @@ export default class RankingView extends cc.Component {
         let self = this;
         if (CC_WECHATGAME) {
             window.wx.shareAppMessage({
-                title: "我邀请了8个好友一起PK，就差你了，赶紧来！",
+                title: "我再这里，等你来超越。--境之边缘",
                 imageUrl: "https://bpw.blyule.com/res/raw-assets/Texture/shareImage0.a52e5.jpg",
                 success: (res) => {
                     console.log("-- shareGroup success --");
@@ -100,9 +132,23 @@ export default class RankingView extends cc.Component {
                             MAIN_MENU_NUM: "user_best_score",
                             shareTicket: res.shareTickets[0]
                         });
-                        // self.dataFetchBtn.interactable = false;
-                        // self.uiRefresh();
+                        self.showPanel("group");
                     }
+                }
+            });
+        } else {
+            console.log("-- Not is wechatGame --");
+        }
+    }
+
+    //分享给好友
+    shareFriend() {
+        if (CC_WECHATGAME) {
+            window.wx.shareAppMessage({
+                title: "我再这里，等你来。--境之边缘",
+                imageUrl: "https://bpw.blyule.com/res/raw-assets/Texture/shareImage0.a52e5.jpg",
+                success: (res) => {
+                    cc.dataMgr.shareSuccess();
                 }
             });
         } else {

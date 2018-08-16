@@ -19,7 +19,11 @@ export default class NodeBox extends cc.Component {
     _isAlive = true;
     _boxType = null; //有三个值:box、prop(道具)、"block"
 
-    onLoad() {}
+    _colorBegin = null;
+
+    onLoad() {
+
+    }
 
     initBox(countBox, aimPos, isLeft, boxType) {
         //console.log("-- countBox:" + countBox + " -- " + isLeft + " -- " + boxType);
@@ -58,6 +62,9 @@ export default class NodeBox extends cc.Component {
 
                 this.spr_prop.scale = 0;
                 this.spr_prop.runAction(cc.sequence(cc.delayTime(0.2), cc.scaleTo(0.2, 1)));
+
+                this._colorBegin = this.spr_box.color;
+                this.spr_box.color = cc.color(this._colorBegin.r * 0.72, this._colorBegin.g * 0.72, this._colorBegin.b * 0.72, 255);
             } else {
                 this.spr_block.active = false;
                 this.spr_prop.active = false;
@@ -104,11 +111,16 @@ export default class NodeBox extends cc.Component {
     touchBox() {
         if (this._boxType == "prop") {
             ++cc.dataMgr.userData.propGreenNum;
-            cc.audioMgr.playEffect("prop_score");
+            //cc.audioMgr.playEffect("prop_score");
             this.spr_prop.active = false;
         } else if (this._boxType == "speed") {
             cc.dataMgr.userData.speedNum = parseInt(Math.random() * 10 + 10);
             this.spr_prop.active = false;
+
+            let node_hint = cc.find("Canvas/node_hint");
+            if (node_hint && node_hint.getComponent("NodeHint")) {
+                node_hint.getComponent("NodeHint").showHint("speed");
+            }
         }
     }
 

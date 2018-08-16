@@ -26,14 +26,16 @@ export default class AudioMgr extends cc.Component {
         });
         cc.game.on(cc.game.EVENT_SHOW, function () {
             console.log("cc.audioEngine.resumeAll");
-            cc.audioEngine.resumeAll();
+            if (cc.dataMgr.userData.onGaming)
+                cc.audioEngine.resumeAll();
         });
 
         let self = this;
         cc.loader.loadRes("sound/bg", cc.AudioClip, function (err, clip) {
             if (!err) {
                 self._audioSource_o.bg = clip;
-                self.playBg();
+                if (cc.find("Canvas").getComponent("Start"))
+                    self.playBg();
             }
         });
         cc.loader.loadRes("sound/btn_click", cc.AudioClip, function (err, clip) {
