@@ -68,9 +68,8 @@ export default class Game extends cc.Component {
                 if (cc.dataMgr.userData.pauseGame)
                     return true;
                 if (cc.dataMgr.userData.isReady && cc.dataMgr.userData.loadOver) {
-                    cc.audioMgr.pauseAll();
-                    self.initGame(false);
                     cc.dataMgr.userData.isReady = false;
+                    self.showGame();
                 }
                 //在游戏中 且 不在加速状态 才能自由选择前进方向。
                 else if (cc.dataMgr.userData.onGaming && cc.dataMgr.userData.speedNum <= 0) {
@@ -86,6 +85,10 @@ export default class Game extends cc.Component {
                     cc.dataMgr.userData.onGaming = true;
                     self.jumpRole(touchPos.x < 360);
                     self.node_game.getChildByName("node_hint").active = false;
+
+                    //开始跳跃之后 再隐藏主界面
+                    self.node_start.active = false;
+                    self.node_role.opacity = 255;
                 }
                 return true;
             },
@@ -99,10 +102,24 @@ export default class Game extends cc.Component {
     showStart() {
         this._isInitGame = false;
         cc.dataMgr.userData.isReady = true;
-        cc.dataMgr.userData.onGaming = false;
 
         this.node_start.active = true;
         this.node_game.active = false;
+    }
+
+    showGame() {
+        let animation = this.node_start.getComponent(cc.Animation);
+        animation.play("start");
+        //animation.on("end", this.onPlayAnimation, this);
+        this.scheduleOnce(this.onPlayAnimation, 1.8);
+        this.node_start.getComponent("PanelStart").hideStart();
+    }
+
+    //动画播放完成 initGame
+    onPlayAnimation(type, state) {
+        cc.audioMgr.pauseAll();
+        this.initGame(false);
+        cc.dataMgr.userData.isReady = false;
     }
 
     //这里是初始游戏,再点击就开始跳了(是否为复活)
@@ -111,7 +128,6 @@ export default class Game extends cc.Component {
         cc.dataMgr.userData.onGaming = false;
 
         this.node_game.active = true;
-        this.node_start.active = false;
 
         if (!isRelive) {
             //初始化数据
@@ -145,7 +161,7 @@ export default class Game extends cc.Component {
                 cc.dataMgr.userData.reliveHp = 30;
 
             //保证角色在中心点下两个 方块高度
-            this.node_camera.position = cc.v2(0, 2 * cc.dataMgr.boxY);
+            //this.node_camera.position = cc.v2(0, 2 * cc.dataMgr.boxY);
 
             console.log("--- initGame ---");
             console.log(cc.dataMgr.userData);
@@ -224,7 +240,7 @@ export default class Game extends cc.Component {
             //界面及角色 显示
             this.hideRelive();
             this.node_game.active = true;
-            this.node_game.getChildByName("node_hint").active = true;
+            //this.node_game.getChildByName("node_hint").active = true;
             this.node_role.active = true;
             this.node_role.getComponent("NodeRole").initRole(posBegin);
             this.node_role.getComponent("NodeRole").blinkRole();
@@ -248,12 +264,16 @@ export default class Game extends cc.Component {
 
     //开局加速
     callBeginSpeed() {
+        //开始跳跃之后 再隐藏主界面
+        this.node_start.active = false;
+        this.node_role.opacity = 255;
+
         this.jumpRole(true);
         this._isInitGame = false;
-        cc.dataMgr.userData.onGaming = true;
 
         //背景音乐
         cc.audioMgr.playBg();
+        cc.dataMgr.userData.onGaming = true;
     }
 
     showRelive() {
@@ -307,6 +327,7 @@ export default class Game extends cc.Component {
                 this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.35, 1), cc.callFunc(this.autoJump, this)));
             } else {
                 cc.dataMgr.userData.roleDieType = data.dieType;
+                cc.audioMgr.pauseAll();
                 cc.dataMgr.userData.onGaming = false;
                 let roleJs = this.node_role.getComponent("NodeRole");
                 this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.35, 1), cc.callFunc(roleJs.toDie, roleJs)));
@@ -569,11 +590,12 @@ export default class Game extends cc.Component {
             this._countTime += dt;
             if (this._countTime >= 1) {
                 this._countSecond++;
-                this._countTime -= 1;
+                this._countTime = 0;
             }
         }
 
         if (this._countSecond >= cc.dataMgr.userData.nextChangeTime) {
+            console.log("-- countSecond -- " + this._countSecond + " -- " + this._countTime + " -- " + cc.dataMgr.userData.nextChangeTime);
             this.changeToNextBg();
             this._countSecond = 0;
         }

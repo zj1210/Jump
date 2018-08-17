@@ -49,8 +49,16 @@ export default class Start extends cc.Component {
         }
     }
 
-    hideStart(){
-        
+    hideStart() {
+        this.node.getChildByName("ziti_kaishiyouxi").active = false;
+        this.node.getChildByName("prop").active = false;
+        for (let i = 0; i < this.node_box.children.length; ++i) {
+            let nodeN = this.node_box.children[i];
+            nodeN.stopAllActions();
+
+            let randY = Math.random() * 20 + 10;
+            nodeN.runAction(cc.sequence(cc.moveBy(Math.random() * 0.5 + 0.5, cc.v2(0, -640)), cc.fadeOut()));
+        }
     }
 
     onClickBtn(event, customeData) {

@@ -23,8 +23,8 @@ export default class DataMgr extends cc.Component {
         bestScore: 0, //最高纪录
         reliveNum: 0, //复活币数目
         propGreenNum: 0, //获得游戏币道具个数
-        propSpeedNum: 6, //加速道具的个数
-        propCutNum: 6, //减速道具的个数
+        propSpeedNum: 0, //加速道具的个数
+        propCutNum: 0, //减速道具的个数
         useFootIdx: 1, //当前使用的脚印下标 默认:prop_foot1
         useRoleIdx: 1, //当前使用的角色下标  默认:role_right1
 
