@@ -34,7 +34,8 @@ export default class RankingView extends cc.Component {
             this.node_end.active = true;
             this.node_list.active = false;
             this.node_end.getChildByName("now_Label").getComponent(cc.Label).string = ("得分:" + cc.dataMgr.userData.countJump);
-            this.node_end.getChildByName("prop").getChildByName("prop_Label").getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
+            this.node_end.getChildByName("prop").active = false;
+            //this.node_end.getChildByName("prop").getChildByName("prop_Label").getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
         } else if (panelName == "friend") {
             this.node_end.active = false;
             this.node_list.active = true;
@@ -51,7 +52,7 @@ export default class RankingView extends cc.Component {
             cc.audioMgr.playEffect("btn_click");
             let btnN = event.target.name;
             if (btnN == "anniu_zhuyie") {
-                cc.director.loadScene("start");
+                cc.director.loadScene("game");
             } else if (btnN == "kuangti_tongyong01") {
                 cc.director.loadScene("game");
             } else if (btnN == "ziti_chakanhaoyou") {

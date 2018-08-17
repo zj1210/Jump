@@ -6,18 +6,10 @@ const {
 } = cc._decorator;
 @ccclass
 export default class Start extends cc.Component {
-    /*
-        重要提示 数据在start onLoad 中初始化,启动游戏一定要打这开始启动
-    */
-    @property(cc.SpriteAtlas) //图集
-    atlas_game = null;
-
     @property(cc.Node)
     spr_light = null;
     @property(cc.Node)
     spr_box = null;
-    @property(cc.Node)
-    spr_role = null;
     @property(cc.Node)
     node_box = null;
 
@@ -29,35 +21,12 @@ export default class Start extends cc.Component {
 
     onLoad() {
         console.log("--- onLoad Start ---");
-        if (!cc.dataMgr) {
-            //let DataMgr = require("DataMgr");
-            cc.dataMgr = new DataMgr();
-            cc.dataMgr.initData();
-        }
-        if (!cc.audioMgr) {
-            //let AudioMgr = require("AudioMgr");
-            cc.audioMgr = new AudioMgr();
-            cc.audioMgr.init();
-        }
     }
 
     start() {
-        let self = this;
-        cc.eventManager.addListener({
-            event: cc.EventListener.TOUCH_ONE_BY_ONE,
-            onTouchBegan: function (touch, event) {
-                cc.director.loadScene("game");
-                return true;
-            },
-            onTouchMoved: function (touch, event) {},
-            onTouchEnded: function (touch, event) {}
-        }, self.node);
-
         this.initStart();
-
         this.rankingView.active = false;
         this.initSubCanvas();
-        this.schedule(this.updataSubCanvas, 0.5);
     }
 
     initStart() {
@@ -69,33 +38,19 @@ export default class Start extends cc.Component {
         let spr_begin = this.node.getChildByName("ziti_kaishiyouxi");
         spr_begin.runAction(cc.repeatForever(cc.sequence(cc.fadeIn(0.4), cc.fadeOut(0.6))));
 
-        //背景颜色
-        let frame = cc.dataMgr.getBgFrame_sf(null);
-        if (frame) {
-            let spr_bg = this.node.getChildByName("game_bg");
-            spr_bg.getComponent(cc.Sprite).spriteFrame = frame;
-        }
-
         //主界面柱子和角色
         //this.spr_light.runAction(cc.repeatForever(cc.sequence(cc.fadeIn(1.2), cc.fadeOut(3.6))));
-        let sprFrame = this.getGameFrame_sf(cc.dataMgr.userData.boxName);
-        if (sprFrame) {
-            this.spr_box.getComponent(cc.Sprite).spriteFrame = sprFrame;
-            for (let i = 0; i < this.node_box.children.length; ++i) {
-                let nodeN = this.node_box.children[i];
-                nodeN.getComponent(cc.Sprite).spriteFrame = sprFrame;
-                let randY = Math.random() * 20 + 10;
-                nodeN.runAction(cc.repeatForever(cc.sequence(cc.moveBy(1.8 + Math.random()*2, cc.v2(0, randY)), cc.moveBy(1.2 + Math.random()*2, cc.v2(0, -randY)))));
-            }
+        //this.spr_box.getComponent(cc.Sprite).spriteFrame = sprFrame;
+        for (let i = 0; i < this.node_box.children.length; ++i) {
+            let nodeN = this.node_box.children[i];
+            //nodeN.getComponent(cc.Sprite).spriteFrame = sprFrame;
+            let randY = Math.random() * 20 + 10;
+            nodeN.runAction(cc.repeatForever(cc.sequence(cc.moveBy(1.8 + Math.random() * 2, cc.v2(0, randY)), cc.moveBy(1.2 + Math.random() * 2, cc.v2(0, -randY)))));
         }
     }
 
-    //获取精灵图片
-    getGameFrame_sf(name) {
-        let sf = this.atlas_game.getSpriteFrame(name);
-        if (!sf)
-            sf = this.atlas_game.getSpriteFrame("zz01");
-        return sf;
+    hideStart(){
+        
     }
 
     onClickBtn(event, customeData) {
@@ -111,6 +66,7 @@ export default class Start extends cc.Component {
                         MAIN_MENU_NUM: "user_best_score",
                         myScore: cc.dataMgr.userData.countJump
                     });
+                    this.scheduleOnce(this.updataSubCanvas, 3);
                 }
             } else if (btnN == "anniu_weixin") {
                 this.shareFriend();
@@ -124,7 +80,7 @@ export default class Start extends cc.Component {
         }
     }
 
-    //微信相关
+    //------ 微信相关 ------
 
     //初始化子域信息
     initSubCanvas() {

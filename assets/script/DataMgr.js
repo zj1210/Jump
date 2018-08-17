@@ -8,6 +8,8 @@ export default class DataMgr extends cc.Component {
     boxY = 64;
 
     userData = {
+        isReady: true, //在主界面中 已准备完成
+        loadOver:false,//加载背景音乐完成
         pauseGame: false, //暂停游戏
         onGaming: false, //游戏正在进行中(砖块 下落 和 场景移动))
 
@@ -15,7 +17,6 @@ export default class DataMgr extends cc.Component {
         baseSpeedY: 160, //相机移动的基础度
         cameraSpeedX: 50, //相机的移动的基础速度
         cameraSpeedY: 160, //相机的移动的Y速度
-
         dropPosY: 200, //当方块位置 小于摄像机位置这么多时消失
 
         //用户相关需要储存的数据

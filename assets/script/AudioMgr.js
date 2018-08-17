@@ -34,8 +34,10 @@ export default class AudioMgr extends cc.Component {
         cc.loader.loadRes("sound/bg", cc.AudioClip, function (err, clip) {
             if (!err) {
                 self._audioSource_o.bg = clip;
-                if (cc.find("Canvas").getComponent("Start"))
+                //主界面中会 加载完成直接播放
+                if (cc.dataMgr.userData.isReady)
                     self.playBg();
+                cc.dataMgr.userData.loadOver = true;
             }
         });
         cc.loader.loadRes("sound/btn_click", cc.AudioClip, function (err, clip) {

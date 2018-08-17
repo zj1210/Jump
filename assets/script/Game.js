@@ -1,3 +1,5 @@
+import DataMgr from 'DataMgr';
+import AudioMgr from 'AudioMgr';
 const {
     ccclass,
     property
@@ -31,10 +33,6 @@ export default class Game extends cc.Component {
     //显示微信子域排行
     @property(cc.Node)
     node_start = null;
-    @property(cc.Node)
-    rankingView = null;
-    @property(cc.Node)
-    subCanvas = null;
 
     _isInitGame = false; //游戏是否初始化完成(完成后点击就开始跳了)
 
@@ -49,7 +47,16 @@ export default class Game extends cc.Component {
         // let DataMgr = require("DataMgr");
         // cc.dataMgr = new DataMgr();
 
-        cc.audioMgr.pauseAll();
+        if (!cc.dataMgr) {
+            //let DataMgr = require("DataMgr");
+            cc.dataMgr = new DataMgr();
+            cc.dataMgr.initData();
+        }
+        if (!cc.audioMgr) {
+            //let AudioMgr = require("AudioMgr");
+            cc.audioMgr = new AudioMgr();
+            cc.audioMgr.init();
+        }
     }
 
     start() {
@@ -60,8 +67,13 @@ export default class Game extends cc.Component {
                 let touchPos = touch.getLocation();
                 if (cc.dataMgr.userData.pauseGame)
                     return true;
+                if (cc.dataMgr.userData.isReady && cc.dataMgr.userData.loadOver) {
+                    cc.audioMgr.pauseAll();
+                    self.initGame(false);
+                    cc.dataMgr.userData.isReady = false;
+                }
                 //在游戏中 且 不在加速状态 才能自由选择前进方向。
-                if (cc.dataMgr.userData.onGaming && cc.dataMgr.userData.speedNum <= 0) {
+                else if (cc.dataMgr.userData.onGaming && cc.dataMgr.userData.speedNum <= 0) {
                     self.jumpRole(touchPos.x < 360);
                 } else if (self._isInitGame) {
                     //背景音乐(两处播放音乐 一处这里 一处 在开局冲刺时)
@@ -81,16 +93,25 @@ export default class Game extends cc.Component {
             onTouchEnded: function (touch, event) {}
         }, self.node);
 
-        this.initGame(false);
+        this.showStart();
+    }
 
-        //微信子域
-        this.initSubCanvas();
+    showStart() {
+        this._isInitGame = false;
+        cc.dataMgr.userData.isReady = true;
+        cc.dataMgr.userData.onGaming = false;
+
+        this.node_start.active = true;
+        this.node_game.active = false;
     }
 
     //这里是初始游戏,再点击就开始跳了(是否为复活)
     initGame(isRelive) {
         cc.audioMgr.pauseAll();
         cc.dataMgr.userData.onGaming = false;
+
+        this.node_game.active = true;
+        this.node_start.active = false;
 
         if (!isRelive) {
             //初始化数据
@@ -236,8 +257,6 @@ export default class Game extends cc.Component {
     }
 
     showRelive() {
-        // this.subPostMessage("submit");
-
         // this.node_relive.active = true;
         // this.node_relive.getComponent("PanelRelive").showRelive();
         // cc.dataMgr.saveData();
@@ -316,10 +335,6 @@ export default class Game extends cc.Component {
             this.createBox(null);
         if (cc.dataMgr.userData.speedNum > 0)
             --cc.dataMgr.userData.speedNum;
-
-        //不是在加速状态 且跳过了五个台阶提交子域超过好友
-        if (cc.dataMgr.userData.countJump % 5 == 0 && cc.dataMgr.userData.speedNum <= 0)
-            this.subPostMessage("nextBeyond");
     }
 
     //开局加速会停下来 其它不会
@@ -561,63 +576,6 @@ export default class Game extends cc.Component {
         if (this._countSecond >= cc.dataMgr.userData.nextChangeTime) {
             this.changeToNextBg();
             this._countSecond = 0;
-        }
-    }
-
-    //------ 微信子域游戏内所有操作 ------
-
-    //初始化子域信息
-    initSubCanvas() {
-        if (true)
-            return;
-        this.tex = new cc.Texture2D();
-        if (CC_WECHATGAME) {
-            console.log("-- WECHAT Game.js initSubCanvas --");
-            window.sharedCanvas.width = 720;
-            window.sharedCanvas.height = 1280;
-
-            this.subPostMessage("gameBegin");
-        }
-    }
-
-    updataSubCanvas() {
-        if (true)
-            return;
-        if (CC_WECHATGAME) {
-            //console.log("-- WECHAT Game.js updataSubCanvas --");
-            this.tex.initWithElement(window.sharedCanvas);
-            this.tex.handleLoadedTexture();
-            this.subCanvas.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
-        }
-    }
-
-    //这里type: gameBegin(游戏开始请求好友数据)、nextBeyond(将要超越的好友)
-    subPostMessage(type) {
-        if (true)
-            return;
-        if (CC_WECHATGAME) {
-            console.log("-- WECHAT Game.js subPostMessage --" + type);
-            if (type == "submit") {
-                window.wx.postMessage({
-                    messageType: 2,
-                    MAIN_MENU_NUM: "user_best_score",
-                    myScore: cc.dataMgr.userData.countJump
-                });
-            } else if (type == "gameBegin") {
-                window.wx.postMessage({
-                    messageType: 6,
-                    MAIN_MENU_NUM: "user_best_score",
-                    myScore: cc.dataMgr.userData.countJump
-                });
-            } else if (type == "nextBeyond") {
-                console.log("-- nextBeyond --" + type);
-                window.wx.postMessage({
-                    messageType: 8,
-                    MAIN_MENU_NUM: "user_best_score",
-                    myScore: cc.dataMgr.userData.countJump
-                });
-                this.updataSubCanvas();
-            }
         }
     }
 }
