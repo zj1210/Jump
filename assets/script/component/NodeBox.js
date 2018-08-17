@@ -26,7 +26,7 @@ export default class NodeBox extends cc.Component {
     }
 
     initBox(countBox, aimPos, isLeft, boxType) {
-        //console.log("-- countBox:" + countBox + " -- " + isLeft + " -- " + boxType);
+        //console.log("-- initBox:" + countBox + " -- " + aimPos.x + " -- " + aimPos.y);
         this._isAlive = true;
         this.node.stopAllActions();
         this.node.setLocalZOrder(6000 - cc.dataMgr.userData.countBox);
@@ -36,6 +36,9 @@ export default class NodeBox extends cc.Component {
             this.node.runAction(cc.moveTo(0.2, aimPos));
         } else {
             this.node.setPosition(aimPos);
+            //为了无缝衔接 第一个为 node_start 中的台阶 游戏中第一个不显示
+            if (countBox != 1)
+                this.node.runAction(cc.fadeIn(0.15));
         }
 
         //显示障碍或道具
@@ -104,6 +107,7 @@ export default class NodeBox extends cc.Component {
             if (gameJs)
                 this.spr_prop.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf("jiaoyin0" + cc.dataMgr.userData.useFootIdx);
             this.spr_prop.y = this._footY;
+            this.node.opacity = 255;
         }
     }
 

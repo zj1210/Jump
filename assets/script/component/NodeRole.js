@@ -27,7 +27,6 @@ export default class NodeRole extends cc.Component {
         if (!posBegin)
             posBegin = cc.v2(0, 0);
         this.node.setPosition(posBegin);
-        this.node.runAction(cc.fadeIn(0.1));
 
         this.spr_role.active = true;
         // for (let i = 0; i < this.node_particle.children.length; ++i) {
@@ -40,6 +39,7 @@ export default class NodeRole extends cc.Component {
     }
 
     blinkRole() {
+        this.node.runAction(cc.fadeIn(0.1));
         this.spr_role.runAction(cc.sequence(cc.blink(1.2, 3), cc.callFunc(this.callBlinkEnd, this)));
     }
 

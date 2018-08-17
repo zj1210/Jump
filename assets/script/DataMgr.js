@@ -8,6 +8,8 @@ export default class DataMgr extends cc.Component {
     boxY = 64;
 
     userData = {
+        isReady: true, //在主界面中 已准备完成
+        loadOver:false,//加载背景音乐完成
         pauseGame: false, //暂停游戏
         onGaming: false, //游戏正在进行中(砖块 下落 和 场景移动))
 
@@ -15,15 +17,14 @@ export default class DataMgr extends cc.Component {
         baseSpeedY: 160, //相机移动的基础度
         cameraSpeedX: 50, //相机的移动的基础速度
         cameraSpeedY: 160, //相机的移动的Y速度
-
         dropPosY: 200, //当方块位置 小于摄像机位置这么多时消失
 
         //用户相关需要储存的数据
         bestScore: 0, //最高纪录
         reliveNum: 0, //复活币数目
         propGreenNum: 0, //获得游戏币道具个数
-        propSpeedNum: 6, //加速道具的个数
-        propCutNum: 6, //减速道具的个数
+        propSpeedNum: 0, //加速道具的个数
+        propCutNum: 0, //减速道具的个数
         useFootIdx: 1, //当前使用的脚印下标 默认:prop_foot1
         useRoleIdx: 1, //当前使用的角色下标  默认:role_right1
 

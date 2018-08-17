@@ -129,7 +129,7 @@ export default class PanelStore extends cc.Component {
             let btnN = event.target.name;
             if (btnN == "anniu_zhuyie") {
                 cc.dataMgr.saveData();
-                cc.director.loadScene("start");
+                cc.director.loadScene("game");
             } else if (btnN == "kuangti_tongyong01") {
                 console.log("--- 购买 ---" + this._onMoving);
                 if (!this._onMoving && this._showPlayerD) {
