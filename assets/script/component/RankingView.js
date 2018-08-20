@@ -61,8 +61,7 @@ export default class RankingView extends cc.Component {
                 this.shareGroup();
             } else if (btnN == "anniu_backEnd") {
                 this.subPostMessage("end");
-            }
-            else if (btnN == "anniu_weixin") {
+            } else if (btnN == "anniu_weixin") {
                 this.shareFriend();
             }
         }
@@ -123,10 +122,12 @@ export default class RankingView extends cc.Component {
         if (CC_WECHATGAME) {
             window.wx.shareAppMessage({
                 title: "我再这里，等你来超越。--境之边缘",
-                imageUrl: "https://bpw.blyule.com/res/raw-assets/Texture/shareImage0.a52e5.jpg",
+                imageUrl: cc.dataMgr.imageUrl.urlGroup,
+                query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
                     console.log("-- shareGroup success --");
                     console.log(res);
+                    cc.dataMgr.shareSuccess("end");
                     if (res.shareTickets != undefined && res.shareTickets.length > 0) {
                         window.wx.postMessage({
                             messageType: 5,
@@ -147,9 +148,10 @@ export default class RankingView extends cc.Component {
         if (CC_WECHATGAME) {
             window.wx.shareAppMessage({
                 title: "我再这里，等你来。--境之边缘",
-                imageUrl: "https://bpw.blyule.com/res/raw-assets/Texture/shareImage0.a52e5.jpg",
+                imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
-                    cc.dataMgr.shareSuccess();
+                    cc.dataMgr.shareSuccess("end");
                 }
             });
         } else {

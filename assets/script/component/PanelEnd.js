@@ -6,7 +6,6 @@ const {
 export default class PanelEnd extends cc.Component {
 
     onLoad() {
-
     }
 
     start() {
@@ -22,6 +21,8 @@ export default class PanelEnd extends cc.Component {
             let spr_bg = this.node.getChildByName("game_bg");
             spr_bg.getComponent(cc.Sprite).spriteFrame = frame;
         }
+        //进入结束界面保存一下数据
+        cc.dataMgr.saveData();
     }
 
     onClickBtn(event, customeData) {

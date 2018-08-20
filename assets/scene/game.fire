@@ -425,7 +425,7 @@
       }
     ],
     "_tag": -1,
-    "_active": true,
+    "_active": false,
     "_components": [],
     "_prefab": null,
     "_id": "29gIU6GN5Ab7JvqBT8AxWd",
@@ -708,8 +708,8 @@
     "_color": {
       "__type__": "cc.Color",
       "r": 255,
-      "g": 255,
-      "b": 255,
+      "g": 0,
+      "b": 235,
       "a": 255
     },
     "_cascadeOpacityEnabled": true,
@@ -1306,8 +1306,10 @@
     "_fontSize": 42,
     "_lineHeight": 45,
     "_enableWrapText": true,
-    "_N$file": null,
-    "_isSystemFontUsed": true,
+    "_N$file": {
+      "__uuid__": "9650f12f-cbee-4593-8eb1-9ffe6c657ca2"
+    },
+    "_isSystemFontUsed": false,
     "_spacingX": 0,
     "_N$string": "0",
     "_N$horizontalAlign": 1,
@@ -1495,8 +1497,10 @@
     "_fontSize": 42,
     "_lineHeight": 42,
     "_enableWrapText": true,
-    "_N$file": null,
-    "_isSystemFontUsed": true,
+    "_N$file": {
+      "__uuid__": "9650f12f-cbee-4593-8eb1-9ffe6c657ca2"
+    },
+    "_isSystemFontUsed": false,
     "_spacingX": 0,
     "_N$string": "122",
     "_N$horizontalAlign": 0,
@@ -4921,8 +4925,10 @@
   },
   {
     "__type__": "cc.ClickEvent",
-    "target": null,
-    "component": "Start",
+    "target": {
+      "__id__": 38
+    },
+    "component": "PanelStart",
     "handler": "onClickBtn",
     "customEventData": ""
   },
@@ -5191,7 +5197,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 280,
+      "width": 266,
       "height": 56
     },
     "_rotationX": 0,
@@ -5223,8 +5229,10 @@
     "_fontSize": 56,
     "_lineHeight": 56,
     "_enableWrapText": true,
-    "_N$file": null,
-    "_isSystemFontUsed": true,
+    "_N$file": {
+      "__uuid__": "9650f12f-cbee-4593-8eb1-9ffe6c657ca2"
+    },
+    "_isSystemFontUsed": false,
     "_spacingX": 0,
     "_N$string": "开局冲刺 x",
     "_N$horizontalAlign": 2,
@@ -5297,8 +5305,10 @@
     "_fontSize": 56,
     "_lineHeight": 56,
     "_enableWrapText": true,
-    "_N$file": null,
-    "_isSystemFontUsed": true,
+    "_N$file": {
+      "__uuid__": "9650f12f-cbee-4593-8eb1-9ffe6c657ca2"
+    },
+    "_isSystemFontUsed": false,
     "_spacingX": 0,
     "_N$string": "20",
     "_N$horizontalAlign": 0,
@@ -5423,8 +5433,10 @@
     "_fontSize": 42,
     "_lineHeight": 42,
     "_enableWrapText": true,
-    "_N$file": null,
-    "_isSystemFontUsed": true,
+    "_N$file": {
+      "__uuid__": "9650f12f-cbee-4593-8eb1-9ffe6c657ca2"
+    },
+    "_isSystemFontUsed": false,
     "_spacingX": 0,
     "_N$string": "台阶下坠减速",
     "_N$horizontalAlign": 1,

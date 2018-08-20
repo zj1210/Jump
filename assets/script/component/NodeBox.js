@@ -100,12 +100,12 @@ export default class NodeBox extends cc.Component {
 
     //角色向左边跳的
     leaveBox(isLeft) {
-        if (cc.dataMgr.userData.useFootIdx > 0 && this._boxType != "block") {
+        if (cc.dataMgr.userData.useFootName && this._boxType != "block") {
             this.spr_prop.active = true;
             this.spr_prop.scaleX = (isLeft ? -1 : 1);
             let gameJs = cc.find("Canvas").getComponent("Game");
             if (gameJs)
-                this.spr_prop.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf("jiaoyin0" + cc.dataMgr.userData.useFootIdx);
+                this.spr_prop.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(cc.dataMgr.userData.useFootName);
             this.spr_prop.y = this._footY;
             this.node.opacity = 255;
         }

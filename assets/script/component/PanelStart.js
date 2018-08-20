@@ -31,8 +31,8 @@ export default class Start extends cc.Component {
 
     initStart() {
         //钻石数量
-        let lab_green = this.node.getChildByName("prop").getChildByName("prop_Label");
-        lab_green.getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
+        // let lab_green = this.node.getChildByName("prop").getChildByName("prop_Label");
+        // lab_green.getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
 
         //点击开始游戏
         let spr_begin = this.node.getChildByName("ziti_kaishiyouxi");
@@ -115,9 +115,10 @@ export default class Start extends cc.Component {
         if (CC_WECHATGAME) {
             window.wx.shareAppMessage({
                 title: "我再这里，等你来。--境之边缘",
-                imageUrl: "https://bpw.blyule.com/res/raw-assets/Texture/shareImage0.a52e5.jpg",
+                imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
-                    cc.dataMgr.shareSuccess();
+                    cc.dataMgr.shareSuccess("startAd");
                 }
             });
         } else {
