@@ -2,7 +2,7 @@
   "__type__": "cc.AnimationClip",
   "_name": "start",
   "_objFlags": 0,
-  "_native": "",
+  "_rawFiles": null,
   "_duration": 1.5,
   "sample": 60,
   "speed": 1,
@@ -359,6 +359,86 @@
             {
               "frame": 0.5,
               "value": false
+            }
+          ]
+        }
+      },
+      "tubiao_biankuanglt": {
+        "props": {
+          "position": [
+            {
+              "frame": 0,
+              "value": [
+                -300,
+                579.5
+              ]
+            },
+            {
+              "frame": 1,
+              "value": [
+                -399.7,
+                680.1
+              ]
+            }
+          ]
+        }
+      },
+      "tubiao_biankuangrt": {
+        "props": {
+          "position": [
+            {
+              "frame": 0,
+              "value": [
+                300,
+                579.5
+              ]
+            },
+            {
+              "frame": 1,
+              "value": [
+                401.1,
+                680.6
+              ]
+            }
+          ]
+        }
+      },
+      "tubiao_biankuangrd": {
+        "props": {
+          "position": [
+            {
+              "frame": 0,
+              "value": [
+                300,
+                -579.5
+              ]
+            },
+            {
+              "frame": 1,
+              "value": [
+                401,
+                -680
+              ]
+            }
+          ]
+        }
+      },
+      "tubiao_biankuangld": {
+        "props": {
+          "position": [
+            {
+              "frame": 0,
+              "value": [
+                -300,
+                -579.5
+              ]
+            },
+            {
+              "frame": 1,
+              "value": [
+                -400.4,
+                -680.6
+              ]
             }
           ]
         }
