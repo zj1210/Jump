@@ -156,6 +156,9 @@ export default class Game extends cc.Component {
                 cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.baseHp + cc.dataMgr.userData.reliveNum;
             cc.dataMgr.userData.reliveNum = 0;
 
+            //检查道具是否过期 并使用道具
+            cc.dataMgr.checkProp();
+
             //暂时加的 设置上限为 30
             if (cc.dataMgr.userData.reliveHp > 30)
                 cc.dataMgr.userData.reliveHp = 30;
@@ -188,14 +191,12 @@ export default class Game extends cc.Component {
             for (let i = 0; i < 6; ++i)
                 this.createBox(null);
 
-            //标识初始化完成 再点击屏幕可以开始跳跃了
-            //this._isInitGame = true;
-
-            //开局自动使用道具
-            this.usePropSpeedOrCut();
+            //开局自动使用道具 冲刺 减速 光效效果
+            this.useProp();
             if (cc.dataMgr.userData.speedNum > 0) {
                 this.scheduleOnce(this.callBeginSpeed, 1.2);
             } else {
+                //标识初始化完成 再点击屏幕可以开始跳跃了
                 this._isInitGame = true;
             }
         } else {
@@ -213,12 +214,10 @@ export default class Game extends cc.Component {
             //给角色找一个合理的位置
             let posBegin = cc.v2(0, 0);
             let minDis = cc.dataMgr.boxY * 6;
-            // if (aimY <= this.node_camera.y)
-            //     aimY = this.node_camera.y;
             for (let i = 0; i < this.root_box.children.length; ++i) {
                 let nodeN = this.root_box.children[i];
                 let nodeNJs = nodeN.getComponent("NodeBox");
-                if (nodeN && nodeNJs /* && nodeN.y <= aimY*/ ) {
+                if (nodeN && nodeNJs) {
                     let disY = Math.abs(nodeN.y - aimY);
                     //console.log("-- findPos : " + disY + " -- " + minDis);
                     //这种是可以 跳上去的砖块
@@ -467,7 +466,7 @@ export default class Game extends cc.Component {
             let nodeN = this.root_box.children[i];
 
             //当前踩的砖块 显示脚丫
-            if (Math.abs(aimPos.y - nodeN.y - cc.dataMgr.boxY) < 10 && cc.dataMgr.userData.useFootIdx > 0) {
+            if (Math.abs(aimPos.y - nodeN.y - cc.dataMgr.boxY) < 10 && cc.dataMgr.userData.useFootName) {
                 let nodeNJs = nodeN.getComponent("NodeBox");
                 if (nodeNJs)
                     nodeNJs.leaveBox(aimPos.x - cc.dataMgr.userData.aimRoleX < 0);
@@ -495,24 +494,25 @@ export default class Game extends cc.Component {
         return data;
     }
 
-    //开局使用加速道具 和 减速道具等
-    usePropSpeedOrCut() {
+    //开局使用加速道具 和 减速道具 光效效果等
+    useProp() {
         //加速道具
-        if (cc.dataMgr.userData.propSpeedNum > 0) {
-            cc.dataMgr.userData.propSpeedNum -= 1;
-            let numS = parseInt(Math.random() * 40 + 20);
-            cc.dataMgr.userData.speedNum = numS;
+        if (cc.dataMgr.userData.useSpeedNum > 0) {
+            cc.dataMgr.userData.speedNum = cc.dataMgr.userData.useSpeedNum;
+            cc.dataMgr.userData.useSpeedNum = 0;
         }
         //减速道具
-        if (cc.dataMgr.userData.propCutNum > 0) {
-            cc.dataMgr.userData.propCutNum -= 1;
-            cc.dataMgr.userData.cutSpeed = 0.7;
+        if (cc.dataMgr.userData.useCutNum > 0) {
+            cc.dataMgr.userData.cutSpeed = cc.dataMgr.userData.useCutNum;
+            cc.dataMgr.userData.useCutNum = 0;
             cc.dataMgr.userData.cameraSpeedY = cc.dataMgr.userData.baseSpeedY * cc.dataMgr.userData.cutSpeed;
 
             this.scheduleOnce(this.callCameraSpeedY, Math.random() * 8 + 12);
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedBegin");
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("cut");
         }
+        //光效效果
+
         //console.log("-- speedNum:" + cc.dataMgr.userData.speedNum + " -- " + cc.dataMgr.userData.cameraSpeedY);
     }
 

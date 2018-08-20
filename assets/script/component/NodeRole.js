@@ -14,9 +14,7 @@ export default class NodeRole extends cc.Component {
 
     _isAlive = true;
 
-    onLoad() {
-
-    }
+    onLoad() {}
 
     initRole(posBegin) {
         //console.log("--- initRole ---" + this.node_particle.children.length);
@@ -29,13 +27,13 @@ export default class NodeRole extends cc.Component {
         this.node.setPosition(posBegin);
 
         this.spr_role.active = true;
-        // for (let i = 0; i < this.node_particle.children.length; ++i) {
-        //     let nodeN = this.node_particle.children[i];
-        //     if (cc.isValid(nodeN))
-        //         nodeN.destroy();
-        // }
-        // this.node_particle.removeAllChildren(true);
         this.node_particle.active = false;
+
+        //替换角色图片
+        let gameJs = cc.find("Canvas").getComponent("Game");
+        if (gameJs) {
+            this.spr_role.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(cc.dataMgr.userData.useRoleName);
+        }
     }
 
     blinkRole() {

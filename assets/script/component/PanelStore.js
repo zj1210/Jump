@@ -58,8 +58,8 @@ export default class PanelStore extends cc.Component {
             }
         }
         //根据显示的更改钱数
-        if (this._showPlayerIdx < cc.dataMgr.playerData.length) {
-            this._showPlayerD = cc.dataMgr.playerData[this._showPlayerIdx];
+        if (this._showPlayerIdx < cc.dataMgr.roleData.length) {
+            this._showPlayerD = cc.dataMgr.roleData[this._showPlayerIdx];
             this.lab_buy.getComponent(cc.Label).string = this._showPlayerD.price;
             this.spr_goumai.active = true;
         } else {
