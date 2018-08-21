@@ -72,7 +72,10 @@ export default class NodeBox extends cc.Component {
                 this.spr_block.active = false;
                 this.spr_prop.active = false;
             }
-            this.spr_box.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(cc.dataMgr.userData.boxName);
+            let boxName = cc.dataMgr.userData.boxName;
+            if (countBox == 1)
+                boxName = cc.dataMgr.boxName[cc.dataMgr.userData.mainBgIdx];
+            this.spr_box.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(boxName);
 
             //触发 生成加速道具
             if (countBox == cc.dataMgr.userData.nextSpeedPos) {

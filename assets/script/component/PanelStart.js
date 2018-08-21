@@ -20,7 +20,7 @@ export default class Start extends cc.Component {
     subCanvas = null;
 
     onLoad() {
-       //console.log("--- onLoad Start ---");
+        //console.log("--- onLoad Start ---");
     }
 
     start() {
@@ -49,6 +49,23 @@ export default class Start extends cc.Component {
         }
     }
 
+    initStartBox() {
+        //场景中柱子和背景颜色变化
+        let boxName = cc.dataMgr.boxName[cc.dataMgr.userData.mainBgIdx];
+        let gameJs = cc.find("Canvas").getComponent("Game");
+        if (gameJs) {
+            let boxSf = gameJs.getGameFrame_sf(boxName);
+            if (boxSf) {
+                this.spr_box.getChildByName("spr_box").getComponent(cc.Sprite).spriteFrame = boxSf;
+                for (let i = 0; i < this.node_box.children.length; ++i) {
+                    let nodeN = this.node_box.children[i];
+                    nodeN.getComponent(cc.Sprite).spriteFrame = boxSf;
+                }
+
+            }
+        }
+    }
+
     hideStart() {
         this.node.getChildByName("ziti_kaishiyouxi").active = false;
         this.node.getChildByName("prop").active = false;
@@ -68,13 +85,14 @@ export default class Start extends cc.Component {
             if (btnN == "anniu_paiming") {
                 this.rankingView.active = true;
                 if (CC_WECHATGAME) {
-                   //console.log("-- WECHAT Start.js subPostMessage --");
+                    //console.log("-- WECHAT Start.js subPostMessage --");
                     window.wx.postMessage({
                         messageType: 1,
                         MAIN_MENU_NUM: "user_best_score",
                         myScore: cc.dataMgr.userData.countJump
                     });
-                    this.scheduleOnce(this.updataSubCanvas, 3);
+                    this.node.runAction(cc.sequence(cc.delayTime(0.1), cc.callFunc(this.updataSubCanvas, this)));
+                    this.scheduleOnce(this.updataSubCanvas, 2.4);
                 }
             } else if (btnN == "anniu_weixin") {
                 let nodeRandom = cc.find("Canvas/node_random");
@@ -106,7 +124,7 @@ export default class Start extends cc.Component {
         if (!this.tex)
             this.tex = new cc.Texture2D();
         if (CC_WECHATGAME) {
-           //console.log("-- WECHAT Start.js initSubCanvas --");
+            //console.log("-- WECHAT Start.js initSubCanvas --");
             window.sharedCanvas.width = 720;
             window.sharedCanvas.height = 1280;
         }
@@ -114,7 +132,7 @@ export default class Start extends cc.Component {
 
     updataSubCanvas() {
         if (CC_WECHATGAME && this.rankingView.active) {
-           //console.log("-- WECHAT Start.js updataSubCanvas --");
+            //console.log("-- WECHAT Start.js updataSubCanvas --");
             this.tex.initWithElement(window.sharedCanvas);
             this.tex.handleLoadedTexture();
             this.subCanvas.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);

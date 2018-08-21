@@ -43,7 +43,7 @@ export default class Game extends cc.Component {
     _countTime = 0;
 
     onLoad() {
-       //console.log("--- Game onLoad ---");
+        //console.log("--- Game onLoad ---");
 
         //这样加载在微信中报错了,查找原因,ES5 写法探究 Start 中写法是正确的
         // let DataMgr = require("DataMgr");
@@ -112,6 +112,16 @@ export default class Game extends cc.Component {
 
         this.node_start.active = true;
         this.node_game.active = false;
+
+        this.node_start.getComponent("PanelStart").initStartBox();
+
+        let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
+        let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
+        spr_bg.opacity = 255;
+        this.node.getChildByName("node_bg").getChildByName("spr_bg2").opacity = 0;
+        let frameBg = cc.dataMgr.getBgFrame_sf(bgName);
+        if (frameBg)
+            spr_bg.getComponent(cc.Sprite).spriteFrame = frameBg;
     }
 
     showGame() {
@@ -174,8 +184,8 @@ export default class Game extends cc.Component {
             //保证角色在中心点下两个 方块高度
             //this.node_camera.position = cc.v2(0, 2 * cc.dataMgr.boxY);
 
-           //console.log("--- initGame ---");
-           //console.log(cc.dataMgr.userData);
+            //console.log("--- initGame ---");
+            //console.log(cc.dataMgr.userData);
 
             for (let i = 0; i < this.root_box.children.length; ++i) {
                 this.root_box.children[i].getComponent("NodeBox").killBox();
@@ -215,8 +225,8 @@ export default class Game extends cc.Component {
             cc.dataMgr.userData.roleDieType = 0;
             cc.dataMgr.userData.isReliveDrop = false;
 
-           //console.log("--- initGame relive ---" + aimY + " -- " + this.node_camera.y);
-           //console.log(cc.dataMgr.userData);
+            //console.log("--- initGame relive ---" + aimY + " -- " + this.node_camera.y);
+            //console.log(cc.dataMgr.userData);
 
             //给角色找一个合理的位置
             let posBegin = cc.v2(0, 0);
@@ -332,8 +342,8 @@ export default class Game extends cc.Component {
         aimY = data.aimPosY;
 
         //落到空 box 上才有声音
-        // if (data && data.boxType == "box") 
-        //     cc.audioMgr.playEffect("role_jump1");
+        if (data && data.boxType == "box")
+            cc.audioMgr.playEffect("role_jump1");
 
         if (data.dieType > 0) {
             //加速的时候是不让死的
@@ -435,9 +445,11 @@ export default class Game extends cc.Component {
         //console.log("--- 变色了 ---");
         //判断确定 idx
         let lastBgName = null;
-        if (cc.dataMgr.userData.countJump == 0)
+        if (cc.dataMgr.userData.countJump == 0) {
             cc.dataMgr.userData.gameBgIdx = 0;
-        else {
+            //之前场景的颜色为 上一次的颜色
+            lastBgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
+        } else {
             lastBgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
 
             //颜色要根据时间 
@@ -523,7 +535,7 @@ export default class Game extends cc.Component {
     useProp() {
         //加速道具
         if (cc.dataMgr.userData.useSpeedNum > 0) {
-           //console.log("--- useProp ---");
+            //console.log("--- useProp ---");
             cc.dataMgr.userData.speedNum = cc.dataMgr.userData.useSpeedNum;
             cc.dataMgr.userData.useSpeedNum = 0;
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedBegin");
@@ -639,7 +651,7 @@ export default class Game extends cc.Component {
         }
 
         if (this._countSecond >= cc.dataMgr.userData.nextChangeTime) {
-           //console.log("-- countSecond -- " + this._countSecond + " -- " + this._countTime + " -- " + cc.dataMgr.userData.nextChangeTime);
+            //console.log("-- countSecond -- " + this._countSecond + " -- " + this._countTime + " -- " + cc.dataMgr.userData.nextChangeTime);
             this.changeToNextBg();
             this._countSecond = 0;
         }

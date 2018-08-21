@@ -52,6 +52,7 @@ export default class DataMgr extends cc.Component {
         reliveHp: 0, //这一局游戏的命数
         shareDouble: 0, //分享获得的翻倍次数
 
+        mainBgIdx:0,//主场景背景的下标切进来一次换一张
         changeNum: 40, //跳多少次变一下场景
         gameBgIdx: 0, //游戏中背景和箱子的图片下标
         boxName: "zz01", //当前所出箱子的图片名称

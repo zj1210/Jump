@@ -5,18 +5,23 @@ const {
 @ccclass
 export default class PanelEnd extends cc.Component {
 
-    onLoad() {
-    }
+    onLoad() {}
 
     start() {
         this.initEnd();
     }
 
     initEnd() {
+        //切换场景的背景图片
+        cc.dataMgr.userData.mainBgIdx++;
+        if (cc.dataMgr.userData.mainBgIdx >= cc.dataMgr.gameBgName.length)
+            cc.dataMgr.userData.mainBgIdx = 0;
+            
         //this.node.getChildByName("best").getChildByName("best_Label").getComponent(cc.Label).string = cc.dataMgr.getBestScore_i(cc.dataMgr.userData.countJump);
 
         //背景颜色
-        let frame = cc.dataMgr.getBgFrame_sf(null);
+        let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
+        let frame = cc.dataMgr.getBgFrame_sf(bgName);
         if (frame) {
             let spr_bg = this.node.getChildByName("game_bg");
             spr_bg.getComponent(cc.Sprite).spriteFrame = frame;

@@ -14,6 +14,14 @@ export default class PanelInvite extends cc.Component {
 
     start() {
         this.initInvite();
+
+         //背景颜色
+         let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
+         let frame = cc.dataMgr.getBgFrame_sf(bgName);
+         if (frame) {
+             let spr_bg = this.node.getChildByName("game_bg");
+             spr_bg.getComponent(cc.Sprite).spriteFrame = frame;
+         }
     }
 
     initInvite() {
