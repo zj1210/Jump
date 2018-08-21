@@ -20,7 +20,7 @@ export default class Start extends cc.Component {
     subCanvas = null;
 
     onLoad() {
-        console.log("--- onLoad Start ---");
+        //console.log("--- onLoad Start ---");
     }
 
     start() {
@@ -33,7 +33,7 @@ export default class Start extends cc.Component {
         //钻石数量
         // let lab_green = this.node.getChildByName("prop").getChildByName("prop_Label");
         // lab_green.getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
-
+        this.node.getChildByName("more_icon").active = true;
         //点击开始游戏
         let spr_begin = this.node.getChildByName("ziti_kaishiyouxi");
         spr_begin.runAction(cc.repeatForever(cc.sequence(cc.fadeIn(0.4), cc.fadeOut(0.6))));
@@ -46,6 +46,23 @@ export default class Start extends cc.Component {
             //nodeN.getComponent(cc.Sprite).spriteFrame = sprFrame;
             let randY = Math.random() * 20 + 10;
             nodeN.runAction(cc.repeatForever(cc.sequence(cc.moveBy(1.8 + Math.random() * 2, cc.v2(0, randY)), cc.moveBy(1.2 + Math.random() * 2, cc.v2(0, -randY)))));
+        }
+    }
+
+    initStartBox() {
+        //场景中柱子和背景颜色变化
+        let boxName = cc.dataMgr.boxName[cc.dataMgr.userData.mainBgIdx];
+        let gameJs = cc.find("Canvas").getComponent("Game");
+        if (gameJs) {
+            let boxSf = gameJs.getGameFrame_sf(boxName);
+            if (boxSf) {
+                this.spr_box.getChildByName("spr_box").getComponent(cc.Sprite).spriteFrame = boxSf;
+                for (let i = 0; i < this.node_box.children.length; ++i) {
+                    let nodeN = this.node_box.children[i];
+                    nodeN.getComponent(cc.Sprite).spriteFrame = boxSf;
+                }
+
+            }
         }
     }
 
@@ -68,22 +85,34 @@ export default class Start extends cc.Component {
             if (btnN == "anniu_paiming") {
                 this.rankingView.active = true;
                 if (CC_WECHATGAME) {
-                    console.log("-- WECHAT Start.js subPostMessage --");
+                    //console.log("-- WECHAT Start.js subPostMessage --");
                     window.wx.postMessage({
                         messageType: 1,
                         MAIN_MENU_NUM: "user_best_score",
                         myScore: cc.dataMgr.userData.countJump
                     });
-                    this.scheduleOnce(this.updataSubCanvas, 3);
+                    this.node.runAction(cc.sequence(cc.delayTime(0.1), cc.callFunc(this.updataSubCanvas, this)));
+                    this.scheduleOnce(this.updataSubCanvas, 2.4);
                 }
             } else if (btnN == "anniu_weixin") {
-                this.shareFriend();
+                let nodeRandom = cc.find("Canvas/node_random");
+                if (nodeRandom) {
+                    nodeRandom.getComponent("PanelRandom").initRand();
+                }
             } else if (btnN == "anniu_yinyue") {
                 cc.director.loadScene("store");
             } else if (btnN == "anniu_shezhi") {
-
+                if (cc.dataMgr.isShowShare)
+                    cc.director.loadScene("invite");
             } else if (btnN == "anniu_backEnd") {
                 this.rankingView.active = false;
+            } else if (btnN == "more_icon") {
+                //let str_imageUrl = "https://bpw.blyule.com/res/raw-assets/Texture/propaganda.6b9b9.jpg";
+                let str_imageUrl = cc.dataMgr.imageUrl.urlMore
+                wx.previewImage({
+                    current: str_imageUrl, // 当前显示图片的http链接
+                    urls: [str_imageUrl] // 需要预览的图片http链接列表
+                });
             }
         }
     }
@@ -95,7 +124,7 @@ export default class Start extends cc.Component {
         if (!this.tex)
             this.tex = new cc.Texture2D();
         if (CC_WECHATGAME) {
-            console.log("-- WECHAT Start.js initSubCanvas --");
+            //console.log("-- WECHAT Start.js initSubCanvas --");
             window.sharedCanvas.width = 720;
             window.sharedCanvas.height = 1280;
         }
@@ -103,26 +132,10 @@ export default class Start extends cc.Component {
 
     updataSubCanvas() {
         if (CC_WECHATGAME && this.rankingView.active) {
-            console.log("-- WECHAT Start.js updataSubCanvas --");
+            //console.log("-- WECHAT Start.js updataSubCanvas --");
             this.tex.initWithElement(window.sharedCanvas);
             this.tex.handleLoadedTexture();
             this.subCanvas.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
-        }
-    }
-
-    //分享给好友
-    shareFriend() {
-        if (CC_WECHATGAME) {
-            window.wx.shareAppMessage({
-                title: "我再这里，等你来。--境之边缘",
-                imageUrl: cc.dataMgr.imageUrl.urlFriend,
-                query: "otherID=" + cc.dataMgr.openid,
-                success: (res) => {
-                    cc.dataMgr.shareSuccess("startAd");
-                }
-            });
-        } else {
-            console.log("-- Not is wechatGame --");
         }
     }
 }

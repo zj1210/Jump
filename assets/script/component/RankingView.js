@@ -15,6 +15,11 @@ export default class RankingView extends cc.Component {
     @property(cc.Node) //查看群排行按钮
     btn_qun = null;
 
+    @property(cc.Node)
+    btn_share = null;
+    @property(cc.Node) //引导分享
+    lab_share = null;
+
     onLoad() {
         this.showPanel("end");
     }
@@ -33,6 +38,10 @@ export default class RankingView extends cc.Component {
         if (panelName == "end") {
             this.node_end.active = true;
             this.node_list.active = false;
+
+            this.lab_share.active = cc.dataMgr.isShowShare;
+            this.btn_share.active = cc.dataMgr.isShowShare;
+
             this.node_end.getChildByName("now_Label").getComponent(cc.Label).string = ("得分:" + cc.dataMgr.userData.countJump);
             this.node_end.getChildByName("prop").active = false;
             //this.node_end.getChildByName("prop").getChildByName("prop_Label").getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
@@ -63,6 +72,8 @@ export default class RankingView extends cc.Component {
                 this.subPostMessage("end");
             } else if (btnN == "anniu_weixin") {
                 this.shareFriend();
+            } else if (btnN == "anniu_chongxinkaishi") {
+                cc.director.loadScene("game");
             }
         }
     }
@@ -73,7 +84,7 @@ export default class RankingView extends cc.Component {
     initSubCanvas() {
         this.tex = new cc.Texture2D();
         if (CC_WECHATGAME) {
-            console.log("-- WECHAT End.js initSubCanvas --");
+           //console.log("-- WECHAT End.js initSubCanvas --");
             window.sharedCanvas.width = 720;
             window.sharedCanvas.height = 1280;
         }
@@ -81,7 +92,7 @@ export default class RankingView extends cc.Component {
 
     updataSubCanvas() {
         if (CC_WECHATGAME) {
-            console.log("-- WECHAT End.js updataSubCanvas --");
+           //console.log("-- WECHAT End.js updataSubCanvas --");
             this.tex.initWithElement(window.sharedCanvas);
             this.tex.handleLoadedTexture();
             this.subCanvas.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
@@ -91,7 +102,7 @@ export default class RankingView extends cc.Component {
     //这里type: submit(提交个人数据)、end(结束界面)、friend(好友排行)
     subPostMessage(type) {
         if (CC_WECHATGAME) {
-            console.log("-- WECHAT End.js subPostMessage --" + type);
+           //console.log("-- WECHAT End.js subPostMessage --" + type);
             if (type == "submit") {
                 window.wx.postMessage({
                     messageType: 2,
@@ -121,12 +132,12 @@ export default class RankingView extends cc.Component {
         let self = this;
         if (CC_WECHATGAME) {
             window.wx.shareAppMessage({
-                title: "我再这里，等你来超越。--境之边缘",
+                title: "我在这里，等你来超越。--境之边缘",
                 imageUrl: cc.dataMgr.imageUrl.urlGroup,
                 query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
-                    console.log("-- shareGroup success --");
-                    console.log(res);
+                   //console.log("-- shareGroup success --");
+                   //console.log(res);
                     cc.dataMgr.shareSuccess("end");
                     if (res.shareTickets != undefined && res.shareTickets.length > 0) {
                         window.wx.postMessage({
@@ -139,7 +150,7 @@ export default class RankingView extends cc.Component {
                 }
             });
         } else {
-            console.log("-- Not is wechatGame --");
+           //console.log("-- Not is wechatGame --");
         }
     }
 
@@ -147,7 +158,7 @@ export default class RankingView extends cc.Component {
     shareFriend() {
         if (CC_WECHATGAME) {
             window.wx.shareAppMessage({
-                title: "我再这里，等你来。--境之边缘",
+                title: "我在这里，等你来。--境之边缘",
                 imageUrl: cc.dataMgr.imageUrl.urlFriend,
                 query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
@@ -155,7 +166,7 @@ export default class RankingView extends cc.Component {
                 }
             });
         } else {
-            console.log("-- Not is wechatGame --");
+           //console.log("-- Not is wechatGame --");
         }
     }
 }

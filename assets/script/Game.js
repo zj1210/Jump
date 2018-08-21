@@ -23,8 +23,10 @@ export default class Game extends cc.Component {
     root_box = null;
     @property(cc.Node) //角色
     node_role = null;
-    @property(cc.Node) //拖尾效果实验
-    node_streak = null;
+    @property(cc.Node) //加速拖尾效果实验
+    node_streakS = null;
+    @property(cc.Node) //角色拖尾效果实验
+    node_streakR = null;
     @property(cc.Node)
     node_ui = null;
     @property(cc.Node) //相机
@@ -41,7 +43,7 @@ export default class Game extends cc.Component {
     _countTime = 0;
 
     onLoad() {
-        console.log("--- Game onLoad ---");
+        //console.log("--- Game onLoad ---");
 
         //这样加载在微信中报错了,查找原因,ES5 写法探究 Start 中写法是正确的
         // let DataMgr = require("DataMgr");
@@ -86,9 +88,14 @@ export default class Game extends cc.Component {
                     self.jumpRole(touchPos.x < 360);
                     self.node_game.getChildByName("node_hint").active = false;
 
-                    //开始跳跃之后 再隐藏主界面
+                    //开始跳跃之后 在隐藏主界面
                     self.node_start.active = false;
                     self.node_role.opacity = 255;
+                    for (let i = 0; i < self.root_box.children.length; ++i) {
+                        let nodeN = self.root_box.children[i];
+                        if (nodeN.getComponent("NodeBox"))
+                            nodeN.getComponent("NodeBox").leaveFrist();
+                    }
                 }
                 return true;
             },
@@ -105,6 +112,16 @@ export default class Game extends cc.Component {
 
         this.node_start.active = true;
         this.node_game.active = false;
+
+        this.node_start.getComponent("PanelStart").initStartBox();
+
+        let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
+        let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
+        spr_bg.opacity = 255;
+        this.node.getChildByName("node_bg").getChildByName("spr_bg2").opacity = 0;
+        let frameBg = cc.dataMgr.getBgFrame_sf(bgName);
+        if (frameBg)
+            spr_bg.getComponent(cc.Sprite).spriteFrame = frameBg;
     }
 
     showGame() {
@@ -113,6 +130,7 @@ export default class Game extends cc.Component {
         //animation.on("end", this.onPlayAnimation, this);
         this.scheduleOnce(this.onPlayAnimation, 1.8);
         this.node_start.getComponent("PanelStart").hideStart();
+        this.node_start.getChildByName("more_icon").active = false;
     }
 
     //动画播放完成 initGame
@@ -122,7 +140,7 @@ export default class Game extends cc.Component {
         cc.dataMgr.userData.isReady = false;
     }
 
-    //这里是初始游戏,再点击就开始跳了(是否为复活)
+    //这里是初始游戏,在点击就开始跳了(是否为复活)
     initGame(isRelive) {
         cc.audioMgr.pauseAll();
         cc.dataMgr.userData.onGaming = false;
@@ -166,8 +184,8 @@ export default class Game extends cc.Component {
             //保证角色在中心点下两个 方块高度
             //this.node_camera.position = cc.v2(0, 2 * cc.dataMgr.boxY);
 
-            console.log("--- initGame ---");
-            console.log(cc.dataMgr.userData);
+            //console.log("--- initGame ---");
+            //console.log(cc.dataMgr.userData);
 
             for (let i = 0; i < this.root_box.children.length; ++i) {
                 this.root_box.children[i].getComponent("NodeBox").killBox();
@@ -196,7 +214,7 @@ export default class Game extends cc.Component {
             if (cc.dataMgr.userData.speedNum > 0) {
                 this.scheduleOnce(this.callBeginSpeed, 1.2);
             } else {
-                //标识初始化完成 再点击屏幕可以开始跳跃了
+                //标识初始化完成 在点击屏幕可以开始跳跃了
                 this._isInitGame = true;
             }
         } else {
@@ -205,11 +223,10 @@ export default class Game extends cc.Component {
 
             //这里是复活(有些数据不需要初始化)
             cc.dataMgr.userData.roleDieType = 0;
-            ++cc.dataMgr.userData.reliveTimes;
             cc.dataMgr.userData.isReliveDrop = false;
 
-            console.log("--- initGame relive ---" + aimY + " -- " + this.node_camera.y);
-            console.log(cc.dataMgr.userData);
+            //console.log("--- initGame relive ---" + aimY + " -- " + this.node_camera.y);
+            //console.log(cc.dataMgr.userData);
 
             //给角色找一个合理的位置
             let posBegin = cc.v2(0, 0);
@@ -255,15 +272,16 @@ export default class Game extends cc.Component {
 
             //console.log("-- 补 " + supr + " --R " + posBegin.y + " --B " + cc.dataMgr.userData.lastBoxY + " --C " + this.node_camera.y);
 
-            //标识初始化完成 再点击屏幕可以开始跳跃了
+            //标识初始化完成 在点击屏幕可以开始跳跃了
             this._isInitGame = true;
         }
         cc.dataMgr.saveData();
+        this.changeStreak();
     }
 
     //开局加速
     callBeginSpeed() {
-        //开始跳跃之后 再隐藏主界面
+        //开始跳跃之后 在隐藏主界面
         this.node_start.active = false;
         this.node_role.opacity = 255;
 
@@ -273,6 +291,12 @@ export default class Game extends cc.Component {
         //背景音乐
         cc.audioMgr.playBg();
         cc.dataMgr.userData.onGaming = true;
+
+        for (let i = 0; i < this.root_box.children.length; ++i) {
+            let nodeN = this.root_box.children[i];
+            if (nodeN.getComponent("NodeBox"))
+                nodeN.getComponent("NodeBox").leaveFrist();
+        }
     }
 
     showRelive() {
@@ -284,7 +308,11 @@ export default class Game extends cc.Component {
             this.initGame(true);
         } else {
             //直接结束游戏
-            cc.director.loadScene("end");
+            //cc.director.loadScene("end");
+
+            this.node_relive.active = true;
+            this.node_relive.getComponent("PanelRelive").showRelive();
+            cc.dataMgr.saveData();
         }
     }
 
@@ -314,8 +342,8 @@ export default class Game extends cc.Component {
         aimY = data.aimPosY;
 
         //落到空 box 上才有声音
-        // if (data && data.boxType == "box") 
-        //     cc.audioMgr.playEffect("role_jump1");
+        if (data && data.boxType == "box")
+            cc.audioMgr.playEffect("role_jump1");
 
         if (data.dieType > 0) {
             //加速的时候是不让死的
@@ -360,11 +388,16 @@ export default class Game extends cc.Component {
     //开局加速会停下来 其它不会
     autoJump() {
         if (cc.dataMgr.userData.speedNum > 0) {
+            this.changeStreak();
             this.jumpRole(false);
             this.node.getChildByName("node_hint").getComponent("NodeHint").changeNum("speed");
         } else {
-            this._isInitGame = this.node_game.getChildByName("node_hint").active;
+            //之前是 开局加速停止 现在事所有加速都停止
+            this._isInitGame = true; //this.node_game.getChildByName("node_hint").active;
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedEnd");
+
+            //且要跳到安全区域 (之前是只有复活跳到安全区域)
+            cc.dataMgr.userData.isReliveDrop = false;
 
             if (this._isInitGame) {
                 cc.audioMgr.pauseAll();
@@ -372,6 +405,8 @@ export default class Game extends cc.Component {
             } else {
                 cc.dataMgr.userData.onGaming = true;
             }
+
+            this.changeStreak();
         }
     }
 
@@ -410,9 +445,11 @@ export default class Game extends cc.Component {
         //console.log("--- 变色了 ---");
         //判断确定 idx
         let lastBgName = null;
-        if (cc.dataMgr.userData.countJump == 0)
+        if (cc.dataMgr.userData.countJump == 0) {
             cc.dataMgr.userData.gameBgIdx = 0;
-        else {
+            //之前场景的颜色为 上一次的颜色
+            lastBgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
+        } else {
             lastBgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
 
             //颜色要根据时间 
@@ -498,8 +535,10 @@ export default class Game extends cc.Component {
     useProp() {
         //加速道具
         if (cc.dataMgr.userData.useSpeedNum > 0) {
+            //console.log("--- useProp ---");
             cc.dataMgr.userData.speedNum = cc.dataMgr.userData.useSpeedNum;
             cc.dataMgr.userData.useSpeedNum = 0;
+            this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedBegin");
         }
         //减速道具
         if (cc.dataMgr.userData.useCutNum > 0) {
@@ -508,7 +547,6 @@ export default class Game extends cc.Component {
             cc.dataMgr.userData.cameraSpeedY = cc.dataMgr.userData.baseSpeedY * cc.dataMgr.userData.cutSpeed;
 
             this.scheduleOnce(this.callCameraSpeedY, Math.random() * 8 + 12);
-            this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedBegin");
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("cut");
         }
         //光效效果
@@ -520,6 +558,20 @@ export default class Game extends cc.Component {
         cc.dataMgr.userData.cutSpeed = 1;
         cc.dataMgr.userData.cameraSpeedY = cc.dataMgr.userData.baseSpeedY;
         this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("cutEnd");
+    }
+
+    changeStreak() {
+        if (cc.dataMgr.userData.speedNum > 0) {
+            this.node_streakS.active = true;
+            this.node_streakR.active = false;
+        } else {
+            this.node_streakS.active = false;
+            if (cc.dataMgr.userData.useStreakColor != null) {
+                this.node_streakR.active = true;
+                this.node_streakR.color = cc.dataMgr.userData.useStreakColor;
+                this.node_streakR.getComponent(cc.MotionStreak).color = cc.dataMgr.userData.useStreakColor;
+            }
+        }
     }
 
     pauseGame(isPause) {
@@ -581,8 +633,12 @@ export default class Game extends cc.Component {
                     nodeN.getComponent("NodeBox").toDie();
                 }
             }
-            this.node_streak.active = (cc.dataMgr.userData.speedNum > 0);
-            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 48);
+
+            if (cc.dataMgr.userData.speedNum > 0)
+                this.node_streakS.position = cc.v2(this.node_role.x, this.node_role.y + 48);
+
+            if (cc.dataMgr.userData.useStreakColor != null)
+                this.node_streakR.position = cc.v2(this.node_role.x, this.node_role.y + 48);
         }
 
         //统计变色相关
@@ -595,7 +651,7 @@ export default class Game extends cc.Component {
         }
 
         if (this._countSecond >= cc.dataMgr.userData.nextChangeTime) {
-            console.log("-- countSecond -- " + this._countSecond + " -- " + this._countTime + " -- " + cc.dataMgr.userData.nextChangeTime);
+            //console.log("-- countSecond -- " + this._countSecond + " -- " + this._countTime + " -- " + cc.dataMgr.userData.nextChangeTime);
             this.changeToNextBg();
             this._countSecond = 0;
         }

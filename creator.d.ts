@@ -5600,7 +5600,7 @@ declare module cc {
 		!#en Put a new Node into the pool.
 		It will automatically remove the node from its parent without cleanup.
 		It will also invoke unuse method of the poolHandlerComp if exist.
-		!#zh 向缓冲池中存入一个不再需要的节点对象。
+		!#zh 向缓冲池中存入一个不在需要的节点对象。
 		这个函数会自动将目标节点从父节点上移除，但是不会进行 cleanup 操作。
 		这个函数会调用 poolHandlerComp 的 unuse 函数，如果组件和函数都存在的话。
 		@param obj obj
@@ -5977,7 +5977,7 @@ declare module cc {
 		/** the main cc.Node in the prefab */
 		data: Node;		
 		/** !#en Indicates the raw assets of this prefab can be load after prefab loaded.
-		!#zh 指示该 Prefab 依赖的资源可否在 Prefab 加载后再延迟加载。 */
+		!#zh 指示该 Prefab 依赖的资源可否在 Prefab 加载后在延迟加载。 */
 		asyncLoadAssets: boolean;		
 		/**
 		Dynamically translation prefab data into minimized code.<br/>
@@ -6013,7 +6013,7 @@ declare module cc {
 	export class SceneAsset extends Asset {		
 		scene: Scene;		
 		/** !#en Indicates the raw assets of this scene can be load after scene launched.
-		!#zh 指示该场景依赖的资源可否在场景切换后再延迟加载。 */
+		!#zh 指示该场景依赖的资源可否在场景切换后在延迟加载。 */
 		asyncLoadAssets: boolean;	
 	}	
 	/** !#en Class for script handling.
@@ -6725,7 +6725,7 @@ declare module cc {
 		编辑器执行撤销/重做操作时，将调用组件的 get set 来录制和还原组件的状态。
 		然而，在极端的情况下，它可能无法良好运作。<br/>
 		那么你就应该实现这个方法，手动根据组件的属性同步“内部状态”。
-		一旦你实现这个方法，当用户撤销或重做时，组件的所有 get set 都不会再被调用。
+		一旦你实现这个方法，当用户撤销或重做时，组件的所有 get set 都不会在被调用。
 		这意味着仅仅指定了默认值的属性将被编辑器记录和还原。<br/>
 		<br/>
 		同样的，编辑可能无法在极端情况下正确地重置您的组件。<br/>
@@ -6882,7 +6882,7 @@ declare module cc {
 		call the destroy method on this component or the associated node explicitly.
 		Otherwise, the created DOM element won't be removed from web page.
 		!#zh
-		如果你不再使用 EditBox，并且组件未添加到场景中，那么你必须手动对组件或所在节点调用 destroy。
+		如果你不在使用 EditBox，并且组件未添加到场景中，那么你必须手动对组件或所在节点调用 destroy。
 		这样才能移除网页上的 DOM 节点，避免 Web 平台内存泄露。
 		
 		@example 
@@ -7770,7 +7770,7 @@ declare module cc {
 		call the destroy method on this component or the associated node explicitly.
 		Otherwise, the created DOM element won't be removed from web page.
 		!#zh
-		如果你不再使用 VideoPlayer，并且组件未添加到场景中，那么你必须手动对组件或所在节点调用 destroy。
+		如果你不在使用 VideoPlayer，并且组件未添加到场景中，那么你必须手动对组件或所在节点调用 destroy。
 		这样才能移除网页上的 DOM 节点，避免 Web 平台内存泄露。
 		
 		@example 
@@ -7845,7 +7845,7 @@ declare module cc {
 		call the destroy method on this component or the associated node explicitly.
 		Otherwise, the created DOM element won't be removed from web page.
 		!#zh
-		如果你不再使用 WebView，并且组件未添加到场景中，那么你必须手动对组件或所在节点调用 destroy。
+		如果你不在使用 WebView，并且组件未添加到场景中，那么你必须手动对组件或所在节点调用 destroy。
 		这样才能移除网页上的 DOM 节点，避免 Web 平台内存泄露。
 		
 		@example 
@@ -8153,7 +8153,7 @@ declare module cc {
 		unuse(): string;		
 		/**
 		!#en Reuse the event for being used again by the object pool.
-		!#zh 用于对象池再次使用的事件。 
+		!#zh 用于对象池在次使用的事件。 
 		*/
 		reuse(): string;		
 		/**
@@ -9665,7 +9665,7 @@ declare module cc {
 		通过 id（通常是资源 url）来释放一个资源或者一个资源数组。
 		从 v1.3 开始，这个方法不仅会从 loader 中删除资源的缓存引用，还会清理它的资源内容。
 		比如说，当你释放一个 texture 资源，这个 texture 和它的 gl 贴图数据都会被释放。
-		在复杂项目中，我们建议你结合 {{#crossLink "loader/getDependsRecursively:method"}}{{/crossLink}} 来使用，便于在设备内存告急的情况下更快地释放不再需要的资源的内存。
+		在复杂项目中，我们建议你结合 {{#crossLink "loader/getDependsRecursively:method"}}{{/crossLink}} 来使用，便于在设备内存告急的情况下更快地释放不在需要的资源的内存。
 		注意，这个函数可能会导致资源贴图或资源所依赖的贴图不可用，如果场景中存在节点仍然依赖同样的贴图，它们可能会变黑并报 GL 错误。
 		如果你只想删除一个资源的缓存引用，请使用 {{#crossLink "pipeline/removeItem:method"}}{{/crossLink}}
 		@param asset asset
@@ -10427,7 +10427,7 @@ declare module cc {
 		You can use cc.isValid(obj) to check whether the object is destroyed before accessing it.
 		!#zh
 		销毁该对象，并释放所有它对其它对象的引用。<br/>
-		实际销毁操作会延迟到当前帧渲染前执行。从下一帧开始，CCObject 将不再可用。
+		实际销毁操作会延迟到当前帧渲染前执行。从下一帧开始，CCObject 将不在可用。
 		您可以在访问对象之前使用 cc.isValid(obj) 来检查对象是否已被销毁。
 		
 		@example 
@@ -11254,7 +11254,7 @@ declare module cc {
 		!#en
 		If you do not need to use the SpriteFrame temporarily, you can call this method so that its texture could be garbage collected. Then when you need to render the SpriteFrame, you should call `ensureLoadTexture` manually to reload texture.
 		!#zh
-		当你暂时不再使用这个 SpriteFrame 时，可以调用这个方法来保证引用的贴图对象能被 GC。然后当你要渲染 SpriteFrame 时，你需要手动调用 `ensureLoadTexture` 来重新加载贴图。
+		当你暂时不在使用这个 SpriteFrame 时，可以调用这个方法来保证引用的贴图对象能被 GC。然后当你要渲染 SpriteFrame 时，你需要手动调用 `ensureLoadTexture` 来重新加载贴图。
 		
 		@example 
 		```js
@@ -17301,7 +17301,7 @@ declare module cc.js {
 		_get(): any;		
 		/**
 		!#en Put an object into the pool.
-		!#zh 向对象池返还一个不再需要的对象。 
+		!#zh 向对象池返还一个不在需要的对象。 
 		*/
 		put(): void;		
 		/**
