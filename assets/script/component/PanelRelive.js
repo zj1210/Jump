@@ -12,14 +12,35 @@ export default class PanelRelive extends cc.Component {
     @property(cc.Node)
     lab_relive = null;
 
+    @property(cc.Node)
+    node_relive = null;
+    @property(cc.Node) //引导分享
+    node_share = null;
+
     _timeCD = 6;
     _timeCount = 0;
+
+    _toEnd = true;
 
     onLoad() {
 
     }
 
     showRelive() {
+        this._toEnd = true;
+        if (cc.dataMgr.isShowShare) {
+            if (cc.dataMgr.userData.reliveTimes < 2) {
+                this.node_share.active = true;
+                this.node_relive.active = false;
+            } else {
+                this.node_share.active = false;
+                this.node_relive.active = true;
+            }
+        } else {
+            this.node_share.active = cc.dataMgr.isShowShare;
+            this.node_relive.active = true;
+        }
+
         this._timeCount = 6;
         this.spr_circle.stopAllActions();
         this.lab_time.stopAllActions();
@@ -27,10 +48,7 @@ export default class PanelRelive extends cc.Component {
         this.spr_circle.runAction(this.myCircleTo_act(this._timeCD, 1));
         this.lab_time.runAction(cc.sequence(cc.repeat(cc.sequence(cc.delayTime(1), cc.callFunc(this.callChengNum, this)), 6), cc.delayTime(0.2), cc.callFunc(this.callEnd, this)));
 
-        //提示当前数目 和 消耗复活币数目
-        let cutNum = 1; //Math.pow(2, cc.dataMgr.userData.reliveTimes);
-        let str = "本次复活消耗：" + cutNum + "个复活币\n当前剩余：" + cc.dataMgr.userData.reliveNum;
-        this.lab_relive.getComponent(cc.Label).string = str;
+        this.lab_relive.getComponent(cc.Label).string = "观看广告可 复活 \n 并回满生命值";
     }
 
     //圆形cd:总时间、百分比(0~1)
@@ -54,7 +72,16 @@ export default class PanelRelive extends cc.Component {
     }
 
     callEnd() {
-        cc.director.loadScene("end");
+        if (this._toEnd)
+            cc.director.loadScene("end");
+    }
+
+    reliveRole() {
+        ++cc.dataMgr.userData.reliveTimes;
+        let gameJs = cc.find("Canvas").getComponent("Game");
+        if (gameJs) {
+            gameJs.initGame(true);
+        }
     }
 
     onClickBtn(event, customeData) {
@@ -62,20 +89,33 @@ export default class PanelRelive extends cc.Component {
             cc.audioMgr.playEffect("btn_click");
             let btnN = event.target.name;
             if (btnN == "btn_relive") {
-                //这里要复活了
-                let cutNum = 1; //Math.pow(2, cc.dataMgr.userData.reliveTimes);
-                if (cc.dataMgr.userData.reliveNum >= cutNum) {
-                    cc.dataMgr.userData.reliveNum -= cutNum;
-                    cc.dataMgr.saveData();
-                    let gameJs = cc.find("Canvas").getComponent("Game");
-                    if (gameJs) {
-                        gameJs.initGame(true);
-                    }
-                } else {
-                    let str = "复活币不足。\n每30分钟恢复1个,恢复上线为10个。"
-                    this.lab_relive.getComponent(cc.Label).string = str;
-                }
+                //这里要观看广告复活了
+                this.lab_relive.getComponent(cc.Label).string = ">_< 敬请期待,广告尚未开启。"
+            } else if (btnN == "btn_end") {
+                this.lab_time.stopAllActions();
+                if (this._toEnd)
+                    cc.director.loadScene("end");
+            } else if (btnN == "anniu_weixin") {
+                this._toEnd = false;
+                this.shareFriend();
             }
+        }
+    }
+
+    //分享给好友
+    shareFriend() {
+        if (CC_WECHATGAME) {
+            window.wx.shareAppMessage({
+                title: "我在这里，等你来。--境之边缘",
+                imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                query: "otherID=" + cc.dataMgr.openid,
+                success: (res) => {
+                    cc.dataMgr.shareSuccess("endRelive");
+                }
+            });
+        } else {
+           //console.log("-- Not is wechatGame PanelRelive --");
+            cc.dataMgr.shareSuccess("endRelive");
         }
     }
 }

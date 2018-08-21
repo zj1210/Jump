@@ -13,6 +13,8 @@ export default class DataMgr extends cc.Component {
     imageUrl = {
         urlGroup: "https://bpw.blyule.com/jump/res/jumpShare1.jpg",
         urlFriend: "https://bpw.blyule.com/jump/res/jumpShare2.jpg",
+        urlMore: "https://bpw.blyule.com/jump/res/jumpShare3.jpg",
+        urlXml: "https://bpw.blyule.com/jump/res/share.xml",
     }
 
     userData = {
@@ -37,9 +39,9 @@ export default class DataMgr extends cc.Component {
         onGaming: false, //游戏正在进行中(砖块 下落 和 场景移动))
 
         //移动相机相关变量(相机的目标位置即是角色的目标位置 aimRoleX aimRoleY)
-        baseSpeedY: 160, //相机移动的基础度
+        baseSpeedY: 100, //相机移动的基础度
         cameraSpeedX: 50, //相机的移动的基础速度
-        cameraSpeedY: 160, //相机的移动的Y速度
+        cameraSpeedY: 100, //相机的移动的Y速度
         dropPosY: 200, //当方块位置 小于摄像机位置这么多时消失
 
         lastBoxX: this.boxX, //最近生成的个 方块的X Y
@@ -111,10 +113,10 @@ export default class DataMgr extends cc.Component {
 
     //玩家拥有的道具等
     haveProp = {
-        haveSpeed: [50, 100, 50, 100], //50 和 100两种
-        haveCut: [0.3, 0.7, 0.3], //0.3 和 0.7 两种
-        haveFoot: [0, 0], //存的是脚印的下标
-        haveStreak: [0], //存的时下标
+        haveSpeed: [], //50 和 100两种
+        haveCut: [], //0.3 和 0.7 两种
+        haveFoot: [], //存的是脚印的下标
+        haveStreak: [], //存的时下标
 
         //玩家当前正在使用的东西
         useSpeed: {
@@ -143,19 +145,26 @@ export default class DataMgr extends cc.Component {
         countShareToday: 0, //统计今天的分享次数
         countAdNum: 0, //统计总的广告此时
         countInvite: 0, //成功邀请好友进入数
-        freeTimes: 3, //免费的转盘次数
+        freeTimes: 3, //免费的转盘次数(新人免费送的)
 
         adCDBegin: 0, //看广告转转盘 冷却时间
+        rewardTimes: 0, //观看视频获得的 转盘机会
         todayShareBegin: 0, //今日开始分享计数的时间
+
+        inviteTake: [], //邀请有礼里领取的奖励
+        isOwnSpeed: false, //永久加速
+        isOwnCut: false, //永久拥有
+        isOwnFoot: false, //永久拥有
+        isOwnStreak: false, //永久拥有
     };
 
     initData() {
-        console.log("--- initData ---");
+       //console.log("--- initData ---");
         let openid = cc.sys.localStorage.getItem("openid");
         if (!openid)
             cc.sys.localStorage.setItem("openid", 0);
         cc.dataMgr.openid = cc.sys.localStorage.getItem("openid");
-        console.log(cc.dataMgr.openid);
+       //console.log(cc.dataMgr.openid);
 
         let score = cc.sys.localStorage.getItem("bestScore");
         if (!score)
@@ -203,15 +212,15 @@ export default class DataMgr extends cc.Component {
         }
 
         let havePropStr = cc.sys.localStorage.getItem("haveProp");
-        console.log("-- haveProp : " + havePropStr);
+       //console.log("-- haveProp : " + havePropStr);
         if (!havePropStr)
             cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
         else {
             this.haveProp = JSON.parse(havePropStr);
-            console.log(this.haveProp);
+           //console.log(this.haveProp);
         }
 
-        console.log(this.userData);
+       //console.log(this.userData);
 
         //加载图片资源
         cc.loader.loadRes("cj01", cc.SpriteFrame, function (err, frame) {
@@ -251,87 +260,103 @@ export default class DataMgr extends cc.Component {
     //每局开始 检查道具是否过期 并修改 userData 中对应的使用数据
     checkProp() {
         //加速冲刺道具
-        if (this.haveProp.useSpeed.num < 0 || this.haveProp.useSpeed.beginTime + 3600 <= this.getTimeSecond_i()) {
-            //如果有道具使用一个新的
-            if (this.haveProp.haveSpeed.length > 0) {
-                let num = this.haveProp.haveSpeed.shift();
-                this.haveProp.useSpeed.num = num;
-                this.haveProp.useSpeed.beginTime = this.getTimeSecond_i();
-                this.haveProp.useSpeed.surplusTimes = 3;
+        if (this.haveProp.isOwnSpeed) {
+            this.userData.useSpeedNum = 100;
+        } else {
+            if (this.haveProp.useSpeed.num < 0 || this.haveProp.useSpeed.beginTime + 3600 <= this.getTimeSecond_i()) {
+                //如果有道具使用一个新的
+                if (this.haveProp.haveSpeed.length > 0) {
+                    let num = this.haveProp.haveSpeed.shift();
+                    this.haveProp.useSpeed.num = num;
+                    this.haveProp.useSpeed.beginTime = this.getTimeSecond_i();
+                    this.haveProp.useSpeed.surplusTimes = 3;
+                }
             }
-        }
-        if (this.haveProp.useSpeed.num > 0 && this.haveProp.useSpeed.beginTime + 3600 > this.getTimeSecond_i()) {
-            this.haveProp.useSpeed.surplusTimes--;
-            this.userData.useSpeedNum = this.haveProp.useSpeed.num;
-            if (this.haveProp.useSpeed.surplusTimes <= 0) {
-                this.haveProp.useSpeed.num = 0;
-                this.haveProp.useSpeed.beginTime = 0;
+            if (this.haveProp.useSpeed.num > 0 && this.haveProp.useSpeed.beginTime + 3600 > this.getTimeSecond_i()) {
+                this.haveProp.useSpeed.surplusTimes--;
+                this.userData.useSpeedNum = this.haveProp.useSpeed.num;
+                if (this.haveProp.useSpeed.surplusTimes <= 0) {
+                    this.haveProp.useSpeed.num = 0;
+                    this.haveProp.useSpeed.beginTime = 0;
+                }
             }
         }
 
         //减速道具
-        if (this.haveProp.useCut.num < 0 || this.haveProp.useCut.beginTime + 3600 <= this.getTimeSecond_i()) {
-            //如果有道具使用一个新的
-            if (this.haveProp.haveCut.length > 0) {
-                let num = this.haveProp.haveCut.shift();
-                this.haveProp.useCut.num = num;
-                this.haveProp.useCut.beginTime = this.getTimeSecond_i();
-                this.haveProp.useCut.surplusTimes = 3;
+        if (this.haveProp.isOwnCut) {
+            this.userData.useCutNum = 0.3;
+        } else {
+            if (this.haveProp.useCut.num < 0 || this.haveProp.useCut.beginTime + 3600 <= this.getTimeSecond_i()) {
+                //如果有道具使用一个新的
+                if (this.haveProp.haveCut.length > 0) {
+                    let num = this.haveProp.haveCut.shift();
+                    this.haveProp.useCut.num = num;
+                    this.haveProp.useCut.beginTime = this.getTimeSecond_i();
+                    this.haveProp.useCut.surplusTimes = 3;
+                }
             }
-        }
-        if (this.haveProp.useCut.num > 0 && this.haveProp.useCut.beginTime + 3600 > this.getTimeSecond_i()) {
-            this.haveProp.useCut.surplusTimes--;
-            this.userData.useCutNum = this.haveProp.useCut.num;
-            if (this.haveProp.useCut.surplusTimes <= 0) {
-                this.haveProp.useCut.num = 0;
-                this.haveProp.useCut.beginTime = 0;
+            if (this.haveProp.useCut.num > 0 && this.haveProp.useCut.beginTime + 3600 > this.getTimeSecond_i()) {
+                this.haveProp.useCut.surplusTimes--;
+                this.userData.useCutNum = this.haveProp.useCut.num;
+                if (this.haveProp.useCut.surplusTimes <= 0) {
+                    this.haveProp.useCut.num = 0;
+                    this.haveProp.useCut.beginTime = 0;
+                }
             }
         }
 
         //脚印效果
-        if (this.haveProp.useFoot.beginTime + this.haveProp.useFoot.continueTime <= this.getTimeSecond_i()) {
-            //过期了换个新的
-            if (this.haveProp.haveFoot.length > 0) {
-                let footIdx = this.haveProp.haveFoot.shift();
-                if (footIdx < this.footName.length) {
-                    this.userData.useFootName = this.footName[footIdx];
+        if (this.haveProp.isOwnFoot) {
+            this.userData.useFootName = this.footName[0];
+        } else {
+            if (this.haveProp.useFoot.beginTime + this.haveProp.useFoot.continueTime <= this.getTimeSecond_i()) {
+                //过期了换个新的
+                if (this.haveProp.haveFoot.length > 0) {
+                    let footIdx = this.haveProp.haveFoot.shift();
+                    if (footIdx < this.footName.length) {
+                        this.userData.useFootName = this.footName[footIdx];
 
-                    this.haveProp.useFoot.footIdx = footIdx;
-                    this.haveProp.useFoot.beginTime = this.getTimeSecond_i();
-                    this.haveProp.useFoot.continueTime = (footIdx % 2 == 0 ? 12 : 24) * 3600;
+                        this.haveProp.useFoot.footIdx = footIdx;
+                        this.haveProp.useFoot.beginTime = this.getTimeSecond_i();
+                        this.haveProp.useFoot.continueTime = (footIdx % 2 == 0 ? 12 : 24) * 3600;
+                    } else
+                        this.userData.useFootName = null;
                 } else
                     this.userData.useFootName = null;
-            } else
-                this.userData.useFootName = null;
-        } else {
-            //没过期
-            if (this.haveProp.useFoot.footIdx < this.footName.length)
-                this.userData.useFootName = this.footName[this.haveProp.useFoot.footIdx];
-            else
-                this.userData.useFootName = null;
+            } else {
+                //没过期
+                if (this.haveProp.useFoot.footIdx < this.footName.length)
+                    this.userData.useFootName = this.footName[this.haveProp.useFoot.footIdx];
+                else
+                    this.userData.useFootName = null;
+            }
         }
 
         //光效效果
-        if (this.haveProp.useStreak.beginTime + this.haveProp.useStreak.continueTime <= this.getTimeSecond_i()) {
-            //过期了换个新的
-            if (this.haveProp.haveStreak.length > 0) {
-                let streakIdx = this.haveProp.haveStreak.shift();
-                if (streakIdx < this.streakColor.length) {
-                    this.userData.useStreakColor = this.streakColor[streakIdx];
+        if (this.haveProp.isOwnStreak) {
+            this.userData.useStreakColor = this.streakColor[0];
+        } else {
+            if (this.haveProp.useStreak.beginTime + this.haveProp.useStreak.continueTime <= this.getTimeSecond_i()) {
+                //过期了换个新的
+                if (this.haveProp.haveStreak.length > 0) {
+                    let streakIdx = this.haveProp.haveStreak.shift();
+                    if (streakIdx < this.streakColor.length) {
+                        this.userData.useStreakColor = this.streakColor[streakIdx];
 
-                    this.haveProp.useStreak.streakIdx = streakIdx;
-                    this.haveProp.useStreak.beginTime = this.getTimeSecond_i();
-                    this.haveProp.useStreak.continueTime = (streakIdx % 2 == 0 ? 12 : 24) * 3600;
+                        this.haveProp.useStreak.streakIdx = streakIdx;
+                        this.haveProp.useStreak.beginTime = this.getTimeSecond_i();
+                        this.haveProp.useStreak.continueTime = (streakIdx % 2 == 0 ? 12 : 24) * 3600;
+                    } else
+                        this.userData.useStreakColor = null;
                 } else
                     this.userData.useStreakColor = null;
-            } else
-                this.userData.useStreakColor = null;
-        } else {
-            //没过期
-            if (this.haveProp.useStreak.streakIdx < this.streakColor.length)
-                this.userData.useStreakColor = this.streakColor[this.haveProp.useStreak.streakIdx];
-            else
-                this.userData.useStreakColor = null;
+            } else {
+                //没过期
+                if (this.haveProp.useStreak.streakIdx < this.streakColor.length)
+                    this.userData.useStreakColor = this.streakColor[this.haveProp.useStreak.streakIdx];
+                else
+                    this.userData.useStreakColor = null;
+            }
         }
 
         //角色
@@ -342,8 +367,8 @@ export default class DataMgr extends cc.Component {
             this.userData.useRoleName = this.roleData[this.haveProp.useRoleIdx].name;
         }
 
-        console.log("--- checkProp over ---");
-        console.log(this.haveProp);
+       //console.log("--- checkProp over ---");
+       //console.log(this.haveProp);
         cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
     }
 
@@ -372,7 +397,7 @@ export default class DataMgr extends cc.Component {
         this.userData.nextChangeTime = this.changeTime[this.userData.nextChangeIdx];
         this.userData.gameBgIdx = this.changeBg[this.userData.nextChangeIdx];
         this.userData.cameraSpeedY = this.changeSpeed[this.userData.nextChangeIdx] * this.userData.baseSpeedY * this.userData.cutSpeed;
-        console.log("-- speed " + this.userData.cameraSpeedY + " -- " + this.userData.nextChangeIdx + " -- " + (this.userData.gameBgIdx + 1));
+       //console.log("-- speed " + this.userData.cameraSpeedY + " -- " + this.userData.nextChangeIdx + " -- " + (this.userData.gameBgIdx + 1));
     }
 
     getTimeSecond_i() {
@@ -399,11 +424,11 @@ export default class DataMgr extends cc.Component {
 
             let openid = cc.sys.localStorage.getItem("openid");
             if (!openid || openid - 1 == -1) { //保证用户是第一次进游戏
-                // console.log("发送wx.login请求!");
+                ////console.log("发送wx.login请求!");
                 wx.login({
                     success: (res) => {
-                        console.log("-- wx.login success --");
-                        console.log(res);
+                       //console.log("-- wx.login success --");
+                       //console.log(res);
                         if (res.code) {
                             //发起网络请求
                             wx.request({
@@ -412,20 +437,20 @@ export default class DataMgr extends cc.Component {
                                     code: res.code,
                                 },
                                 success: (obj, statusCode, header) => {
-                                    console.log("请求openid,服务器返回的数据！！--> " + obj);
-                                    console.log(obj.data.openid);
+                                   //console.log("请求openid,服务器返回的数据！！--> " + obj);
+                                   //console.log(obj.data.openid);
 
                                     cc.dataMgr.openid = obj.data.openid;
                                     cc.sys.localStorage.setItem("openid", obj.data.openid); //之所以要存，是在分享的时候放入query中
                                     //微信官方文档那里写的调用函数是getLaunchInfoSync，但是根本搜不到这个API，应该是下面这个。
                                     let launchOption = wx.getLaunchOptionsSync();
-                                    console.log(launchOption);
+                                   //console.log(launchOption);
                                     if (launchOption.query.otherID == null || launchOption.query.otherID == undefined) {
                                         launchOption.query.otherID = 0;
                                     }
-                                    console.log("看下 自己的openid 和 推荐方的openid");
-                                    console.log(cc.dataMgr.openid);
-                                    console.log(launchOption.query.otherID);
+                                   //console.log("看下 自己的openid 和 推荐方的openid");
+                                   //console.log(cc.dataMgr.openid);
+                                   //console.log(launchOption.query.otherID);
                                     wx.request({
                                         url: 'https://bpw.blyule.com/game_2/public/index.php/index/index/add?userid=' + self.openid + "&" + "cuid=" + launchOption.query.otherID,
                                         data: {
@@ -433,8 +458,8 @@ export default class DataMgr extends cc.Component {
                                             cuid: launchOption.query.otherID,
                                         },
                                         success: (data, statusCode, header) => {
-                                            console.log("添加用户成功！ 服务器返回的数据！！--> ");
-                                            console.log(data);
+                                           //console.log("添加用户成功！ 服务器返回的数据！！--> ");
+                                           //console.log(data);
                                         },
                                     });
 
@@ -451,7 +476,7 @@ export default class DataMgr extends cc.Component {
     //从服务器获得用户的推荐奖励，并刷新在界面上
     getShareReward() {
         let openid = cc.sys.localStorage.getItem("openid");
-        console.log("--- 获取分享奖励 ---" + openid);
+       //console.log("--- 获取分享奖励 ---" + openid);
         if (CC_WECHATGAME && openid) {
             wx.request({
                 url: 'https://bpw.blyule.com/game_2/public/index.php/index/index/getprise?userid=' + openid,
@@ -459,10 +484,12 @@ export default class DataMgr extends cc.Component {
                     userid: openid,
                 },
                 success: (obj, statusCode, header) => {
-                    console.log("--- 获取分享奖励 success ---");
-                    console.log(obj);
+                   //console.log("--- 获取分享奖励 success ---");
+                   //console.log(obj);
                     if (obj.data.code > 0) {
-
+                        let num = obj.data.code;
+                        cc.dataMgr.haveProp.countInvite += num;
+                        cc.dataMgr.refreshInvite();
                     }
                 },
             });
@@ -473,19 +500,27 @@ export default class DataMgr extends cc.Component {
     getShowShare() {
         if (CC_WECHATGAME) {
             wx.request({
-                url: 'https://bpw.blyule.com/res/share.xml',
+                url: this.imageUrl.urlXml,
                 success: (obj, statusCode, header) => {
-                    console.log("--- getShowShare success ---");
-                    console.log(obj);
+                   //console.log("--- getShowShare success ---");
+                   //console.log(obj);
                     if (obj.data == 0)
                         cc.dataMgr.isShowShare = false;
                     else
                         cc.dataMgr.isShowShare = true;
-                    console.log("--- 关闭分享：--- " + cc.dataMgr.isShowShare);
+                   //console.log("--- 关闭分享：--- " + cc.dataMgr.isShowShare);
                 },
             });
         } else
             cc.dataMgr.isShowShare = true;
+    }
+
+    //刷新邀请奖励
+    refreshInvite() {
+        if (cc.dataMgr.haveProp.countInvite > 0) {
+            cc.dataMgr.userData.addHpMax = parseInt(5 + cc.dataMgr.haveProp.countInvite * 5);
+        }
+        //邀请榜奖励
     }
 
     //type : 分享的类型 不同的分享有不同的效果
@@ -495,8 +530,19 @@ export default class DataMgr extends cc.Component {
             this.userData.reliveNum = this.userData.addHpMax;
             this.userData.shareDouble = 2;
         } else if (type == "startAd") {
-
+            //广告分享成功
+            this.haveProp.adCDBegin = 0;
+            //刷新界面
+        } else if (type == "endRelive") {
+            //调用结束界面的复活接口
+            cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.baseHp + cc.dataMgr.userData.addHpMax;
+            let nodeNJs = cc.find("Canvas/node_relive").getComponent("PanelRelive");
+           //console.log(nodeNJs);
+            if (nodeNJs) {
+                nodeNJs.reliveRole();
+            }
         }
+
         if (this.getTimeSecond_i() > this.haveProp.todayShareBegin + 24 * 3600) {
             this.haveProp.todayShareBegin = this.getTimeSecond_i();
             this.haveProp.countShareToday = 0;

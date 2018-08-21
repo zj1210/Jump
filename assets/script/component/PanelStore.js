@@ -8,9 +8,9 @@ export default class PanelStore extends cc.Component {
     @property(cc.Node)
     node_content = null;
     @property(cc.Node)
-    lab_buy = null;
+    lab_xuanze = null;
     @property(cc.Node)
-    spr_goumai = null;
+    lab_yixuanzhe = null;
 
     _firstPosX = -512; //界面中摆放的第一个 player 的位置
     _playerDis = 256; //两个player 之间的距离
@@ -60,12 +60,8 @@ export default class PanelStore extends cc.Component {
         //根据显示的更改钱数
         if (this._showPlayerIdx < cc.dataMgr.roleData.length) {
             this._showPlayerD = cc.dataMgr.roleData[this._showPlayerIdx];
-            this.lab_buy.getComponent(cc.Label).string = this._showPlayerD.price;
-            this.spr_goumai.active = true;
         } else {
             this._showPlayerD = null;
-            this.lab_buy.getComponent(cc.Label).string = 0;
-            this.spr_goumai.active = false;
         }
     }
 
@@ -131,7 +127,7 @@ export default class PanelStore extends cc.Component {
                 cc.dataMgr.saveData();
                 cc.director.loadScene("game");
             } else if (btnN == "kuangti_tongyong01") {
-                console.log("--- 购买 ---" + this._onMoving);
+               //console.log("--- 购买 ---" + this._onMoving);
                 if (!this._onMoving && this._showPlayerD) {
 
                 }

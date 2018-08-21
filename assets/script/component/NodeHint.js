@@ -12,12 +12,14 @@ export default class NodeRole extends cc.Component {
     node_cut = null;
 
     onLoad() {
+        this.node_cut.active = false;
+        this.node_speed.active = false;
         this.node.active = false;
     }
 
     //speedBegin 开局加速 speed 冲刺 cut 减速
     showHint(type) {
-        //console.log("--- hint --- " + type);
+       //console.log("--- showHint --- " + type);
         this.node.active = true;
         if (type == "speedBegin") {
             //提示开局冲刺

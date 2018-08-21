@@ -100,6 +100,7 @@ export default class NodeBox extends cc.Component {
 
     //角色向左边跳的
     leaveBox(isLeft) {
+        //console.log("--- leaveBox ---" + isLeft);
         if (cc.dataMgr.userData.useFootName && this._boxType != "block") {
             this.spr_prop.active = true;
             this.spr_prop.scaleX = (isLeft ? -1 : 1);
@@ -107,18 +108,28 @@ export default class NodeBox extends cc.Component {
             if (gameJs)
                 this.spr_prop.getComponent(cc.Sprite).spriteFrame = gameJs.getGameFrame_sf(cc.dataMgr.userData.useFootName);
             this.spr_prop.y = this._footY;
-            this.node.opacity = 255;
         }
+    }
+
+    leaveFrist() {
+        this.node.active = true;
+        this.node.opacity = 255;
+        this.spr_box.opacity = 255;
+        //this.node.runAction(cc.fadeIn(0.15));
     }
 
     //角色碰到 砖块了
     touchBox() {
+        //todo 第一个砖块消失了。。。
+        this.node.opacity = 255;
         if (this._boxType == "prop") {
             ++cc.dataMgr.userData.propGreenNum;
             //cc.audioMgr.playEffect("prop_score");
             this.spr_prop.active = false;
         } else if (this._boxType == "speed") {
-            cc.dataMgr.userData.speedNum = parseInt(Math.random() * 10 + 10);
+            let num = parseInt(Math.random() * 10 + 10);
+            if (cc.dataMgr.userData.speedNum < num)
+                cc.dataMgr.userData.speedNum = num;
             this.spr_prop.active = false;
 
             let node_hint = cc.find("Canvas/node_hint");
