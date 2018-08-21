@@ -74,7 +74,7 @@ export default class Start extends cc.Component {
             nodeN.stopAllActions();
 
             let randY = Math.random() * 20 + 10;
-            nodeN.runAction(cc.sequence(cc.moveBy(Math.random() * 0.5 + 0.5, cc.v2(0, -640)), cc.fadeOut()));
+            nodeN.runAction(cc.sequence(cc.moveBy(Math.random() * 0.5 + 0.5, cc.v2(0, -640)), cc.fadeOut(0.3)));
         }
     }
 

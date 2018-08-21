@@ -3,7 +3,7 @@
     "__type__": "cc.SceneAsset",
     "_name": "",
     "_objFlags": 0,
-    "_native": "",
+    "_rawFiles": null,
     "scene": {
       "__id__": 1
     }
@@ -213,7 +213,7 @@
       "__id__": 3
     },
     "_enabled": true,
-    "alignMode": 0,
+    "isAlignOnce": true,
     "_target": null,
     "_alignFlags": 45,
     "_left": 0,
@@ -322,7 +322,7 @@
       "__id__": 6
     },
     "_enabled": true,
-    "alignMode": 0,
+    "isAlignOnce": true,
     "_target": null,
     "_alignFlags": 36,
     "_left": 0,
@@ -431,7 +431,7 @@
       "__id__": 9
     },
     "_enabled": true,
-    "alignMode": 0,
+    "isAlignOnce": true,
     "_target": null,
     "_alignFlags": 33,
     "_left": 0,
@@ -540,7 +540,7 @@
       "__id__": 12
     },
     "_enabled": true,
-    "alignMode": 0,
+    "isAlignOnce": true,
     "_target": null,
     "_alignFlags": 9,
     "_left": 22,
@@ -649,7 +649,7 @@
       "__id__": 15
     },
     "_enabled": true,
-    "alignMode": 0,
+    "isAlignOnce": true,
     "_target": null,
     "_alignFlags": 12,
     "_left": 22,
@@ -1798,7 +1798,7 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": -210,
+      "x": -150,
       "y": -405
     },
     "_skewX": 0,
@@ -1946,7 +1946,7 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": 210,
+      "x": 150,
       "y": -405
     },
     "_skewX": 0,
@@ -2066,7 +2066,7 @@
     ],
     "_prefab": null,
     "_id": "55JBjxnx1OQZbrSii0guPQ",
-    "_opacity": 255,
+    "_opacity": 155,
     "_color": {
       "__type__": "cc.Color",
       "r": 255,
@@ -2082,8 +2082,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 489,
-      "height": 72
+      "width": 364,
+      "height": 64
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -2092,7 +2092,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": -530
+      "y": -515
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -2110,16 +2110,16 @@
     },
     "_enabled": true,
     "_useOriginalSize": false,
-    "_actualFontSize": 32,
-    "_fontSize": 32,
-    "_lineHeight": 36,
+    "_actualFontSize": 28,
+    "_fontSize": 28,
+    "_lineHeight": 32,
     "_enableWrapText": true,
     "_N$file": {
       "__uuid__": "9650f12f-cbee-4593-8eb1-9ffe6c657ca2"
     },
     "_isSystemFontUsed": false,
     "_spacingX": 0,
-    "_N$string": "提示:分享好友立即回满额外生命值\n且下一局生命加倍！",
+    "_N$string": "分享好友立即回满额外生命值\n且下一局生命加倍！",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
