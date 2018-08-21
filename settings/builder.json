@@ -28,7 +28,7 @@
   "renderMode": "0",
   "startScene": "dbae7192-2c29-4112-9d38-2beba7c4ae15",
   "title": "Jump",
-  "webOrientation": "auto",
+  "webOrientation": "portrait",
   "wechatgame": {
     "REMOTE_SERVER_ROOT": "https://bpw.blyule.com/jumpTry/",
     "appid": "wxd0a430fea9731a89",

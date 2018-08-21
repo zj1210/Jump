@@ -6001,8 +6001,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 56,
-      "height": 56
+      "width": 169.4,
+      "height": 78.4
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -6034,11 +6034,11 @@
     "_lineHeight": 56,
     "_enableWrapText": true,
     "_N$file": {
-      "__uuid__": "9650f12f-cbee-4593-8eb1-9ffe6c657ca2"
+      "__uuid__": "71ef6737-2bf4-4a6b-87f7-b9525920382a"
     },
     "_isSystemFontUsed": false,
     "_spacingX": 0,
-    "_N$string": "20",
+    "_N$string": "120000",
     "_N$horizontalAlign": 0,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "SimHei",

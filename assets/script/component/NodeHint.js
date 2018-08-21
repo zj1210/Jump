@@ -26,7 +26,6 @@ export default class NodeRole extends cc.Component {
             this.node_speed.active = true;
             this.node_speed.getChildByName("lab_title").getComponent(cc.Label).string = "开局冲刺 x";
             this.node_speed.getChildByName("lab_speed").getComponent(cc.Label).string = cc.dataMgr.userData.speedNum;
-            //this.node_speed.runAction(cc.repeatForever(cc.sequence(cc.scaleTo(0.8, 1.2), cc.scaleTo(0.6, 1))));
         } else if (type == "speed") {
             this.node_speed.active = true;
             this.node_speed.getChildByName("lab_title").getComponent(cc.Label).string = "加速冲刺 x";

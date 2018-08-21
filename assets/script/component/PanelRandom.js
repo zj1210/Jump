@@ -76,7 +76,7 @@ export default class PanelRandom extends cc.Component {
 
     //初始化界面
     initRand() {
-       //console.log("--- initRand ---" + cc.dataMgr.isShowShare);
+       console.log("--- initRand ---" + cc.dataMgr.isShowShare);
 
         //是否显示分享引导
         this.node.active = true;
@@ -100,7 +100,7 @@ export default class PanelRandom extends cc.Component {
             this.lab_time.color = cc.Color.GRAY;
 
             let nextTime = this.getNextADTime_i();
-            this.lab_time.getComponent(cc.Label).string = ("下次观看视频:\n x " + nextTime);
+            this.lab_time.getComponent(cc.Label).string = ("下次观看视频:\n" + nextTime);
 
             if (nextTime > 0) {
                 this.lab_time.stopAllActions();
@@ -119,7 +119,7 @@ export default class PanelRandom extends cc.Component {
             this.lab_time.stopAllActions();
             this.initRand();
         } else
-            this.lab_time.getComponent(cc.Label).string = ("下次观看视频:\n x " + nextTime);
+            this.lab_time.getComponent(cc.Label).string = ("下次观看视频:\n" + nextTime);
     }
 
     getNextADTime_i() {

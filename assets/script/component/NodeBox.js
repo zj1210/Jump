@@ -118,7 +118,6 @@ export default class NodeBox extends cc.Component {
         this.node.active = true;
         this.node.opacity = 255;
         this.spr_box.opacity = 255;
-        //this.node.runAction(cc.fadeIn(0.15));
     }
 
     //角色碰到 砖块了

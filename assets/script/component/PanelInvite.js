@@ -9,7 +9,7 @@ export default class PanelInvite extends cc.Component {
     node_content = null;
 
     onLoad() {
-        //console.log("--- onLoad PanelInvite ---");
+        console.log("--- onLoad PanelInvite ---");
     }
 
     start() {

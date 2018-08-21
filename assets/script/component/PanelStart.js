@@ -39,11 +39,8 @@ export default class Start extends cc.Component {
         spr_begin.runAction(cc.repeatForever(cc.sequence(cc.fadeIn(0.4), cc.fadeOut(0.6))));
 
         //主界面柱子和角色
-        //this.spr_light.runAction(cc.repeatForever(cc.sequence(cc.fadeIn(1.2), cc.fadeOut(3.6))));
-        //this.spr_box.getComponent(cc.Sprite).spriteFrame = sprFrame;
         for (let i = 0; i < this.node_box.children.length; ++i) {
             let nodeN = this.node_box.children[i];
-            //nodeN.getComponent(cc.Sprite).spriteFrame = sprFrame;
             let randY = Math.random() * 20 + 10;
             nodeN.runAction(cc.repeatForever(cc.sequence(cc.moveBy(1.8 + Math.random() * 2, cc.v2(0, randY)), cc.moveBy(1.2 + Math.random() * 2, cc.v2(0, -randY)))));
         }
@@ -74,7 +71,7 @@ export default class Start extends cc.Component {
             nodeN.stopAllActions();
 
             let randY = Math.random() * 20 + 10;
-            nodeN.runAction(cc.sequence(cc.moveBy(Math.random() * 0.5 + 0.5, cc.v2(0, -640)), cc.fadeOut()));
+            nodeN.runAction(cc.sequence(cc.moveBy(Math.random() * 0.5 + 0.5, cc.v2(0, -640)), cc.fadeOut(0.3)));
         }
     }
 

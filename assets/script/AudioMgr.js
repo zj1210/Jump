@@ -19,7 +19,7 @@ export default class AudioMgr extends cc.Component {
     _jumpID = null;
 
     init() {
-       //console.log("--- onLoad AudioMgr ---")
+       console.log("--- onLoad AudioMgr ---")
         cc.game.on(cc.game.EVENT_HIDE, function () {
            //console.log("cc.audioEngine.pauseAll");
             cc.audioEngine.pauseAll();

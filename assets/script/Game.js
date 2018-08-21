@@ -144,8 +144,9 @@ export default class Game extends cc.Component {
     initGame(isRelive) {
         cc.audioMgr.pauseAll();
         cc.dataMgr.userData.onGaming = false;
-
         this.node_game.active = true;
+
+        console.log("--- initGame ---" + isRelive);
 
         if (!isRelive) {
             //初始化数据
@@ -183,9 +184,6 @@ export default class Game extends cc.Component {
 
             //保证角色在中心点下两个 方块高度
             //this.node_camera.position = cc.v2(0, 2 * cc.dataMgr.boxY);
-
-            //console.log("--- initGame ---");
-            //console.log(cc.dataMgr.userData);
 
             for (let i = 0; i < this.root_box.children.length; ++i) {
                 this.root_box.children[i].getComponent("NodeBox").killBox();
@@ -405,7 +403,6 @@ export default class Game extends cc.Component {
             } else {
                 cc.dataMgr.userData.onGaming = true;
             }
-
             this.changeStreak();
         }
     }
@@ -562,12 +559,16 @@ export default class Game extends cc.Component {
 
     changeStreak() {
         if (cc.dataMgr.userData.speedNum > 0) {
-            this.node_streakS.active = true;
-            this.node_streakR.active = false;
+            this.node_streakS.opacity = 255;
+            this.node_streakR.opacity = 0
+            // this.node_streakS.active = true;
+            // this.node_streakR.active = false;
         } else {
-            this.node_streakS.active = false;
+            // this.node_streakS.active = false;
+            this.node_streakS.opacity = 0;
+            this.node_streakR.opacity = 255
             if (cc.dataMgr.userData.useStreakColor != null) {
-                this.node_streakR.active = true;
+                //this.node_streakR.active = true;
                 this.node_streakR.color = cc.dataMgr.userData.useStreakColor;
                 this.node_streakR.getComponent(cc.MotionStreak).color = cc.dataMgr.userData.useStreakColor;
             }
@@ -634,10 +635,10 @@ export default class Game extends cc.Component {
                 }
             }
 
-            if (cc.dataMgr.userData.speedNum > 0)
+            //if (cc.dataMgr.userData.speedNum > 0)
                 this.node_streakS.position = cc.v2(this.node_role.x, this.node_role.y + 48);
 
-            if (cc.dataMgr.userData.useStreakColor != null)
+            //if (cc.dataMgr.userData.useStreakColor != null)
                 this.node_streakR.position = cc.v2(this.node_role.x, this.node_role.y + 48);
         }
 

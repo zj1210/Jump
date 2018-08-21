@@ -52,7 +52,7 @@ export default class DataMgr extends cc.Component {
         reliveHp: 0, //这一局游戏的命数
         shareDouble: 0, //分享获得的翻倍次数
 
-        mainBgIdx:0,//主场景背景的下标切进来一次换一张
+        mainBgIdx: 0, //主场景背景的下标切进来一次换一张
         changeNum: 40, //跳多少次变一下场景
         gameBgIdx: 0, //游戏中背景和箱子的图片下标
         boxName: "zz01", //当前所出箱子的图片名称
@@ -160,12 +160,12 @@ export default class DataMgr extends cc.Component {
     };
 
     initData() {
-       //console.log("--- initData ---");
+        console.log("--- initData ---");
         let openid = cc.sys.localStorage.getItem("openid");
         if (!openid)
             cc.sys.localStorage.setItem("openid", 0);
         cc.dataMgr.openid = cc.sys.localStorage.getItem("openid");
-       //console.log(cc.dataMgr.openid);
+        //console.log(cc.dataMgr.openid);
 
         let score = cc.sys.localStorage.getItem("bestScore");
         if (!score)
@@ -213,15 +213,15 @@ export default class DataMgr extends cc.Component {
         }
 
         let havePropStr = cc.sys.localStorage.getItem("haveProp");
-       //console.log("-- haveProp : " + havePropStr);
+        //console.log("-- haveProp : " + havePropStr);
         if (!havePropStr)
             cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
         else {
             this.haveProp = JSON.parse(havePropStr);
-           //console.log(this.haveProp);
         }
 
-       //console.log(this.userData);
+        console.log(this.userData);
+        console.log(this.haveProp);
 
         //加载图片资源
         cc.loader.loadRes("cj01", cc.SpriteFrame, function (err, frame) {
@@ -368,8 +368,8 @@ export default class DataMgr extends cc.Component {
             this.userData.useRoleName = this.roleData[this.haveProp.useRoleIdx].name;
         }
 
-       //console.log("--- checkProp over ---");
-       //console.log(this.haveProp);
+        //console.log("--- checkProp over ---");
+        //console.log(this.haveProp);
         cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
     }
 
@@ -398,7 +398,7 @@ export default class DataMgr extends cc.Component {
         this.userData.nextChangeTime = this.changeTime[this.userData.nextChangeIdx];
         this.userData.gameBgIdx = this.changeBg[this.userData.nextChangeIdx];
         this.userData.cameraSpeedY = this.changeSpeed[this.userData.nextChangeIdx] * this.userData.baseSpeedY * this.userData.cutSpeed;
-       //console.log("-- speed " + this.userData.cameraSpeedY + " -- " + this.userData.nextChangeIdx + " -- " + (this.userData.gameBgIdx + 1));
+        //console.log("-- speed " + this.userData.cameraSpeedY + " -- " + this.userData.nextChangeIdx + " -- " + (this.userData.gameBgIdx + 1));
     }
 
     getTimeSecond_i() {
@@ -428,8 +428,8 @@ export default class DataMgr extends cc.Component {
                 ////console.log("发送wx.login请求!");
                 wx.login({
                     success: (res) => {
-                       //console.log("-- wx.login success --");
-                       //console.log(res);
+                        //console.log("-- wx.login success --");
+                        //console.log(res);
                         if (res.code) {
                             //发起网络请求
                             wx.request({
@@ -438,20 +438,20 @@ export default class DataMgr extends cc.Component {
                                     code: res.code,
                                 },
                                 success: (obj, statusCode, header) => {
-                                   //console.log("请求openid,服务器返回的数据！！--> " + obj);
-                                   //console.log(obj.data.openid);
+                                    //console.log("请求openid,服务器返回的数据！！--> " + obj);
+                                    //console.log(obj.data.openid);
 
                                     cc.dataMgr.openid = obj.data.openid;
                                     cc.sys.localStorage.setItem("openid", obj.data.openid); //之所以要存，是在分享的时候放入query中
                                     //微信官方文档那里写的调用函数是getLaunchInfoSync，但是根本搜不到这个API，应该是下面这个。
                                     let launchOption = wx.getLaunchOptionsSync();
-                                   //console.log(launchOption);
+                                    //console.log(launchOption);
                                     if (launchOption.query.otherID == null || launchOption.query.otherID == undefined) {
                                         launchOption.query.otherID = 0;
                                     }
-                                   //console.log("看下 自己的openid 和 推荐方的openid");
-                                   //console.log(cc.dataMgr.openid);
-                                   //console.log(launchOption.query.otherID);
+                                    //console.log("看下 自己的openid 和 推荐方的openid");
+                                    //console.log(cc.dataMgr.openid);
+                                    //console.log(launchOption.query.otherID);
                                     wx.request({
                                         url: 'https://bpw.blyule.com/game_2/public/index.php/index/index/add?userid=' + self.openid + "&" + "cuid=" + launchOption.query.otherID,
                                         data: {
@@ -459,8 +459,8 @@ export default class DataMgr extends cc.Component {
                                             cuid: launchOption.query.otherID,
                                         },
                                         success: (data, statusCode, header) => {
-                                           //console.log("添加用户成功！ 服务器返回的数据！！--> ");
-                                           //console.log(data);
+                                            //console.log("添加用户成功！ 服务器返回的数据！！--> ");
+                                            //console.log(data);
                                         },
                                     });
 
@@ -477,7 +477,7 @@ export default class DataMgr extends cc.Component {
     //从服务器获得用户的推荐奖励，并刷新在界面上
     getShareReward() {
         let openid = cc.sys.localStorage.getItem("openid");
-       //console.log("--- 获取分享奖励 ---" + openid);
+        //console.log("--- 获取分享奖励 ---" + openid);
         if (CC_WECHATGAME && openid) {
             wx.request({
                 url: 'https://bpw.blyule.com/game_2/public/index.php/index/index/getprise?userid=' + openid,
@@ -485,8 +485,8 @@ export default class DataMgr extends cc.Component {
                     userid: openid,
                 },
                 success: (obj, statusCode, header) => {
-                   //console.log("--- 获取分享奖励 success ---");
-                   //console.log(obj);
+                    //console.log("--- 获取分享奖励 success ---");
+                    //console.log(obj);
                     if (obj.data.code > 0) {
                         let num = obj.data.code;
                         cc.dataMgr.haveProp.countInvite += num;
@@ -503,13 +503,13 @@ export default class DataMgr extends cc.Component {
             wx.request({
                 url: this.imageUrl.urlXml,
                 success: (obj, statusCode, header) => {
-                   //console.log("--- getShowShare success ---");
-                   //console.log(obj);
+                    //console.log("--- getShowShare success ---");
+                    //console.log(obj);
                     if (obj.data == 0)
                         cc.dataMgr.isShowShare = false;
                     else
                         cc.dataMgr.isShowShare = true;
-                   //console.log("--- 关闭分享：--- " + cc.dataMgr.isShowShare);
+                    //console.log("--- 关闭分享：--- " + cc.dataMgr.isShowShare);
                 },
             });
         } else
@@ -538,7 +538,7 @@ export default class DataMgr extends cc.Component {
             //调用结束界面的复活接口
             cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.baseHp + cc.dataMgr.userData.addHpMax;
             let nodeNJs = cc.find("Canvas/node_relive").getComponent("PanelRelive");
-           //console.log(nodeNJs);
+            //console.log(nodeNJs);
             if (nodeNJs) {
                 nodeNJs.reliveRole();
             }
