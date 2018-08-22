@@ -5,7 +5,7 @@
   "_rawFiles": null,
   "_duration": 8.433333333333334,
   "sample": 60,
-  "speed": 1,
+  "speed": 0.8,
   "wrapMode": "2",
   "curveData": {
     "paths": {
@@ -135,8 +135,8 @@
             {
               "frame": 2.966666666666667,
               "value": [
-                -241,
-                -161
+                -218,
+                74
               ]
             },
             {
