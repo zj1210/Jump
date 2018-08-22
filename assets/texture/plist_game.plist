@@ -7,11 +7,11 @@
             <key>daoju_speed.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{370,494},{111,108}}</string>
+                <string>{{2,900},{111,108}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
-                <false/>
+                <true/>
                 <key>sourceColorRect</key>
                 <string>{{0,0},{111,108}}</string>
                 <key>sourceSize</key>
@@ -20,7 +20,7 @@
             <key>daoju_zuanshi.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{370,402},{90,114}}</string>
+                <string>{{370,482},{90,114}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -33,7 +33,7 @@
             <key>jiaoyin01.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{486,402},{34,19}}</string>
+                <string>{{487,402},{34,19}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -59,7 +59,7 @@
             <key>particle.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{472,604},{30,30}}</string>
+                <string>{{112,981},{30,30}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -68,6 +68,19 @@
                 <string>{{0,0},{30,30}}</string>
                 <key>sourceSize</key>
                 <string>{30,30}</string>
+            </dict>
+            <key>point.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{366,574},{141,170}}</string>
+                <key>offset</key>
+                <string>{6,-1}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{12,2},{141,170}}</string>
+                <key>sourceSize</key>
+                <string>{153,172}</string>
             </dict>
             <key>role_right1.png</key>
             <dict>
@@ -134,10 +147,23 @@
                 <key>sourceSize</key>
                 <string>{88,127}</string>
             </dict>
+            <key>role_streak1.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{370,402},{115,78}}</string>
+                <key>offset</key>
+                <string>{-6,-5}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,10},{115,78}}</string>
+                <key>sourceSize</key>
+                <string>{127,88}</string>
+            </dict>
             <key>spr_hp.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,955},{64,56}}</string>
+                <string>{{188,900},{64,56}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -202,7 +228,7 @@
             <key>zhangai05.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{2,874},{74,79}}</string>
+                <string>{{112,900},{74,79}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -215,11 +241,11 @@
             <key>zz01.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{366,604},{104,268}}</string>
+                <string>{{2,794},{104,268}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
-                <false/>
+                <true/>
                 <key>sourceColorRect</key>
                 <string>{{0,0},{104,268}}</string>
                 <key>sourceSize</key>
@@ -287,7 +313,7 @@
             <key>size</key>
             <string>{512,1024}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:ace2ea9e5964196ab9686b9f2ed466ab$</string>
+            <string>$TexturePacker:SmartUpdate:7d816c81c8e75695d9a47e910f622968$</string>
             <key>textureFileName</key>
             <string>plist_game.png</string>
         </dict>

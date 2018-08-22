@@ -8,8 +8,6 @@ export default class PanelRandom extends cc.Component {
     node_panBg = null;
     @property(cc.Node)
     node_point = null;
-    @property(cc.Node)
-    lab_time = null;
 
     @property(cc.Node)
     btn_share = null;
@@ -17,7 +15,9 @@ export default class PanelRandom extends cc.Component {
     lab_share = null;
 
     @property(cc.Node) //最后的提示获得。
-    lab_reward = null;
+    node_reward = null;
+    @property(cc.Node)
+    node_label = null;
 
     //转盘的奖励及 角度(所有判断都包含边界)
     _randData = [{
@@ -63,52 +63,50 @@ export default class PanelRandom extends cc.Component {
     _cdTime = 300; //冷却时间为 五分钟
 
     _rewardName = null;
-    _inRandom = false; //玩家在 转盘中是不能点解按钮的
 
     onLoad() {
-       //console.log("--- onLoad PanelRandom ---");
+        //console.log("--- onLoad PanelRandom ---");
         //this.node.active = false;
     }
 
     start() {
-
+        this.node_reward.active = false;
     }
 
     //初始化界面
     initRand() {
-       console.log("--- initRand ---" + cc.dataMgr.isShowShare);
+        console.log("--- initRand ---" + cc.dataMgr.isShowShare);
 
         //是否显示分享引导
         this.node.active = true;
         this.btn_share.active = cc.dataMgr.isShowShare;
         this.lab_share.active = cc.dataMgr.isShowShare;
-        this.lab_reward.active = false;
+        //this.node_reward.active = false;
 
         if (cc.dataMgr.haveProp.freeTimes > 0 || cc.dataMgr.haveProp.rewardTimes > 0) {
             this.node_point.getComponent(cc.Button).interactable = true;
-            this.lab_time.color = cc.Color.WHITE;
-            this.lab_time.getComponent(cc.Label).string = ("点击抽奖\n x" + cc.dataMgr.haveProp.freeTimes);
+            this.node_point.getChildByName("lab_title").getComponent(cc.Label).string = "点击抽奖";
+            this.node_point.getChildByName("lab_num").getComponent(cc.Label).string = ("x" + cc.dataMgr.haveProp.freeTimes);
         } else if (cc.dataMgr.getTimeSecond_i() >= cc.dataMgr.haveProp.adCDBegin + this._cdTime) {
             //广告接口暂时 不用
             this.node_point.getComponent(cc.Button).interactable = true;
             //this.node_point.getComponent(cc.Button).interactable = false;
-            this.lab_time.color = cc.Color.WHITE;
-            this.lab_time.getComponent(cc.Label).string = "观看视频\n立即抽奖";
+            this.node_point.getChildByName("lab_title").getComponent(cc.Label).string = "观看视频\n立即抽奖";
+            this.node_point.getChildByName("lab_num").getComponent(cc.Label).string = "";
         } else {
             //这里是广告倒计时
             this.node_point.getComponent(cc.Button).interactable = false;
-            this.lab_time.color = cc.Color.GRAY;
 
             let nextTime = this.getNextADTime_i();
-            this.lab_time.getComponent(cc.Label).string = ("下次观看视频:\n" + nextTime);
-
+            this.node_point.getChildByName("lab_title").getComponent(cc.Label).string = "下次观看视频";
+            this.node_point.getChildByName("lab_num").getComponent(cc.Label).string = nextTime;
             if (nextTime > 0) {
-                this.lab_time.stopAllActions();
+                this.node_point.stopAllActions();
 
-                this.lab_time.runAction(cc.sequence(cc.repeat(cc.sequence(cc.delayTime(1), cc.callFunc(this.refreshTime, this)), nextTime), cc.callFunc(this.initRand, this)));
+                this.node_point.runAction(cc.sequence(cc.repeat(cc.sequence(cc.delayTime(1), cc.callFunc(this.refreshTime, this)), nextTime), cc.callFunc(this.initRand, this)));
             } else {
-                this.lab_time.stopAllActions();
-                this.lab_time.runAction(cc.sequence(cc.delayTime(1), cc.callFunc(this.initRand, this)));
+                this.node_point.stopAllActions();
+                this.node_point.runAction(cc.sequence(cc.delayTime(1), cc.callFunc(this.initRand, this)));
             }
         }
     }
@@ -116,10 +114,12 @@ export default class PanelRandom extends cc.Component {
     refreshTime() {
         let nextTime = this.getNextADTime_i();
         if (nextTime <= 0) {
-            this.lab_time.stopAllActions();
+            this.node_point.stopAllActions();
             this.initRand();
-        } else
-            this.lab_time.getComponent(cc.Label).string = ("下次观看视频:\n" + nextTime);
+        } else {
+            this.node_point.getChildByName("lab_title").getComponent(cc.Label).string = "下次观看视频";
+            this.node_point.getChildByName("lab_num").getComponent(cc.Label).string = nextTime;
+        }
     }
 
     getNextADTime_i() {
@@ -150,10 +150,14 @@ export default class PanelRandom extends cc.Component {
         }
 
         let aimAngle = this.getAimAngle_i();
-        let rotaTo = cc.rotateTo(2.4 + Math.random(), 720 + 720 + aimAngle);
-        rotaTo.easing(cc.easeIn(3.0));
-        this.node_panBg.runAction(cc.sequence(rotaTo, cc.callFunc(this.randEnd, this)));
+        let rotaTo = cc.rotateTo(6.2 + Math.random(), 720 + 720 + 720 + aimAngle);
+        rotaTo.easing(cc.easeElasticInOut(4));
+        this.node_panBg.runAction(cc.sequence(rotaTo, cc.delayTime(0.4), cc.callFunc(this.randEnd, this)));
+    }
 
+    //转盘结束奖励商品
+    randEnd() {
+        console.log("--- randEnd ---" + this._rewardName);
         //时间改变
         if (cc.dataMgr.haveProp.freeTimes > 0) {
             cc.dataMgr.haveProp.freeTimes--;
@@ -161,39 +165,44 @@ export default class PanelRandom extends cc.Component {
             cc.dataMgr.haveProp.rewardTimes--;
         }
         cc.dataMgr.haveProp.adCDBegin = cc.dataMgr.getTimeSecond_i();
-    }
 
-    //转盘结束奖励商品
-    randEnd() {
-       //console.log("--- randEnd ---" + this._rewardName);
         let rewardStr = "未知。";
+        let numStr = "";
         if (this._rewardName == "cut30") {
             cc.dataMgr.haveProp.haveCut.push(0.7);
-            rewardStr = "恭喜获得:\n开局阶梯下坠减速30% \n x 3";
+            rewardStr = "开局阶梯下坠减速";
+            numStr = "30%x3";
         } else if (this._rewardName == "cut70") {
             //减速70%存入0.3 剩余速度为0.3
             cc.dataMgr.haveProp.haveCut.push(0.3);
-            rewardStr = "恭喜获得:\n开局阶梯下坠减速70%\n x 3";
+            rewardStr = "开局阶梯下坠减速";
+            numStr = "70% x 3";
         } else if (this._rewardName == "foot") {
             //存入脚印下标
             cc.dataMgr.haveProp.haveFoot.push(0);
-            rewardStr = "恭喜获得:\n帅气小脚印\n 12小时";
+            rewardStr = "帅气小脚印";
+            numStr = "12小时";
         } else if (this._rewardName == "speed100") {
             cc.dataMgr.haveProp.haveSpeed.push(100);
-            rewardStr = "恭喜获得:\n开局冲刺100阶\n x 3";
+            rewardStr = "开局冲刺";
+            numStr = "100阶 x 3";
         } else if (this._rewardName == "speed50") {
             cc.dataMgr.haveProp.haveSpeed.push(50);
-            rewardStr = "恭喜获得:\n开局冲刺50阶\n x 3";
+            rewardStr = "开局冲刺";
+            numStr = "50阶 x 3";
         } else if (this._rewardName == "streak") {
             cc.dataMgr.haveProp.haveStreak.push(0);
-            rewardStr = "恭喜获得:\n帅气动态光效\n 12小时";
+            rewardStr = "帅气动态光效";
+            numStr = "12小时";
         }
         cc.dataMgr.saveData();
 
-        this.lab_reward.active = true;
-        this.lab_reward.scale = 2.4;
-        this.lab_reward.getComponent(cc.Label).string = rewardStr;
-        this.lab_reward.runAction(cc.sequence(cc.fadeIn(0.2), cc.scaleTo(0.3, 0.9), cc.scaleTo(0.1, 1), cc.delayTime(2.0), cc.fadeOut(0.8), cc.callFunc(this.initRand, this)));
+        this.node_reward.active = true;
+        this.node_label.scale = 2.4;
+        this.node_label.getChildByName("lab_reward").getComponent(cc.Label).string = rewardStr;
+        this.node_label.getChildByName("lab_num").getComponent(cc.Label).string = numStr;
+        this.node_label.runAction(cc.sequence(cc.fadeIn(0.2), cc.scaleTo(0.3, 0.9), cc.scaleTo(0.1, 1)));
+        this.scheduleOnce(this.initRand, 0.8);
     }
 
     getAimAngle_i() {
@@ -216,6 +225,11 @@ export default class PanelRandom extends cc.Component {
             let btnN = event.target.name;
             if (btnN == "anniu_zhuyie") {
                 this.node.active = false;
+                cc.find("Canvas/node_start").active = true;
+                //手指显示
+                let startJs = cc.find("Canvas/node_start").getComponent("PanelStart");
+                if (startJs)
+                    startJs.spr_point.active = (cc.dataMgr.haveProp.freeTimes > 0);
             } else if (btnN == "anniu_weixin") {
                 this.shareFriend();
             } else if (btnN == "zp01") {
@@ -224,6 +238,8 @@ export default class PanelRandom extends cc.Component {
                     this.randBegin();
                 else
                     this.initRand();
+            } else if (btnN == "spr_bg") {
+                this.node_reward.active = false;
             }
         }
     }
@@ -240,7 +256,7 @@ export default class PanelRandom extends cc.Component {
                 }
             });
         } else {
-           //console.log("-- Not is wechatGame Start --");
+            //console.log("-- Not is wechatGame Start --");
             cc.dataMgr.shareSuccess("startAd");
         }
     }

@@ -11,10 +11,10 @@ export default class DataMgr extends cc.Component {
     isShowShare = false; //显示引导分享
 
     imageUrl = {
-        urlGroup: "https://bpw.blyule.com/jump/res/jumpShare1.jpg",
-        urlFriend: "https://bpw.blyule.com/jump/res/jumpShare2.jpg",
-        urlMore: "https://bpw.blyule.com/jump/res/jumpShare3.jpg",
-        urlXml: "https://bpw.blyule.com/jump/res/share.xml",
+        urlGroup: "https://bpw.blyule.com/wxJump/res/jumpShare1.jpg",
+        urlFriend: "https://bpw.blyule.com/wxJump/res/jumpShare2.jpg",
+        urlMore: "https://bpw.blyule.com/wxJump/res/jumpShare3.jpg",
+        urlXml: "https://bpw.blyule.com/wxJump/res/share.xml",
     }
 
     userData = {
@@ -145,7 +145,7 @@ export default class DataMgr extends cc.Component {
         countShareNum: 0, //统计总的分享次数
         countShareToday: 0, //统计今天的分享次数
         countAdNum: 0, //统计总的广告此时
-        countInvite: 0, //成功邀请好友进入数
+        countInvite: 10, //成功邀请好友进入数
         freeTimes: 3, //免费的转盘次数(新人免费送的)
 
         adCDBegin: 0, //看广告转转盘 冷却时间
@@ -212,13 +212,13 @@ export default class DataMgr extends cc.Component {
             }
         }
 
-        let havePropStr = cc.sys.localStorage.getItem("haveProp");
-        //console.log("-- haveProp : " + havePropStr);
-        if (!havePropStr)
-            cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
-        else {
-            this.haveProp = JSON.parse(havePropStr);
-        }
+        // let havePropStr = cc.sys.localStorage.getItem("haveProp");
+        // //console.log("-- haveProp : " + havePropStr);
+        // if (!havePropStr)
+        //     cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
+        // else {
+        //     this.haveProp = JSON.parse(havePropStr);
+        // }
 
         console.log(this.userData);
         console.log(this.haveProp);

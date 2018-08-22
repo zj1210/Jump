@@ -3,7 +3,7 @@
     "__type__": "cc.SceneAsset",
     "_name": "",
     "_objFlags": 0,
-    "_rawFiles": null,
+    "_native": "",
     "scene": {
       "__id__": 1
     }
@@ -213,7 +213,7 @@
       "__id__": 3
     },
     "_enabled": true,
-    "isAlignOnce": true,
+    "alignMode": 0,
     "_target": null,
     "_alignFlags": 45,
     "_left": 0,
@@ -322,7 +322,7 @@
       "__id__": 6
     },
     "_enabled": true,
-    "isAlignOnce": true,
+    "alignMode": 0,
     "_target": null,
     "_alignFlags": 36,
     "_left": 0,
@@ -431,7 +431,7 @@
       "__id__": 9
     },
     "_enabled": true,
-    "isAlignOnce": true,
+    "alignMode": 0,
     "_target": null,
     "_alignFlags": 33,
     "_left": 0,
@@ -540,7 +540,7 @@
       "__id__": 12
     },
     "_enabled": true,
-    "isAlignOnce": true,
+    "alignMode": 0,
     "_target": null,
     "_alignFlags": 9,
     "_left": 22,
@@ -649,7 +649,7 @@
       "__id__": 15
     },
     "_enabled": true,
-    "isAlignOnce": true,
+    "alignMode": 0,
     "_target": null,
     "_alignFlags": 12,
     "_left": 22,
@@ -867,8 +867,10 @@
     "_fontSize": 50,
     "_lineHeight": 50,
     "_enableWrapText": true,
-    "_N$file": null,
-    "_isSystemFontUsed": true,
+    "_N$file": {
+      "__uuid__": "097746db-3f62-434d-a4ab-a2cee21d7ab6"
+    },
+    "_isSystemFontUsed": false,
     "_spacingX": 0,
     "_N$string": "666",
     "_N$horizontalAlign": 1,
@@ -1271,8 +1273,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 96,
-      "height": 64
+      "width": 138.6,
+      "height": 72
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -1281,7 +1283,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 390
+      "y": 386
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -1299,12 +1301,12 @@
     },
     "_enabled": true,
     "_useOriginalSize": false,
-    "_actualFontSize": 64,
-    "_fontSize": 64,
-    "_lineHeight": 64,
+    "_actualFontSize": 72,
+    "_fontSize": 72,
+    "_lineHeight": 40,
     "_enableWrapText": true,
     "_N$file": {
-      "__uuid__": "9650f12f-cbee-4593-8eb1-9ffe6c657ca2"
+      "__uuid__": "097746db-3f62-434d-a4ab-a2cee21d7ab6"
     },
     "_isSystemFontUsed": false,
     "_spacingX": 0,
@@ -1595,7 +1597,7 @@
     "_lineHeight": 40,
     "_enableWrapText": true,
     "_N$file": {
-      "__uuid__": "9650f12f-cbee-4593-8eb1-9ffe6c657ca2"
+      "__uuid__": "097746db-3f62-434d-a4ab-a2cee21d7ab6"
     },
     "_isSystemFontUsed": false,
     "_spacingX": 0,
@@ -2082,8 +2084,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 364,
-      "height": 64
+      "width": 327.6,
+      "height": 44.8
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -2115,11 +2117,11 @@
     "_lineHeight": 32,
     "_enableWrapText": true,
     "_N$file": {
-      "__uuid__": "9650f12f-cbee-4593-8eb1-9ffe6c657ca2"
+      "__uuid__": "097746db-3f62-434d-a4ab-a2cee21d7ab6"
     },
     "_isSystemFontUsed": false,
     "_spacingX": 0,
-    "_N$string": "分享好友立即回满额外生命值\n且下一局生命加倍！",
+    "_N$string": "分享好友立即回满额外生命值\n且下1局生命加倍",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",

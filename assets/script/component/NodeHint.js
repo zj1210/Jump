@@ -24,11 +24,11 @@ export default class NodeRole extends cc.Component {
         if (type == "speedBegin") {
             //提示开局冲刺
             this.node_speed.active = true;
-            this.node_speed.getChildByName("lab_title").getComponent(cc.Label).string = "开局冲刺 x";
+            this.node_speed.getChildByName("lab_title").getComponent(cc.Label).string = "开局冲刺x";
             this.node_speed.getChildByName("lab_speed").getComponent(cc.Label).string = cc.dataMgr.userData.speedNum;
         } else if (type == "speed") {
             this.node_speed.active = true;
-            this.node_speed.getChildByName("lab_title").getComponent(cc.Label).string = "加速冲刺 x";
+            this.node_speed.getChildByName("lab_title").getComponent(cc.Label).string = "加速冲刺x";
             this.node_speed.getChildByName("lab_speed").getComponent(cc.Label).string = cc.dataMgr.userData.speedNum;
         } else if (type == "speedEnd") {
             this.node_speed.stopAllActions();

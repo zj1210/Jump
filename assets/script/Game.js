@@ -24,9 +24,7 @@ export default class Game extends cc.Component {
     @property(cc.Node) //角色
     node_role = null;
     @property(cc.Node) //加速拖尾效果实验
-    node_streakS = null;
-    @property(cc.Node) //角色拖尾效果实验
-    node_streakR = null;
+    node_streak = null;
     @property(cc.Node)
     node_ui = null;
     @property(cc.Node) //相机
@@ -197,7 +195,7 @@ export default class Game extends cc.Component {
             this.node_role.getComponent("NodeRole").initRole(null);
 
             this.node_ui.getChildByName("lab_score").active = true;
-            this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = ("得分：" + cc.dataMgr.userData.countJump);
+            this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = (cc.dataMgr.userData.countJump);
             this.node_ui.getChildByName("lab_hp").getComponent(cc.Label).string = cc.dataMgr.userData.reliveHp;
 
             //改变背景 和 boxName
@@ -260,7 +258,7 @@ export default class Game extends cc.Component {
             this.node_role.getComponent("NodeRole").blinkRole();
 
             this.node_ui.getChildByName("lab_score").active = true;
-            this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = ("得分：" + cc.dataMgr.userData.countJump);
+            this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = (cc.dataMgr.userData.countJump);
             this.node_ui.getChildByName("lab_hp").getComponent(cc.Label).string = cc.dataMgr.userData.reliveHp;
 
             //补充台阶数
@@ -327,7 +325,7 @@ export default class Game extends cc.Component {
         //     this.changeToNextBg();
         //更改为根据时间变换颜色 在updata 中调用
 
-        this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = ("得分：" + cc.dataMgr.userData.countJump);
+        this.node_ui.getChildByName("lab_score").getComponent(cc.Label).string = (cc.dataMgr.userData.countJump);
 
         let aimY = cc.dataMgr.boxY + cc.dataMgr.userData.aimRoleY;
         let aimX = (isLeft ? -1 : 1) * cc.dataMgr.boxX + cc.dataMgr.userData.aimRoleX;
@@ -386,7 +384,6 @@ export default class Game extends cc.Component {
     //开局加速会停下来 其它不会
     autoJump() {
         if (cc.dataMgr.userData.speedNum > 0) {
-            this.changeStreak();
             this.jumpRole(false);
             this.node.getChildByName("node_hint").getComponent("NodeHint").changeNum("speed");
         } else {
@@ -403,8 +400,8 @@ export default class Game extends cc.Component {
             } else {
                 cc.dataMgr.userData.onGaming = true;
             }
-            this.changeStreak();
         }
+        this.changeStreak();
     }
 
     //如果nodeN 存在只是初始化它的位置 及信息
@@ -559,18 +556,15 @@ export default class Game extends cc.Component {
 
     changeStreak() {
         if (cc.dataMgr.userData.speedNum > 0) {
-            this.node_streakS.opacity = 255;
-            this.node_streakR.opacity = 0
-            // this.node_streakS.active = true;
-            // this.node_streakR.active = false;
+            this.node_streak.getComponent(cc.MotionStreak).stroke = 80;
+            this.node_streak.color = cc.Color.WHITE;
+            this.node_streak.getComponent(cc.MotionStreak).color = cc.Color.WHITE;
         } else {
-            // this.node_streakS.active = false;
-            this.node_streakS.opacity = 0;
-            this.node_streakR.opacity = 255
+            this.node_streak.getComponent(cc.MotionStreak).stroke = 0;
             if (cc.dataMgr.userData.useStreakColor != null) {
-                //this.node_streakR.active = true;
-                this.node_streakR.color = cc.dataMgr.userData.useStreakColor;
-                this.node_streakR.getComponent(cc.MotionStreak).color = cc.dataMgr.userData.useStreakColor;
+                this.node_streak.getComponent(cc.MotionStreak).stroke = 8;
+                this.node_streak.color = cc.dataMgr.userData.useStreakColor;
+                this.node_streak.getComponent(cc.MotionStreak).color = cc.dataMgr.userData.useStreakColor;
             }
         }
     }
@@ -635,11 +629,7 @@ export default class Game extends cc.Component {
                 }
             }
 
-            //if (cc.dataMgr.userData.speedNum > 0)
-                this.node_streakS.position = cc.v2(this.node_role.x, this.node_role.y + 48);
-
-            //if (cc.dataMgr.userData.useStreakColor != null)
-                this.node_streakR.position = cc.v2(this.node_role.x, this.node_role.y + 48);
+            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 48);
         }
 
         //统计变色相关

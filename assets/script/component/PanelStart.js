@@ -13,6 +13,9 @@ export default class Start extends cc.Component {
     @property(cc.Node)
     node_box = null;
 
+    @property(cc.Node)
+    spr_point = null;
+
     //显示微信子域排行
     @property(cc.Node)
     rankingView = null;
@@ -21,6 +24,7 @@ export default class Start extends cc.Component {
 
     onLoad() {
         //console.log("--- onLoad Start ---");
+        this.spr_point.active = false;
     }
 
     start() {
@@ -61,6 +65,11 @@ export default class Start extends cc.Component {
 
             }
         }
+
+        if (cc.dataMgr.haveProp.freeTimes > 0) {
+            this.spr_point.active = true;
+            this.spr_point.runAction(cc.repeatForever(cc.sequence(cc.moveBy(0.8, cc.v2(0, -40)), cc.moveBy(0.4, cc.v2(0, 40)))));
+        }
     }
 
     hideStart() {
@@ -95,6 +104,7 @@ export default class Start extends cc.Component {
                 let nodeRandom = cc.find("Canvas/node_random");
                 if (nodeRandom) {
                     nodeRandom.getComponent("PanelRandom").initRand();
+                    cc.find("Canvas/node_start").active = false;
                 }
             } else if (btnN == "anniu_yinyue") {
                 cc.director.loadScene("store");
@@ -104,12 +114,13 @@ export default class Start extends cc.Component {
             } else if (btnN == "anniu_backEnd") {
                 this.rankingView.active = false;
             } else if (btnN == "more_icon") {
-                //let str_imageUrl = "https://bpw.blyule.com/res/raw-assets/Texture/propaganda.6b9b9.jpg";
-                let str_imageUrl = cc.dataMgr.imageUrl.urlMore
-                wx.previewImage({
-                    current: str_imageUrl, // 当前显示图片的http链接
-                    urls: [str_imageUrl] // 需要预览的图片http链接列表
-                });
+                if (CC_WECHATGAME) {
+                    let str_imageUrl = cc.dataMgr.imageUrl.urlMore
+                    wx.previewImage({
+                        current: str_imageUrl, // 当前显示图片的http链接
+                        urls: [str_imageUrl] // 需要预览的图片http链接列表
+                    });
+                }
             }
         }
     }
