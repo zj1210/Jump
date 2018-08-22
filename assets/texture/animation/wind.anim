@@ -1,0 +1,155 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "wind",
+  "_objFlags": 0,
+  "_rawFiles": null,
+  "_duration": 8.433333333333334,
+  "sample": 60,
+  "speed": 0.8,
+  "wrapMode": "2",
+  "curveData": {
+    "paths": {
+      "mask2/mengban1": {
+        "props": {
+          "position": [
+            {
+              "frame": 0,
+              "value": [
+                -99,
+                -141
+              ]
+            },
+            {
+              "frame": 2.0166666666666666,
+              "value": [
+                209,
+                393
+              ]
+            }
+          ]
+        }
+      },
+      "mask3/mengban1": {
+        "props": {
+          "position": [
+            {
+              "frame": 5.216666666666667,
+              "value": [
+                76,
+                -171
+              ]
+            },
+            {
+              "frame": 7.05,
+              "value": [
+                -176,
+                396
+              ]
+            }
+          ]
+        }
+      },
+      "mask4/mengban1": {
+        "props": {
+          "position": [
+            {
+              "frame": 1.9666666666666666,
+              "value": [
+                206,
+                274
+              ]
+            },
+            {
+              "frame": 3.7666666666666666,
+              "value": [
+                -185,
+                -208
+              ]
+            }
+          ]
+        }
+      },
+      "mask5/mengban1": {
+        "props": {
+          "position": [
+            {
+              "frame": 6.6,
+              "value": [
+                -166,
+                -386
+              ]
+            },
+            {
+              "frame": 8.433333333333334,
+              "value": [
+                67,
+                190
+              ]
+            }
+          ]
+        }
+      },
+      "mask6/mengban1": {
+        "props": {
+          "position": [
+            {
+              "frame": 0.9666666666666667,
+              "value": [
+                -291,
+                337
+              ]
+            },
+            {
+              "frame": 2.8,
+              "value": [
+                119,
+                -135
+              ]
+            }
+          ]
+        }
+      },
+      "mask7/mengban1": {
+        "props": {
+          "position": [
+            {
+              "frame": 4.133333333333334,
+              "value": [
+                185,
+                147
+              ]
+            },
+            {
+              "frame": 6.016666666666667,
+              "value": [
+                -291,
+                -252
+              ]
+            }
+          ]
+        }
+      },
+      "mask8/mengban1": {
+        "props": {
+          "position": [
+            {
+              "frame": 2.966666666666667,
+              "value": [
+                -218,
+                74
+              ]
+            },
+            {
+              "frame": 4.933333333333334,
+              "value": [
+                339,
+                -383
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "events": []
+}
