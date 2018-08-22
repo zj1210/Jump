@@ -41,6 +41,8 @@ export default class RankingView extends cc.Component {
 
             this.lab_share.active = cc.dataMgr.isShowShare;
             this.btn_share.active = cc.dataMgr.isShowShare;
+            this.node_end.getChildByName("anniu_zhuyie").x = (cc.dataMgr.isShowShare ? 0 : -100);
+            this.node_end.getChildByName("anniu_chongxinkaishi").x = (cc.dataMgr.isShowShare ? 150 : 100);
 
             this.node_end.getChildByName("now_Label").getComponent(cc.Label).string = ("得分:" + cc.dataMgr.userData.countJump);
             this.node_end.getChildByName("prop").active = false;
@@ -84,7 +86,7 @@ export default class RankingView extends cc.Component {
     initSubCanvas() {
         this.tex = new cc.Texture2D();
         if (CC_WECHATGAME) {
-           //console.log("-- WECHAT End.js initSubCanvas --");
+            //console.log("-- WECHAT End.js initSubCanvas --");
             window.sharedCanvas.width = 720;
             window.sharedCanvas.height = 1280;
         }
@@ -92,7 +94,7 @@ export default class RankingView extends cc.Component {
 
     updataSubCanvas() {
         if (CC_WECHATGAME) {
-           //console.log("-- WECHAT End.js updataSubCanvas --");
+            //console.log("-- WECHAT End.js updataSubCanvas --");
             this.tex.initWithElement(window.sharedCanvas);
             this.tex.handleLoadedTexture();
             this.subCanvas.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
@@ -102,7 +104,7 @@ export default class RankingView extends cc.Component {
     //这里type: submit(提交个人数据)、end(结束界面)、friend(好友排行)
     subPostMessage(type) {
         if (CC_WECHATGAME) {
-           //console.log("-- WECHAT End.js subPostMessage --" + type);
+            //console.log("-- WECHAT End.js subPostMessage --" + type);
             if (type == "submit") {
                 window.wx.postMessage({
                     messageType: 2,
@@ -136,8 +138,8 @@ export default class RankingView extends cc.Component {
                 imageUrl: cc.dataMgr.imageUrl.urlGroup,
                 query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
-                   //console.log("-- shareGroup success --");
-                   //console.log(res);
+                    //console.log("-- shareGroup success --");
+                    //console.log(res);
                     cc.dataMgr.shareSuccess("end");
                     if (res.shareTickets != undefined && res.shareTickets.length > 0) {
                         window.wx.postMessage({
@@ -150,7 +152,7 @@ export default class RankingView extends cc.Component {
                 }
             });
         } else {
-           //console.log("-- Not is wechatGame --");
+            //console.log("-- Not is wechatGame --");
         }
     }
 
@@ -166,7 +168,7 @@ export default class RankingView extends cc.Component {
                 }
             });
         } else {
-           //console.log("-- Not is wechatGame --");
+            //console.log("-- Not is wechatGame --");
         }
     }
 }

@@ -145,7 +145,7 @@ export default class DataMgr extends cc.Component {
         countShareNum: 0, //统计总的分享次数
         countShareToday: 0, //统计今天的分享次数
         countAdNum: 0, //统计总的广告此时
-        countInvite: 10, //成功邀请好友进入数
+        countInvite: 0, //成功邀请好友进入数
         freeTimes: 3, //免费的转盘次数(新人免费送的)
 
         adCDBegin: 0, //看广告转转盘 冷却时间
@@ -162,7 +162,7 @@ export default class DataMgr extends cc.Component {
     initData() {
         console.log("--- initData ---");
         let openid = cc.sys.localStorage.getItem("openid");
-        if (!openid)
+        //if (!openid)
             cc.sys.localStorage.setItem("openid", 0);
         cc.dataMgr.openid = cc.sys.localStorage.getItem("openid");
         //console.log(cc.dataMgr.openid);
@@ -384,7 +384,7 @@ export default class DataMgr extends cc.Component {
         }
         if (canUsed) {
             this.haveProp.useRoleIdx = idx;
-            this.userData.useROleName = this.roleData[idx].name;
+            this.userData.useRoleName = this.roleData[idx].name;
         }
     }
 
@@ -425,11 +425,11 @@ export default class DataMgr extends cc.Component {
 
             let openid = cc.sys.localStorage.getItem("openid");
             if (!openid || openid - 1 == -1) { //保证用户是第一次进游戏
-                ////console.log("发送wx.login请求!");
+                console.log("发送wx.login请求!");
                 wx.login({
                     success: (res) => {
-                        //console.log("-- wx.login success --");
-                        //console.log(res);
+                        console.log("-- wx.login success --");
+                        console.log(res);
                         if (res.code) {
                             //发起网络请求
                             wx.request({
@@ -449,9 +449,9 @@ export default class DataMgr extends cc.Component {
                                     if (launchOption.query.otherID == null || launchOption.query.otherID == undefined) {
                                         launchOption.query.otherID = 0;
                                     }
-                                    //console.log("看下 自己的openid 和 推荐方的openid");
-                                    //console.log(cc.dataMgr.openid);
-                                    //console.log(launchOption.query.otherID);
+                                    console.log("看下 自己的openid 和 推荐方的openid");
+                                    console.log(cc.dataMgr.openid);
+                                    console.log(launchOption.query.otherID);
                                     wx.request({
                                         url: 'https://bpw.blyule.com/game_2/public/index.php/index/index/add?userid=' + self.openid + "&" + "cuid=" + launchOption.query.otherID,
                                         data: {
@@ -459,8 +459,8 @@ export default class DataMgr extends cc.Component {
                                             cuid: launchOption.query.otherID,
                                         },
                                         success: (data, statusCode, header) => {
-                                            //console.log("添加用户成功！ 服务器返回的数据！！--> ");
-                                            //console.log(data);
+                                            console.log("添加用户成功！ 服务器返回的数据！！--> ");
+                                            console.log(data);
                                         },
                                     });
 
@@ -477,7 +477,7 @@ export default class DataMgr extends cc.Component {
     //从服务器获得用户的推荐奖励，并刷新在界面上
     getShareReward() {
         let openid = cc.sys.localStorage.getItem("openid");
-        //console.log("--- 获取分享奖励 ---" + openid);
+        console.log("--- 获取分享奖励 ---" + openid);
         if (CC_WECHATGAME && openid) {
             wx.request({
                 url: 'https://bpw.blyule.com/game_2/public/index.php/index/index/getprise?userid=' + openid,
@@ -485,8 +485,8 @@ export default class DataMgr extends cc.Component {
                     userid: openid,
                 },
                 success: (obj, statusCode, header) => {
-                    //console.log("--- 获取分享奖励 success ---");
-                    //console.log(obj);
+                    console.log("--- 获取分享奖励 success ---");
+                    console.log(obj);
                     if (obj.data.code > 0) {
                         let num = obj.data.code;
                         cc.dataMgr.haveProp.countInvite += num;
@@ -503,8 +503,8 @@ export default class DataMgr extends cc.Component {
             wx.request({
                 url: this.imageUrl.urlXml,
                 success: (obj, statusCode, header) => {
-                    //console.log("--- getShowShare success ---");
-                    //console.log(obj);
+                    console.log("--- getShowShare success ---");
+                    console.log(obj);
                     if (obj.data == 0)
                         cc.dataMgr.isShowShare = false;
                     else
@@ -521,11 +521,24 @@ export default class DataMgr extends cc.Component {
         if (cc.dataMgr.haveProp.countInvite > 0) {
             cc.dataMgr.userData.addHpMax = parseInt(5 + cc.dataMgr.haveProp.countInvite * 5);
         }
-        //邀请榜奖励
+        //邀请榜奖励 
+        let inviteJs = cc.find("Canvas").getComponent("PanelInvite");
+        if(inviteJs){
+            inviteJs.initInvite();
+        }
     }
 
     //type : 分享的类型 不同的分享有不同的效果
     shareSuccess(type) {
+        if (this.getTimeSecond_i() > this.haveProp.todayShareBegin + 24 * 3600) {
+            this.haveProp.todayShareBegin = this.getTimeSecond_i();
+            this.haveProp.countShareToday = 0;
+        }
+        if (this.haveProp.countShareToday < 10) {
+            this.haveProp.countShareToday++;
+            this.haveProp.countShareNum++;
+        }
+
         if (type == "end") {
             //这是分享成功给玩家的奖励 回满reliveNum 和 下局双倍
             this.userData.reliveNum = this.userData.addHpMax;
@@ -542,15 +555,12 @@ export default class DataMgr extends cc.Component {
             if (nodeNJs) {
                 nodeNJs.reliveRole();
             }
-        }
-
-        if (this.getTimeSecond_i() > this.haveProp.todayShareBegin + 24 * 3600) {
-            this.haveProp.todayShareBegin = this.getTimeSecond_i();
-            this.haveProp.countShareToday = 0;
-        }
-        if (this.haveProp.countShareToday < 10) {
-            this.haveProp.countShareToday++;
-            this.haveProp.countShareNum++;
+        } else if (type == "store") {
+            let nodeNJs = cc.find("Canvas").getComponent("PanelStore");
+            //console.log(nodeNJs);
+            if (nodeNJs) {
+                nodeNJs.refreshShareNum();
+            }
         }
     }
 }

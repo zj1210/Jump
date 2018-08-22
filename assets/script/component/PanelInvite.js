@@ -22,6 +22,8 @@ export default class PanelInvite extends cc.Component {
              let spr_bg = this.node.getChildByName("game_bg");
              spr_bg.getComponent(cc.Sprite).spriteFrame = frame;
          }
+
+         cc.dataMgr.getShareReward();
     }
 
     initInvite() {

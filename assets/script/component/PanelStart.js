@@ -70,6 +70,17 @@ export default class Start extends cc.Component {
             this.spr_point.active = true;
             this.spr_point.runAction(cc.repeatForever(cc.sequence(cc.moveBy(0.8, cc.v2(0, -40)), cc.moveBy(0.4, cc.v2(0, 40)))));
         }
+
+        this.refreshStart();
+    }
+
+    refreshStart() {
+        this.spr_point.active = (cc.dataMgr.haveProp.freeTimes > 0);
+        let gameJs = cc.find("Canvas").getComponent("Game");
+        if (gameJs) {
+            let roleSf = gameJs.getGameFrame_sf(cc.dataMgr.userData.useRoleName);
+            this.spr_box.getChildByName("spr_role").getComponent(cc.Sprite).spriteFrame = roleSf;
+        }
     }
 
     hideStart() {

@@ -48,7 +48,7 @@ export default class PanelRelive extends cc.Component {
         this.spr_circle.runAction(this.myCircleTo_act(this._timeCD, 1));
         this.lab_time.runAction(cc.sequence(cc.repeat(cc.sequence(cc.delayTime(1), cc.callFunc(this.callChengNum, this)), 6), cc.delayTime(0.2), cc.callFunc(this.callEnd, this)));
 
-        this.lab_relive.getComponent(cc.Label).string = "观看广告可 复活 \n 并回满生命值";
+        this.lab_relive.getComponent(cc.Label).string = "观看广告复活并回满生命值";
     }
 
     //圆形cd:总时间、百分比(0~1)
@@ -90,11 +90,11 @@ export default class PanelRelive extends cc.Component {
             let btnN = event.target.name;
             if (btnN == "btn_relive") {
                 //这里要观看广告复活了
-                this.lab_relive.getComponent(cc.Label).string = ">_< 敬请期待,广告尚未开启。"
+                this.lab_relive.getComponent(cc.Label).string = "敬请期待广告尚未开放"
             } else if (btnN == "btn_end") {
                 this.lab_time.stopAllActions();
-                if (this._toEnd)
-                    cc.director.loadScene("end");
+                //if (this._toEnd)
+                cc.director.loadScene("end");
             } else if (btnN == "anniu_weixin") {
                 this._toEnd = false;
                 this.shareFriend();
@@ -114,7 +114,7 @@ export default class PanelRelive extends cc.Component {
                 }
             });
         } else {
-           //console.log("-- Not is wechatGame PanelRelive --");
+            //console.log("-- Not is wechatGame PanelRelive --");
             cc.dataMgr.shareSuccess("endRelive");
         }
     }

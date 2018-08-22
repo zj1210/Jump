@@ -81,7 +81,9 @@ export default class PanelRandom extends cc.Component {
         this.node.active = true;
         this.btn_share.active = cc.dataMgr.isShowShare;
         this.lab_share.active = cc.dataMgr.isShowShare;
-        //this.node_reward.active = false;
+        this.node.getChildByName("anniu_zhuyie").x = (cc.dataMgr.isShowShare ? 100 : 0);
+        this.btn_share.x = (cc.dataMgr.isShowShare ? -100 : 0);
+        this.lab_share.x = -100;
 
         if (cc.dataMgr.haveProp.freeTimes > 0 || cc.dataMgr.haveProp.rewardTimes > 0) {
             this.node_point.getComponent(cc.Button).interactable = true;
@@ -98,7 +100,7 @@ export default class PanelRandom extends cc.Component {
             this.node_point.getComponent(cc.Button).interactable = false;
 
             let nextTime = this.getNextADTime_i();
-            this.node_point.getChildByName("lab_title").getComponent(cc.Label).string = "下次观看视频";
+            this.node_point.getChildByName("lab_title").getComponent(cc.Label).string = "下次观看";
             this.node_point.getChildByName("lab_num").getComponent(cc.Label).string = nextTime;
             if (nextTime > 0) {
                 this.node_point.stopAllActions();
@@ -117,7 +119,7 @@ export default class PanelRandom extends cc.Component {
             this.node_point.stopAllActions();
             this.initRand();
         } else {
-            this.node_point.getChildByName("lab_title").getComponent(cc.Label).string = "下次观看视频";
+            this.node_point.getChildByName("lab_title").getComponent(cc.Label).string = "下次观看";
             this.node_point.getChildByName("lab_num").getComponent(cc.Label).string = nextTime;
         }
     }
@@ -180,7 +182,7 @@ export default class PanelRandom extends cc.Component {
         } else if (this._rewardName == "foot") {
             //存入脚印下标
             cc.dataMgr.haveProp.haveFoot.push(0);
-            rewardStr = "帅气小脚印";
+            rewardStr = "脚印";
             numStr = "12小时";
         } else if (this._rewardName == "speed100") {
             cc.dataMgr.haveProp.haveSpeed.push(100);
@@ -192,7 +194,7 @@ export default class PanelRandom extends cc.Component {
             numStr = "50阶 x 3";
         } else if (this._rewardName == "streak") {
             cc.dataMgr.haveProp.haveStreak.push(0);
-            rewardStr = "帅气动态光效";
+            rewardStr = "动态光效";
             numStr = "12小时";
         }
         cc.dataMgr.saveData();
@@ -229,7 +231,7 @@ export default class PanelRandom extends cc.Component {
                 //手指显示
                 let startJs = cc.find("Canvas/node_start").getComponent("PanelStart");
                 if (startJs)
-                    startJs.spr_point.active = (cc.dataMgr.haveProp.freeTimes > 0);
+                    startJs.refreshStart();
             } else if (btnN == "anniu_weixin") {
                 this.shareFriend();
             } else if (btnN == "zp01") {

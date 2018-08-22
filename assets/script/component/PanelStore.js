@@ -7,6 +7,13 @@ export default class PanelStore extends cc.Component {
 
     @property(cc.Node)
     node_content = null;
+
+    @property(cc.Node)
+    lab_shareNum = null;
+    @property(cc.Node)
+    btn_select = null;
+    @property(cc.Node)
+    lab_share = null;
     @property(cc.Node)
     lab_xuanze = null;
     @property(cc.Node)
@@ -34,6 +41,23 @@ export default class PanelStore extends cc.Component {
             let spr_bg = this.node.getChildByName("game_bg");
             spr_bg.getComponent(cc.Sprite).spriteFrame = frame;
         }
+
+        //诱导分享
+        this.node.getChildByName("anniu_zhuyie").x = (cc.dataMgr.isShowShare ? 100 : 0);
+        this.node.getChildByName("anniu_weixin").x = (cc.dataMgr.isShowShare ? -100 : 0);
+        this.node.getChildByName("anniu_weixin").active = cc.dataMgr.isShowShare;
+
+        this.refreshShareNum();
+    }
+
+    refreshShareNum() {
+        if (cc.dataMgr.isShowShare) {
+            this.lab_shareNum.getComponent(cc.Label).string = ("分享x" + cc.dataMgr.haveProp.countShareNum);
+        } else
+            this.lab_shareNum.getComponent(cc.Label).string = ("视频x" + cc.dataMgr.haveProp.countAdNum);
+
+        //为了分享之后就更新界面
+        this.callMoveEnd();
     }
 
     //检查content 位置使至少一个角色是亮的(每次滑动后都调用),并确定 _playerIdx;
@@ -61,6 +85,27 @@ export default class PanelStore extends cc.Component {
         //根据显示的更改钱数
         if (this._showPlayerIdx < cc.dataMgr.roleData.length) {
             this._showPlayerD = cc.dataMgr.roleData[this._showPlayerIdx];
+            if (this._showPlayerD.name == cc.dataMgr.userData.useRoleName) {
+                this.lab_xuanze.active = false;
+                this.lab_yixuanzhe.active = true;
+                this.lab_share.active = false;
+                this.btn_select.getComponent(cc.Button).interactable = false;
+            } else if (this._showPlayerD.price <= cc.dataMgr.haveProp.countShareNum) {
+                this.lab_xuanze.active = true;
+                this.lab_yixuanzhe.active = false;
+                this.lab_share.active = false;
+                this.btn_select.getComponent(cc.Button).interactable = true;
+            } else {
+                this.lab_xuanze.active = false;
+                this.lab_yixuanzhe.active = false;
+                this.lab_share.active = true;
+                this.btn_select.getComponent(cc.Button).interactable = false;
+
+                if (cc.dataMgr.isShowShare)
+                    this.lab_share.getComponent(cc.Label).string = ("分享x" + this._showPlayerD.price);
+                else
+                    this.lab_share.getComponent(cc.Label).string = ("视频x" + this._showPlayerD.price);
+            }
         } else {
             this._showPlayerD = null;
         }
@@ -128,15 +173,40 @@ export default class PanelStore extends cc.Component {
                 cc.dataMgr.saveData();
                 cc.director.loadScene("game");
             } else if (btnN == "kuangti_tongyong01") {
-               //console.log("--- 购买 ---" + this._onMoving);
+                console.log("--- 使用 ---" + this._onMoving);
                 if (!this._onMoving && this._showPlayerD) {
+                    cc.dataMgr.changeRole(this._showPlayerIdx);
+                    this.callMoveEnd();
 
+                    //这是切换场景自然会 更换图片
+                    // let startJs = cc.find("Canvas/node_start").getComponent("PanelStart");
+                    // if (startJs)
+                    //     startJs.refreshStart();
                 }
+            } else if (btnN == "anniu_weixin") {
+                this.shareFriend();
             }
         }
     }
 
     update(dt) {
         this.resetScale();
+    }
+
+    //分享给好友
+    shareFriend() {
+        if (CC_WECHATGAME) {
+            window.wx.shareAppMessage({
+                title: "我在这里，等你来。--境之边缘",
+                imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                query: "otherID=" + cc.dataMgr.openid,
+                success: (res) => {
+                    cc.dataMgr.shareSuccess("store");
+                }
+            });
+        } else {
+            //console.log("-- Not is wechatGame store --");
+            cc.dataMgr.shareSuccess("store");
+        }
     }
 }

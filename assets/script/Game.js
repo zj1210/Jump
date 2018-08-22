@@ -338,8 +338,8 @@ export default class Game extends cc.Component {
         aimY = data.aimPosY;
 
         //落到空 box 上才有声音
-        if (data && data.boxType == "box")
-            cc.audioMgr.playEffect("role_jump1");
+        // if (data && data.boxType == "box")
+        //     cc.audioMgr.playEffect("role_jump1");
 
         if (data.dieType > 0) {
             //加速的时候是不让死的
