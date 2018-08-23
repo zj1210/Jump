@@ -25,6 +25,9 @@ export default class Game extends cc.Component {
     @property(cc.Prefab) //预置box
     pre_box = null;
 
+    @property(cc.Node)//背景图片
+    node_bg = null;
+
     @property(cc.Node) //复活界面
     node_relive = null;
 
@@ -125,9 +128,9 @@ export default class Game extends cc.Component {
         this.node_start.getComponent("PanelStart").initStartBox();
 
         let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
-        let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
+        let spr_bg = this.node_bg.getChildByName("node_mask1").getChildByName("spr_bg");
         spr_bg.opacity = 255;
-        this.node.getChildByName("node_bg").getChildByName("spr_bg2").opacity = 0;
+        this.node_bg.getChildByName("node_mask2").getChildByName("spr_bg").opacity = 0;
         let frameBg = cc.dataMgr.getBgFrame_sf(bgName);
         if (frameBg)
             spr_bg.getComponent(cc.Sprite).spriteFrame = frameBg;
@@ -466,7 +469,7 @@ export default class Game extends cc.Component {
         cc.dataMgr.userData.boxName = cc.dataMgr.boxName[cc.dataMgr.userData.gameBgIdx];
 
         let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
-        let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
+        let spr_bg = this.node_bg.getChildByName("node_mask1").getChildByName("spr_bg");
         spr_bg.opacity = 0;
         let frameBg = cc.dataMgr.getBgFrame_sf(bgName);
         if (frameBg)
@@ -474,7 +477,7 @@ export default class Game extends cc.Component {
 
         //console.log("--- " + bgName + " -- " + lastBgName);
         if (lastBgName) {
-            let spr_bg2 = this.node.getChildByName("node_bg").getChildByName("spr_bg2");
+            let spr_bg2 = this.node_bg.getChildByName("node_mask2").getChildByName("spr_bg");
             let frameLast = cc.dataMgr.getBgFrame_sf(lastBgName);
             if (frameLast)
                 spr_bg2.getComponent(cc.Sprite).spriteFrame = frameLast;
@@ -492,7 +495,7 @@ export default class Game extends cc.Component {
     }
 
     callShowBg() {
-        let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
+        let spr_bg = this.node_bg.getChildByName("node_mask1").getChildByName("spr_bg");
         spr_bg.opacity = 255;
     }
 
