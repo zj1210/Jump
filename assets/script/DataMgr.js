@@ -10,6 +10,8 @@ export default class DataMgr extends cc.Component {
     openid = null;
     isShowShare = false; //显示引导分享
 
+    version = "20180823"; //不同的 version 版本会清空本地信息
+
     imageUrl = {
         urlGroup: "https://bpw.blyule.com/wxJump/res/jumpShare1.jpg",
         urlFriend: "https://bpw.blyule.com/wxJump/res/jumpShare2.jpg",
@@ -22,7 +24,7 @@ export default class DataMgr extends cc.Component {
         bestScore: 0, //最高纪录
         reliveNum: 0, //复活币数目
         propGreenNum: 0, //获得游戏币道具个数
-        addHpMax: 5, //可添加的生命值 最大值
+        addHpMax: 1, //可添加的生命值 最大值
         //addHpNow:5,//可添加的生命值 (翻倍也是翻这个数) 用 reliveNum 代替了。。
 
         //用户使用的数据
@@ -48,7 +50,7 @@ export default class DataMgr extends cc.Component {
         lastBoxY: -this.boxY, //确保第一个在 (0,0);
         countBox: 0, //盒子计数
 
-        baseHp: 5, //基础生命值
+        baseHp: 1, //基础生命值
         reliveHp: 0, //这一局游戏的命数
         shareDouble: 0, //分享获得的翻倍次数
 
@@ -88,23 +90,28 @@ export default class DataMgr extends cc.Component {
     //角色的数据
     roleData = [{
             name: "role_right1",
-            price: 0
+            price: 0,
+            hp: 1
         },
         {
             name: "role_right2",
-            price: 6
+            price: 6,
+            hp: 2
         },
         {
             name: "role_right3",
-            price: 24
+            price: 24,
+            hp: 2
         },
         {
             name: "role_right4",
-            price: 48
+            price: 48,
+            hp: 3
         },
         {
             name: "role_right5",
-            price: 99
+            price: 99,
+            hp: 4
         }
     ];
     //拖尾的颜色(idx 偶数是12h、奇数是24h)
@@ -160,12 +167,21 @@ export default class DataMgr extends cc.Component {
     };
 
     initData() {
+        //版本比较 是否重置数据
+        let reset = false;
+        let version = cc.sys.localStorage.getItem("version");
+        if (version != this.version) {
+            reset = true;
+            cc.sys.localStorage.setItem("version", this.version);
+        }
         console.log("--- initData ---");
+
+        //玩家openid
         let openid = cc.sys.localStorage.getItem("openid");
-        //if (!openid)
+        if (!openid || reset)
             cc.sys.localStorage.setItem("openid", 0);
         cc.dataMgr.openid = cc.sys.localStorage.getItem("openid");
-        //console.log(cc.dataMgr.openid);
+        console.log(cc.dataMgr.openid);
 
         let score = cc.sys.localStorage.getItem("bestScore");
         if (!score)
@@ -180,19 +196,19 @@ export default class DataMgr extends cc.Component {
             this.userData.propGreenNum = parseInt(propNum);
 
         let addHpMax = cc.sys.localStorage.getItem("addHpMax");
-        if (!addHpMax)
-            cc.sys.localStorage.setItem("addHpMax", 5);
+        if (!addHpMax || reset)
+            cc.sys.localStorage.setItem("addHpMax", 1 + this.haveProp.countInvite);
         else
             this.userData.addHpMax = parseInt(addHpMax);
 
         let reliveNum = cc.sys.localStorage.getItem("reliveNum");
-        if (!reliveNum)
+        if (!reliveNum || reset)
             cc.sys.localStorage.setItem("reliveNum", 0);
         else
             this.userData.reliveNum = parseInt(reliveNum);
 
         let reliveTime = cc.sys.localStorage.getItem("reliveTime")
-        if (!reliveTime) {
+        if (!reliveTime || reset) {
             cc.sys.localStorage.setItem("reliveTime", parseInt(Date.now() / 1000));
             cc.sys.localStorage.setItem("reliveNum", this.userData.addHpMax);
             this.userData.reliveNum = this.userData.addHpMax;
@@ -212,13 +228,28 @@ export default class DataMgr extends cc.Component {
             }
         }
 
-        // let havePropStr = cc.sys.localStorage.getItem("haveProp");
-        // //console.log("-- haveProp : " + havePropStr);
-        // if (!havePropStr)
-        //     cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
-        // else {
-        //     this.haveProp = JSON.parse(havePropStr);
-        // }
+        let mainIdx = cc.sys.localStorage.getItem("mainBgIdx");
+        if (!mainIdx)
+            cc.sys.localStorage.setItem("mainBgIdx", 0);
+        else
+            cc.dataMgr.userData.mainBgIdx = parseInt(mainIdx);
+
+        let havePropStr = cc.sys.localStorage.getItem("haveProp");
+        //console.log("-- haveProp : " + havePropStr);
+
+        if (!havePropStr)
+            cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
+        else {
+            if (reset) {
+                let haveProp = JSON.parse(havePropStr);
+                this.haveProp.countShareNum = haveProp.countShareNum;
+                this.haveProp.countShareToday = haveProp.countShareToday;
+                this.haveProp.countAdNum = haveProp.countAdNum;
+                this.haveProp.countInvite = haveProp.countInvite;
+                this.haveProp.freeTimes = haveProp.freeTimes;
+            } else
+                this.haveProp = JSON.parse(havePropStr);
+        }
 
         console.log(this.userData);
         console.log(this.haveProp);
@@ -363,9 +394,11 @@ export default class DataMgr extends cc.Component {
         //角色
         if (this.haveProp.useRoleIdx < this.roleData.length) {
             this.userData.useRoleName = this.roleData[this.haveProp.useRoleIdx].name;
+            this.userData.baseHp = this.roleData[this.haveProp.useRoleIdx].hp;
         } else {
             this.haveProp.useRoleIdx = 0;
             this.userData.useRoleName = this.roleData[this.haveProp.useRoleIdx].name;
+            this.userData.baseHp = this.roleData[this.haveProp.useRoleIdx].hp;
         }
 
         //console.log("--- checkProp over ---");
@@ -385,6 +418,7 @@ export default class DataMgr extends cc.Component {
         if (canUsed) {
             this.haveProp.useRoleIdx = idx;
             this.userData.useRoleName = this.roleData[idx].name;
+            this.userData.baseHp = this.roleData[idx].hp;
         }
     }
 
@@ -399,6 +433,14 @@ export default class DataMgr extends cc.Component {
         this.userData.gameBgIdx = this.changeBg[this.userData.nextChangeIdx];
         this.userData.cameraSpeedY = this.changeSpeed[this.userData.nextChangeIdx] * this.userData.baseSpeedY * this.userData.cutSpeed;
         //console.log("-- speed " + this.userData.cameraSpeedY + " -- " + this.userData.nextChangeIdx + " -- " + (this.userData.gameBgIdx + 1));
+    }
+
+    getStreakName() {
+        let idx = this.haveProp.useRoleIdx;
+        if (idx >= this.roleData.length)
+            idx = 0;
+        ++idx;
+        return ("role_streak" + idx);
     }
 
     getTimeSecond_i() {
@@ -424,7 +466,7 @@ export default class DataMgr extends cc.Component {
         if (CC_WECHATGAME) {
 
             let openid = cc.sys.localStorage.getItem("openid");
-            if (!openid || openid - 1 == -1) { //保证用户是第一次进游戏
+            if (!openid || openid - 1 == -1 || openid == "0") { //保证用户是第一次进游戏
                 console.log("发送wx.login请求!");
                 wx.login({
                     success: (res) => {
@@ -438,14 +480,14 @@ export default class DataMgr extends cc.Component {
                                     code: res.code,
                                 },
                                 success: (obj, statusCode, header) => {
-                                    //console.log("请求openid,服务器返回的数据！！--> " + obj);
-                                    //console.log(obj.data.openid);
+                                    console.log("请求openid,服务器返回的数据！！--> " + obj);
+                                    console.log(obj.data.openid);
 
                                     cc.dataMgr.openid = obj.data.openid;
                                     cc.sys.localStorage.setItem("openid", obj.data.openid); //之所以要存，是在分享的时候放入query中
                                     //微信官方文档那里写的调用函数是getLaunchInfoSync，但是根本搜不到这个API，应该是下面这个。
                                     let launchOption = wx.getLaunchOptionsSync();
-                                    //console.log(launchOption);
+                                    console.log(launchOption);
                                     if (launchOption.query.otherID == null || launchOption.query.otherID == undefined) {
                                         launchOption.query.otherID = 0;
                                     }
@@ -453,7 +495,7 @@ export default class DataMgr extends cc.Component {
                                     console.log(cc.dataMgr.openid);
                                     console.log(launchOption.query.otherID);
                                     wx.request({
-                                        url: 'https://bpw.blyule.com/game_2/public/index.php/index/index/add?userid=' + self.openid + "&" + "cuid=" + launchOption.query.otherID,
+                                        url: 'https://bpw.blyule.com/game_2/public/index.php/index/index/add?userid=' + cc.dataMgr.openid + "&" + "cuid=" + launchOption.query.otherID,
                                         data: {
                                             userid: cc.dataMgr.openid,
                                             cuid: launchOption.query.otherID,
@@ -463,8 +505,6 @@ export default class DataMgr extends cc.Component {
                                             console.log(data);
                                         },
                                     });
-
-
                                 },
                             });
                         }
@@ -513,17 +553,20 @@ export default class DataMgr extends cc.Component {
                 },
             });
         } else
-            cc.dataMgr.isShowShare = false;
+            cc.dataMgr.isShowShare = true;
     }
 
     //刷新邀请奖励
     refreshInvite() {
         if (cc.dataMgr.haveProp.countInvite > 0) {
-            cc.dataMgr.userData.addHpMax = parseInt(5 + cc.dataMgr.haveProp.countInvite * 5);
+            cc.dataMgr.userData.addHpMax = parseInt(1 + cc.dataMgr.haveProp.countInvite);
+            //addHpMax 设置上限 10
+            if (cc.dataMgr.userData.addHpMax > 10)
+                cc.dataMgr.userData.addHpMax = 0;
         }
         //邀请榜奖励 
         let inviteJs = cc.find("Canvas").getComponent("PanelInvite");
-        if(inviteJs){
+        if (inviteJs) {
             inviteJs.initInvite();
         }
     }

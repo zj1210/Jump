@@ -44,8 +44,8 @@ export default class PanelInvite extends cc.Component {
                 nodeN.getChildByName("anniu_yilingqu").active = false;
             }
         }
-        this.lab_addNum.getComponent(cc.Label).string = ("已加额外生命值x" + cc.dataMgr.userData.addHpMax);
-        this.lab_inviteNum.getComponent(cc.Label).string = ("已邀请好友x" + cc.dataMgr.haveProp.countInvite);
+        this.lab_addNum.getComponent(cc.Label).string = ("额外生命值" + cc.dataMgr.userData.addHpMax);
+        this.lab_inviteNum.getComponent(cc.Label).string = ("已邀请好友" + cc.dataMgr.haveProp.countInvite);
     }
 
     takeReward(idx) {

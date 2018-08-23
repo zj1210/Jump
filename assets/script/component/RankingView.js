@@ -6,12 +6,18 @@ const {
 export default class RankingView extends cc.Component {
 
     @property(cc.Node) //显示微信子域排行
-    subCanvas = null;
+    sub_end = null;
+    @property(cc.Node) //显示微信子域排行
+    sub_list = null;
+    @property(cc.Node) //显示微信子域排行
+    sub_my = null;
 
     @property(cc.Node) //结束界面
     node_end = null;
     @property(cc.Node) //好友列表和 群列表对应按钮
     node_list = null;
+    @property(cc.Node) //显示列表的content
+    node_content = null;
     @property(cc.Node) //查看群排行按钮
     btn_qun = null;
 
@@ -51,10 +57,14 @@ export default class RankingView extends cc.Component {
             this.node_end.active = false;
             this.node_list.active = true;
             this.btn_qun.active = true;
+            this.node_list.getChildByName("spr_qun").active = true;
+            this.node_list.getChildByName("spr_friend").active = false;
         } else if (panelName == "group") {
             this.node_end.active = false;
             this.node_list.active = true;
             this.btn_qun.active = false;
+            this.node_list.getChildByName("spr_qun").active = false;
+            this.node_list.getChildByName("spr_friend").active = true;
         }
     }
 
@@ -97,7 +107,16 @@ export default class RankingView extends cc.Component {
             //console.log("-- WECHAT End.js updataSubCanvas --");
             this.tex.initWithElement(window.sharedCanvas);
             this.tex.handleLoadedTexture();
-            this.subCanvas.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
+            if (this.node_end.active) {
+                this.sub_end.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
+            } else {
+                this.sub_list.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
+                this.sub_my.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
+
+                console.log("--- 微信子域 大小 ---" + this.sub_list.height);
+
+                this.node_content.height = this.sub_list.height;
+            }
         }
     }
 

@@ -11,6 +11,9 @@ export default class PanelStore extends cc.Component {
     @property(cc.Node)
     lab_shareNum = null;
     @property(cc.Node)
+    lab_title = null;
+
+    @property(cc.Node)
     btn_select = null;
     @property(cc.Node)
     lab_share = null;
@@ -18,6 +21,9 @@ export default class PanelStore extends cc.Component {
     lab_xuanze = null;
     @property(cc.Node)
     lab_yixuanzhe = null;
+
+    @property(cc.Node)
+    lab_hp = null;
 
     _firstPosX = -512; //界面中摆放的第一个 player 的位置
     _playerDis = 256; //两个player 之间的距离
@@ -32,6 +38,10 @@ export default class PanelStore extends cc.Component {
         this._colorBegin = this.node_content.children[0].color;
         this._firstPosX = this.node_content.children[0].x;
         this.node.getChildByName("prop").getChildByName("prop_Label").getComponent(cc.Label).string = cc.dataMgr.userData.propGreenNum;
+
+        let posX = this._firstPosX + cc.dataMgr.haveProp.useRoleIdx * this._playerDis;
+        console.log("--- onLoad Store ---" + posX + " -- " + cc.dataMgr.haveProp.useRoleIdx);
+        this.node_content.x = -posX;
         this.checkContentPos();
 
         //背景颜色
@@ -52,9 +62,12 @@ export default class PanelStore extends cc.Component {
 
     refreshShareNum() {
         if (cc.dataMgr.isShowShare) {
-            this.lab_shareNum.getComponent(cc.Label).string = ("分享x" + cc.dataMgr.haveProp.countShareNum);
-        } else
-            this.lab_shareNum.getComponent(cc.Label).string = ("视频x" + cc.dataMgr.haveProp.countAdNum);
+            this.lab_title.getComponent(cc.Label).string = "已获得分享值";
+            this.lab_shareNum.getComponent(cc.Label).string = cc.dataMgr.haveProp.countShareNum;
+        } else {
+            this.lab_title.getComponent(cc.Label).string = "已看视频";
+            this.lab_shareNum.getComponent(cc.Label).string = cc.dataMgr.haveProp.countAdNum;
+        }
 
         //为了分享之后就更新界面
         this.callMoveEnd();
@@ -106,6 +119,7 @@ export default class PanelStore extends cc.Component {
                 else
                     this.lab_share.getComponent(cc.Label).string = ("视频x" + this._showPlayerD.price);
             }
+            this.lab_hp.getComponent(cc.Label).string = ("生命值x" + this._showPlayerD.hp);
         } else {
             this._showPlayerD = null;
         }

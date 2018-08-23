@@ -20,7 +20,11 @@ export default class Start extends cc.Component {
     @property(cc.Node)
     rankingView = null;
     @property(cc.Node)
-    subCanvas = null;
+    sub_list = null;
+    @property(cc.Node)
+    sub_my = null;
+    @property(cc.Node) //显示列表的content
+    node_content = null;
 
     onLoad() {
         //console.log("--- onLoad Start ---");
@@ -154,7 +158,9 @@ export default class Start extends cc.Component {
             //console.log("-- WECHAT Start.js updataSubCanvas --");
             this.tex.initWithElement(window.sharedCanvas);
             this.tex.handleLoadedTexture();
-            this.subCanvas.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
+            this.sub_list.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
+            this.sub_my.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
+            this.node_content.height = this.sub_list.height;
         }
     }
 }

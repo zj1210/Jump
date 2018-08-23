@@ -11,6 +11,17 @@ export default class Game extends cc.Component {
     @property(cc.SpriteFrame) //溶解所需
     noiseTexture = null;
 
+    @property(cc.SpriteFrame)
+    role_streak1 = null;
+    @property(cc.SpriteFrame)
+    role_streak2 = null;
+    @property(cc.SpriteFrame)
+    role_streak3 = null;
+    @property(cc.SpriteFrame)
+    role_streak4 = null;
+    @property(cc.SpriteFrame)
+    role_streak5 = null;
+
     @property(cc.Prefab) //预置box
     pre_box = null;
 
@@ -543,8 +554,13 @@ export default class Game extends cc.Component {
             this.scheduleOnce(this.callCameraSpeedY, Math.random() * 8 + 12);
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("cut");
         }
-        //光效效果
-
+        //光效效果 替换图片
+        this.changeStreak();
+        let streakName = cc.dataMgr.getStreakName();
+        let streakSf = this[streakName];
+        console.log("-- streakName --" + streakName);
+        if (streakSf)
+            this.node_streak.getComponent(cc.MotionStreak).texture = streakSf.getTexture();
         //console.log("-- speedNum:" + cc.dataMgr.userData.speedNum + " -- " + cc.dataMgr.userData.cameraSpeedY);
     }
 
@@ -555,16 +571,19 @@ export default class Game extends cc.Component {
     }
 
     changeStreak() {
+        let stroke = this.node_streak.getComponent(cc.MotionStreak).stroke;
         if (cc.dataMgr.userData.speedNum > 0) {
-            this.node_streak.getComponent(cc.MotionStreak).stroke = 80;
-            this.node_streak.color = cc.Color.WHITE;
-            this.node_streak.getComponent(cc.MotionStreak).color = cc.Color.WHITE;
+            if (stroke != 80) {
+                this.node_streak.getComponent(cc.MotionStreak).stroke = 80;
+                this.node_streak.color = cc.Color.WHITE;
+                this.node_streak.getComponent(cc.MotionStreak).color = cc.Color.WHITE;
+            }
         } else {
             this.node_streak.getComponent(cc.MotionStreak).stroke = 0;
             if (cc.dataMgr.userData.useStreakColor != null) {
                 this.node_streak.getComponent(cc.MotionStreak).stroke = 8;
-                this.node_streak.color = cc.dataMgr.userData.useStreakColor;
-                this.node_streak.getComponent(cc.MotionStreak).color = cc.dataMgr.userData.useStreakColor;
+                //this.node_streak.color = cc.dataMgr.userData.useStreakColor;
+                //this.node_streak.getComponent(cc.MotionStreak).color = cc.dataMgr.userData.useStreakColor;
             }
         }
     }
@@ -629,7 +648,7 @@ export default class Game extends cc.Component {
                 }
             }
 
-            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 48);
+            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 64);
         }
 
         //统计变色相关

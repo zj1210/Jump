@@ -16,7 +16,8 @@ export default class PanelEnd extends cc.Component {
         cc.dataMgr.userData.mainBgIdx++;
         if (cc.dataMgr.userData.mainBgIdx >= cc.dataMgr.gameBgName.length)
             cc.dataMgr.userData.mainBgIdx = 0;
-            
+        cc.sys.localStorage.setItem("mainBgIdx", cc.dataMgr.userData.mainBgIdx);
+
         //this.node.getChildByName("best").getChildByName("best_Label").getComponent(cc.Label).string = cc.dataMgr.getBestScore_i(cc.dataMgr.userData.countJump);
 
         //背景颜色

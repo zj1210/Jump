@@ -178,7 +178,7 @@ export default class PanelRandom extends cc.Component {
             //减速70%存入0.3 剩余速度为0.3
             cc.dataMgr.haveProp.haveCut.push(0.3);
             rewardStr = "开局阶梯下坠减速";
-            numStr = "70% x 3";
+            numStr = "70%x3";
         } else if (this._rewardName == "foot") {
             //存入脚印下标
             cc.dataMgr.haveProp.haveFoot.push(0);
@@ -187,11 +187,11 @@ export default class PanelRandom extends cc.Component {
         } else if (this._rewardName == "speed100") {
             cc.dataMgr.haveProp.haveSpeed.push(100);
             rewardStr = "开局冲刺";
-            numStr = "100阶 x 3";
+            numStr = "100阶x3";
         } else if (this._rewardName == "speed50") {
             cc.dataMgr.haveProp.haveSpeed.push(50);
             rewardStr = "开局冲刺";
-            numStr = "50阶 x 3";
+            numStr = "50阶x3";
         } else if (this._rewardName == "streak") {
             cc.dataMgr.haveProp.haveStreak.push(0);
             rewardStr = "动态光效";
