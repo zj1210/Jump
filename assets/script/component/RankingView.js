@@ -47,8 +47,8 @@ export default class RankingView extends cc.Component {
 
             this.lab_share.active = cc.dataMgr.isShowShare;
             this.btn_share.active = cc.dataMgr.isShowShare;
-            this.node_end.getChildByName("anniu_zhuyie").x = (cc.dataMgr.isShowShare ? 0 : -100);
-            this.node_end.getChildByName("anniu_chongxinkaishi").x = (cc.dataMgr.isShowShare ? 150 : 100);
+            //this.node_end.getChildByName("anniu_zhuyie").x = (cc.dataMgr.isShowShare ? 0 : -100);
+            //this.node_end.getChildByName("anniu_chongxinkaishi").x = (cc.dataMgr.isShowShare ? 150 : 100);
 
             this.node_end.getChildByName("now_Label").getComponent(cc.Label).string = ("得分:" + cc.dataMgr.userData.countJump);
             this.node_end.getChildByName("prop").active = false;
@@ -127,20 +127,20 @@ export default class RankingView extends cc.Component {
             if (type == "submit") {
                 window.wx.postMessage({
                     messageType: 2,
-                    MAIN_MENU_NUM: "user_best_score",
+                    MAIN_MENU_NUM: "scoreS",
                     myScore: cc.dataMgr.userData.countJump
                 });
             } else if (type == "end") {
                 window.wx.postMessage({
                     messageType: 3,
-                    MAIN_MENU_NUM: "user_best_score",
+                    MAIN_MENU_NUM: "scoreS",
                     myScore: cc.dataMgr.userData.countJump
                 });
                 this.showPanel("end")
             } else if (type == "friend") {
                 window.wx.postMessage({
                     messageType: 1,
-                    MAIN_MENU_NUM: "user_best_score",
+                    MAIN_MENU_NUM: "scoreS",
                     myScore: cc.dataMgr.userData.countJump
                 });
                 this.showPanel("friend");
@@ -152,6 +152,9 @@ export default class RankingView extends cc.Component {
     shareGroup() {
         let self = this;
         if (CC_WECHATGAME) {
+            window.wx.updateShareMenu({
+                withShareTicket: true
+            });
             window.wx.shareAppMessage({
                 title: "我在这里，等你来超越。--境之边缘",
                 imageUrl: cc.dataMgr.imageUrl.urlGroup,
@@ -163,7 +166,7 @@ export default class RankingView extends cc.Component {
                     if (res.shareTickets != undefined && res.shareTickets.length > 0) {
                         window.wx.postMessage({
                             messageType: 5,
-                            MAIN_MENU_NUM: "user_best_score",
+                            MAIN_MENU_NUM: "scoreS",
                             shareTicket: res.shareTickets[0]
                         });
                         self.showPanel("group");
@@ -178,6 +181,9 @@ export default class RankingView extends cc.Component {
     //分享给好友
     shareFriend() {
         if (CC_WECHATGAME) {
+            window.wx.updateShareMenu({
+                withShareTicket: false
+            });
             window.wx.shareAppMessage({
                 title: "我在这里，等你来。--境之边缘",
                 imageUrl: cc.dataMgr.imageUrl.urlFriend,

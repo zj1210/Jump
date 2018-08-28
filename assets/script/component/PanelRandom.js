@@ -21,46 +21,46 @@ export default class PanelRandom extends cc.Component {
 
     //转盘的奖励及 角度(所有判断都包含边界)
     _randData = [{
-            rotaMax: 90,
-            rotaMin: 30,
-            rewardName: "cut30",
-            prob: 0.2, //概率
-        },
-        {
-            rotaMax: 150,
-            rotaMin: 90,
-            rewardName: "cut70",
-            prob: 0.15, //概率
-        },
-        {
-            rotaMax: 210,
-            rotaMin: 150,
-            rewardName: "foot",
-            prob: 0.05, //概率
-        },
-        {
-            rotaMax: 270,
-            rotaMin: 210,
-            rewardName: "speed100",
-            prob: 0.15, //概率
-        },
-        {
-            rotaMax: 330,
-            rotaMin: 270,
-            rewardName: "speed50",
-            prob: 0.4, //概率
-        },
-        {
-            rotaMax: 30,
-            rotaMin: 330,
-            rewardName: "streak",
-            prob: 0.05, //概率
-        },
+        rotaMax: 90,
+        rotaMin: 30,
+        rewardName: "cut30",
+        prob: 0.2, //概率
+    },
+    {
+        rotaMax: 150,
+        rotaMin: 90,
+        rewardName: "cut70",
+        prob: 0.15, //概率
+    },
+    {
+        rotaMax: 210,
+        rotaMin: 150,
+        rewardName: "foot",
+        prob: 0.05, //概率
+    },
+    {
+        rotaMax: 270,
+        rotaMin: 210,
+        rewardName: "speed100",
+        prob: 0.15, //概率
+    },
+    {
+        rotaMax: 330,
+        rotaMin: 270,
+        rewardName: "speed50",
+        prob: 0.4, //概率
+    },
+    {
+        rotaMax: 30,
+        rotaMin: 330,
+        rewardName: "streak",
+        prob: 0.05, //概率
+    },
     ]
 
     _freeReward = ["streak", "cut70", "speed100"];
 
-    _cdTime = 300; //冷却时间为 五分钟
+    _cdTime = 3600; //冷却时间为 五分钟
 
     _rewardName = null;
 
@@ -88,7 +88,7 @@ export default class PanelRandom extends cc.Component {
         if (cc.dataMgr.haveProp.freeTimes > 0 || cc.dataMgr.haveProp.rewardTimes > 0) {
             this.node_point.getComponent(cc.Button).interactable = true;
             this.node_point.getChildByName("lab_title").getComponent(cc.Label).string = "点击抽奖";
-            this.node_point.getChildByName("lab_num").getComponent(cc.Label).string = ("x" + cc.dataMgr.haveProp.freeTimes);
+            this.node_point.getChildByName("lab_num").getComponent(cc.Label).string = ("x" + (cc.dataMgr.haveProp.freeTimes + cc.dataMgr.haveProp.rewardTimes));
         } else if (cc.dataMgr.getTimeSecond_i() >= cc.dataMgr.haveProp.adCDBegin + this._cdTime) {
             //广告接口暂时 不用
             this.node_point.getComponent(cc.Button).interactable = true;
@@ -126,6 +126,17 @@ export default class PanelRandom extends cc.Component {
 
     getNextADTime_i() {
         return -cc.dataMgr.getTimeSecond_i() + cc.dataMgr.haveProp.adCDBegin + this._cdTime;
+    }
+
+    getShowTime_s() {
+        let nextTime = this.getNextADTime_i();
+        let hour = parseInt(nextTime / 3600);
+        let miu = parseInt(nextTime / 60);
+        let second = parseInt(nextTime % 60);
+        if (hour > 0)
+            return (hour + ":" + (miu > 9 ? miu : "0" + miu) + ":" + (second > 9 ? second : "0" + second))
+        else
+            return (miu > 9 ? miu : "0" + miu) + ":" + (second > 9 ? second : "0" + second);
     }
 
     //开始转转盘
@@ -249,12 +260,20 @@ export default class PanelRandom extends cc.Component {
     //分享给好友
     shareFriend() {
         if (CC_WECHATGAME) {
+            window.wx.updateShareMenu({
+                withShareTicket: true
+            });
             window.wx.shareAppMessage({
                 title: "我在这里，等你来。--境之边缘",
                 imageUrl: cc.dataMgr.imageUrl.urlFriend,
                 query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
-                    cc.dataMgr.shareSuccess("startAd");
+                    console.log("--- 大转盘微信分享 ---");
+                    console.log(res);
+                    //改为分享到群立即抽奖
+                    if (res.shareTickets != undefined && res.shareTickets.length >= 0) {
+                        cc.dataMgr.shareSuccess("startAd");
+                    }
                 }
             });
         } else {

@@ -67,10 +67,14 @@ export default class PanelInvite extends cc.Component {
             cc.dataMgr.haveProp.haveStreak.push(1);
         } else if (idx == 8) {
             cc.dataMgr.haveProp.isOwnSpeed = true;
-            cc.dataMgr.haveProp.isOwnCut = true;
         } else if (idx == 9) {
-            cc.dataMgr.haveProp.isOwnFoot = true;
+            cc.dataMgr.haveProp.isOwnCut = true;
+        }
+        else if (idx == 10) {
             cc.dataMgr.haveProp.isOwnStreak = true;
+        }
+        else if (idx == 11) {
+            cc.dataMgr.haveProp.isOwnFoot = true;
         }
 
         cc.dataMgr.haveProp.inviteTake.push(idx);
@@ -109,11 +113,14 @@ export default class PanelInvite extends cc.Component {
                 }
             } else if (btnN == "anniu_weixin") {
                 if (CC_WECHATGAME) {
+                    window.wx.updateShareMenu({
+                        withShareTicket: false
+                    });
                     window.wx.shareAppMessage({
                         title: "我在这里，等你来。--境之边缘",
                         imageUrl: cc.dataMgr.imageUrl.urlFriend,
                         query: "otherID=" + cc.dataMgr.openid,
-                        success: (res) => {}
+                        success: (res) => { }
                     });
                 } else {
                     //console.log("-- Not is wechatGame PanelRelive --");

@@ -201,7 +201,7 @@
         "__id__": 50
       }
     ],
-    "zoomRatio": 1.4
+    "zoomRatio": 1.32
   },
   {
     "__type__": "cc.Node",
@@ -593,7 +593,7 @@
     ],
     "_prefab": null,
     "_id": "fbEjvfpwBHdpqnCCLxRAbx",
-    "_opacity": 0,
+    "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
       "r": 255,
@@ -619,7 +619,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 0
+      "y": 89
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -656,7 +656,7 @@
     "_cascadeOpacityEnabled": true,
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 0.54,
+      "x": 0.5,
       "y": 0.1
     },
     "_contentSize": {
@@ -666,8 +666,8 @@
     },
     "_rotationX": 0,
     "_rotationY": 0,
-    "_scaleX": 1,
-    "_scaleY": 1,
+    "_scaleX": 0.64,
+    "_scaleY": 0.64,
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -1282,7 +1282,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": -282,
-      "y": 583.0000000000001
+      "y": 560
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -7778,7 +7778,7 @@
     "_cascadeOpacityEnabled": true,
     "_anchorPoint": {
       "__type__": "cc.Vec2",
-      "x": 0.54,
+      "x": 0.5,
       "y": 0.1
     },
     "_contentSize": {
@@ -7788,8 +7788,8 @@
     },
     "_rotationX": 0,
     "_rotationY": 0,
-    "_scaleX": 1,
-    "_scaleY": 1,
+    "_scaleX": 0.64,
+    "_scaleY": 0.64,
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -11609,8 +11609,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 151.2,
-      "height": 56
+      "width": 112,
+      "height": 64
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -11639,17 +11639,15 @@
     "_useOriginalSize": false,
     "_actualFontSize": 28,
     "_fontSize": 28,
-    "_lineHeight": 80,
+    "_lineHeight": 32,
     "_enableWrapText": true,
-    "_N$file": {
-      "__uuid__": "097746db-3f62-434d-a4ab-a2cee21d7ab6"
-    },
-    "_isSystemFontUsed": false,
+    "_N$file": null,
+    "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_N$string": "分享好友\n立即观看视频",
+    "_N$string": "分享到群\n立即抽奖",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "Arial",
+    "_N$fontFamily": "Simhei",
     "_N$overflow": 0
   },
   {

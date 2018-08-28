@@ -25,7 +25,7 @@ export default class Game extends cc.Component {
     @property(cc.Prefab) //预置box
     pre_box = null;
 
-    @property(cc.Node)//背景图片
+    @property(cc.Node) //背景图片
     node_bg = null;
 
     @property(cc.Node) //复活界面
@@ -111,11 +111,23 @@ export default class Game extends cc.Component {
                 }
                 return true;
             },
-            onTouchMoved: function (touch, event) {},
-            onTouchEnded: function (touch, event) {}
+            onTouchMoved: function (touch, event) { },
+            onTouchEnded: function (touch, event) { }
         }, self.node);
 
         this.showStart();
+
+        //微信转发定义
+        if (CC_WECHATGAME) {
+            window.wx.showShareMenu();
+            window.wx.onShareAppMessage(function () {
+                return {
+                    title: "旋转、跳跃、永不停歇。--境之边境",
+                    imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                    query: "otherID=" + cc.dataMgr.openid
+                }
+            })
+        }
     }
 
     showStart() {
@@ -320,9 +332,14 @@ export default class Game extends cc.Component {
             //直接结束游戏
             //cc.director.loadScene("end");
 
-            this.node_relive.active = true;
-            this.node_relive.getComponent("PanelRelive").showRelive();
-            cc.dataMgr.saveData();
+            //修改为只有两次复活了 等有广告了再加
+            if (cc.dataMgr.userData.reliveTimes < 2) {
+                this.node_relive.active = true;
+                this.node_relive.getComponent("PanelRelive").showRelive();
+                cc.dataMgr.saveData();
+            }
+            else
+                cc.director.loadScene("end");
         }
     }
 
@@ -469,6 +486,7 @@ export default class Game extends cc.Component {
         cc.dataMgr.userData.boxName = cc.dataMgr.boxName[cc.dataMgr.userData.gameBgIdx];
 
         let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
+        this.node_bg.getChildByName("node_mask1").size = cc.v2(2000, 2000);
         let spr_bg = this.node_bg.getChildByName("node_mask1").getChildByName("spr_bg");
         spr_bg.opacity = 0;
         let frameBg = cc.dataMgr.getBgFrame_sf(bgName);
@@ -477,7 +495,18 @@ export default class Game extends cc.Component {
 
         //console.log("--- " + bgName + " -- " + lastBgName);
         if (lastBgName) {
-            let spr_bg2 = this.node_bg.getChildByName("node_mask2").getChildByName("spr_bg");
+            let node_mask2 = this.node_bg.getChildByName("node_mask2");
+            node_mask2.size = cc.v2(0, 0);
+            let delayTime = cc.delayTime(0.6);
+            delayTime.update = function (dt) {
+                let node = delayTime.getTarget();
+                if (node) {
+                    node.size = cc.v2(2000 * dt, 2000 * dt);
+                }
+            };
+            node_mask2.runAction(delayTime);
+
+            let spr_bg2 = node_mask2.getChildByName("spr_bg");
             let frameLast = cc.dataMgr.getBgFrame_sf(lastBgName);
             if (frameLast)
                 spr_bg2.getComponent(cc.Sprite).spriteFrame = frameLast;
@@ -495,6 +524,7 @@ export default class Game extends cc.Component {
     }
 
     callShowBg() {
+        this.node_bg.getChildByName("node_mask1").size = cc.v2(0, 0);
         let spr_bg = this.node_bg.getChildByName("node_mask1").getChildByName("spr_bg");
         spr_bg.opacity = 255;
     }
@@ -612,7 +642,7 @@ export default class Game extends cc.Component {
         if (event.target) {
             cc.audioMgr.playEffect("btn_click");
             let btnN = event.target.name;
-            if (btnN == "") {}
+            if (btnN == "") { }
         }
     }
 

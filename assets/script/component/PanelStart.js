@@ -109,7 +109,7 @@ export default class Start extends cc.Component {
                     //console.log("-- WECHAT Start.js subPostMessage --");
                     window.wx.postMessage({
                         messageType: 1,
-                        MAIN_MENU_NUM: "user_best_score",
+                        MAIN_MENU_NUM: "scoreS",
                         myScore: cc.dataMgr.userData.countJump
                     });
                     this.node.runAction(cc.sequence(cc.delayTime(0.1), cc.callFunc(this.updataSubCanvas, this)));

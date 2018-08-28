@@ -29,6 +29,7 @@ export default class PanelRelive extends cc.Component {
     showRelive() {
         this._toEnd = true;
         if (cc.dataMgr.isShowShare) {
+            //修改为只有两次复活了
             if (cc.dataMgr.userData.reliveTimes < 2) {
                 this.node_share.active = true;
                 this.node_relive.active = false;
@@ -105,6 +106,9 @@ export default class PanelRelive extends cc.Component {
     //分享给好友
     shareFriend() {
         if (CC_WECHATGAME) {
+            window.wx.updateShareMenu({
+                withShareTicket: false
+            });
             window.wx.shareAppMessage({
                 title: "我在这里，等你来。--境之边缘",
                 imageUrl: cc.dataMgr.imageUrl.urlFriend,

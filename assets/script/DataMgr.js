@@ -10,7 +10,7 @@ export default class DataMgr extends cc.Component {
     openid = null;
     isShowShare = false; //显示引导分享
 
-    version = "20180823"; //不同的 version 版本会清空本地信息
+    version = "20180828"; //不同的 version 版本会清空本地信息
 
     imageUrl = {
         urlGroup: "https://bpw.blyule.com/wxJump/res/jumpShare1.jpg",
@@ -89,30 +89,30 @@ export default class DataMgr extends cc.Component {
 
     //角色的数据
     roleData = [{
-            name: "role_right1",
-            price: 0,
-            hp: 1
-        },
-        {
-            name: "role_right2",
-            price: 6,
-            hp: 2
-        },
-        {
-            name: "role_right3",
-            price: 24,
-            hp: 2
-        },
-        {
-            name: "role_right4",
-            price: 48,
-            hp: 3
-        },
-        {
-            name: "role_right5",
-            price: 99,
-            hp: 4
-        }
+        name: "role_right1",
+        price: 0,
+        hp: 3
+    },
+    {
+        name: "role_right2",
+        price: 6,
+        hp: 3
+    },
+    {
+        name: "role_right3",
+        price: 24,
+        hp: 3
+    },
+    {
+        name: "role_right4",
+        price: 48,
+        hp: 3
+    },
+    {
+        name: "role_right5",
+        price: 99,
+        hp: 3
+    }
     ];
     //拖尾的颜色(idx 偶数是12h、奇数是24h)
     streakColor = [cc.color(255, 0, 0, 255), cc.color(0, 255, 0, 255), cc.color(0, 0, 255, 255), cc.color(255, 0, 255, 255)];
@@ -197,7 +197,7 @@ export default class DataMgr extends cc.Component {
 
         let addHpMax = cc.sys.localStorage.getItem("addHpMax");
         if (!addHpMax || reset)
-            cc.sys.localStorage.setItem("addHpMax", 1 + this.haveProp.countInvite);
+            cc.sys.localStorage.setItem("addHpMax", 2 * this.haveProp.countInvite);
         else
             this.userData.addHpMax = parseInt(addHpMax);
 
@@ -241,12 +241,18 @@ export default class DataMgr extends cc.Component {
             cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
         else {
             if (reset) {
+                console.log("--- reset 数据清空了 ---")
                 let haveProp = JSON.parse(havePropStr);
                 this.haveProp.countShareNum = haveProp.countShareNum;
                 this.haveProp.countShareToday = haveProp.countShareToday;
                 this.haveProp.countAdNum = haveProp.countAdNum;
                 this.haveProp.countInvite = haveProp.countInvite;
                 this.haveProp.freeTimes = haveProp.freeTimes;
+
+                if (this.haveProp.countInvite > 100)
+                    this.haveProp.countInvite = 100;
+                this.userData.addHpMax = 2 * this.haveProp.countInvite;
+                cc.sys.localStorage.setItem("addHpMax", this.userData.addHpMax);
             } else
                 this.haveProp = JSON.parse(havePropStr);
         }
@@ -559,10 +565,9 @@ export default class DataMgr extends cc.Component {
     //刷新邀请奖励
     refreshInvite() {
         if (cc.dataMgr.haveProp.countInvite > 0) {
-            cc.dataMgr.userData.addHpMax = parseInt(1 + cc.dataMgr.haveProp.countInvite);
-            //addHpMax 设置上限 10
-            if (cc.dataMgr.userData.addHpMax > 10)
-                cc.dataMgr.userData.addHpMax = 0;
+            if (cc.dataMgr.haveProp.countInvite > 100)
+                cc.dataMgr.haveProp.countInvite = 100;
+            cc.dataMgr.userData.addHpMax = 2 * cc.dataMgr.haveProp.countInvite;
         }
         //邀请榜奖励 
         let inviteJs = cc.find("Canvas").getComponent("PanelInvite");
@@ -573,7 +578,8 @@ export default class DataMgr extends cc.Component {
 
     //type : 分享的类型 不同的分享有不同的效果
     shareSuccess(type) {
-        if (this.getTimeSecond_i() > this.haveProp.todayShareBegin + 24 * 3600) {
+        //三个小时分享十次
+        if (this.getTimeSecond_i() > this.haveProp.todayShareBegin + 3 * 3600) {
             this.haveProp.todayShareBegin = this.getTimeSecond_i();
             this.haveProp.countShareToday = 0;
         }
@@ -589,7 +595,12 @@ export default class DataMgr extends cc.Component {
         } else if (type == "startAd") {
             //广告分享成功
             this.haveProp.adCDBegin = 0;
+            cc.dataMgr.haveProp.rewardTimes += 1;
             //刷新界面
+            let nodeNJs = cc.find("Canvas/node_random").getComponent("PanelRandom");
+            if (nodeNJs) {
+                nodeNJs.initRand();
+            }
         } else if (type == "endRelive") {
             //调用结束界面的复活接口
             cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.baseHp + cc.dataMgr.userData.addHpMax;
