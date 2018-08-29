@@ -12,7 +12,7 @@ export default class PanelRandom extends cc.Component {
     @property(cc.Node)
     btn_share = null;
     @property(cc.Node) //引导提示
-    lab_share = null;
+    spr_share = null;
 
     @property(cc.Node) //最后的提示获得。
     node_reward = null;
@@ -47,7 +47,7 @@ export default class PanelRandom extends cc.Component {
     {
         rotaMax: 330,
         rotaMin: 270,
-        rewardName: "speed50",
+        rewardName: "streak1",
         prob: 0.4, //概率
     },
     {
@@ -58,7 +58,7 @@ export default class PanelRandom extends cc.Component {
     },
     ]
 
-    _freeReward = ["streak", "cut70", "speed100"];
+    _freeReward = ["streak1", "cut70", "speed100"];
 
     _cdTime = 3600; //冷却时间为 五分钟
 
@@ -80,10 +80,10 @@ export default class PanelRandom extends cc.Component {
         //是否显示分享引导
         this.node.active = true;
         this.btn_share.active = cc.dataMgr.isShowShare;
-        this.lab_share.active = cc.dataMgr.isShowShare;
+        this.spr_share.active = cc.dataMgr.isShowShare;
         this.node.getChildByName("anniu_zhuyie").x = (cc.dataMgr.isShowShare ? 100 : 0);
         this.btn_share.x = (cc.dataMgr.isShowShare ? -100 : 0);
-        this.lab_share.x = -100;
+        this.spr_share.x = -100;
 
         if (cc.dataMgr.haveProp.freeTimes > 0 || cc.dataMgr.haveProp.rewardTimes > 0) {
             this.node_point.getComponent(cc.Button).interactable = true;
@@ -199,10 +199,10 @@ export default class PanelRandom extends cc.Component {
             cc.dataMgr.haveProp.haveSpeed.push(100);
             rewardStr = "开局冲刺";
             numStr = "100阶x3";
-        } else if (this._rewardName == "speed50") {
-            cc.dataMgr.haveProp.haveSpeed.push(50);
-            rewardStr = "开局冲刺";
-            numStr = "50阶x3";
+        } else if (this._rewardName == "streak1") {
+            cc.dataMgr.haveProp.haveStreak.push(1);
+            rewardStr = "动态光效";
+            numStr = "12小时";
         } else if (this._rewardName == "streak") {
             cc.dataMgr.haveProp.haveStreak.push(0);
             rewardStr = "动态光效";

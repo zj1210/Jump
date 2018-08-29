@@ -39,6 +39,8 @@ export default class Game extends cc.Component {
     node_role = null;
     @property(cc.Node) //加速拖尾效果实验
     node_streak = null;
+    @property(cc.Node)//梦幻气泡
+    node_particle = null;
     @property(cc.Node)
     node_ui = null;
     @property(cc.Node) //相机
@@ -138,12 +140,16 @@ export default class Game extends cc.Component {
         this.node_game.active = false;
 
         this.node_start.getComponent("PanelStart").initStartBox();
+        this.changeGameBg();
+    }
 
+    changeGameBg() {
         let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
         let spr_bg = this.node_bg.getChildByName("node_mask1").getChildByName("spr_bg");
         spr_bg.opacity = 255;
         this.node_bg.getChildByName("node_mask2").getChildByName("spr_bg").opacity = 0;
         let frameBg = cc.dataMgr.getBgFrame_sf(bgName);
+        console.log(frameBg);
         if (frameBg)
             spr_bg.getComponent(cc.Sprite).spriteFrame = frameBg;
     }
@@ -193,7 +199,7 @@ export default class Game extends cc.Component {
             cc.dataMgr.userData.isReliveDrop = true;
 
             if (cc.dataMgr.userData.shareDouble > 0) {
-                cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.reliveNum * 2 + cc.dataMgr.userData.baseHp;
+                cc.dataMgr.userData.reliveHp = (cc.dataMgr.userData.reliveNum + cc.dataMgr.userData.baseHp) * 2;
                 cc.dataMgr.userData.shareDouble--;
             } else
                 cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.baseHp + cc.dataMgr.userData.reliveNum;
@@ -604,10 +610,13 @@ export default class Game extends cc.Component {
     }
 
     changeStreak() {
+        //梦幻气泡
+        this.node_particle.active = cc.dataMgr.userData.showParticle;
+
         let stroke = this.node_streak.getComponent(cc.MotionStreak).stroke;
         if (cc.dataMgr.userData.speedNum > 0) {
-            if (stroke != 80) {
-                this.node_streak.getComponent(cc.MotionStreak).stroke = 80;
+            if (stroke != 60) {
+                this.node_streak.getComponent(cc.MotionStreak).stroke = 60;
                 this.node_streak.color = cc.Color.WHITE;
                 this.node_streak.getComponent(cc.MotionStreak).color = cc.Color.WHITE;
             }
@@ -681,7 +690,8 @@ export default class Game extends cc.Component {
                 }
             }
 
-            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 64);
+            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 54);
+            this.node_particle.position = cc.v2(this.node_role.x, this.node_role.y + 48);
         }
 
         //统计变色相关

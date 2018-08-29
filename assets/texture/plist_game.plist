@@ -33,7 +33,7 @@
             <key>jiaoyin01.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{350,176},{34,19}}</string>
+                <string>{{351,176},{34,19}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -59,7 +59,7 @@
             <key>particle.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{350,197},{30,30}}</string>
+                <string>{{351,197},{30,30}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -241,33 +241,33 @@
             <key>zz03.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{350,382},{104,268}}</string>
+                <string>{{244,176},{105,268}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{104,268}}</string>
+                <string>{{0,0},{105,268}}</string>
                 <key>sourceSize</key>
-                <string>{104,268}</string>
+                <string>{105,268}</string>
             </dict>
             <key>zz04.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{244,176},{104,268}}</string>
+                <string>{{388,112},{105,268}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
                 <false/>
                 <key>sourceColorRect</key>
-                <string>{{0,0},{104,268}}</string>
+                <string>{{0,0},{105,268}}</string>
                 <key>sourceSize</key>
-                <string>{104,268}</string>
+                <string>{105,268}</string>
             </dict>
             <key>zz05.png</key>
             <dict>
                 <key>frame</key>
-                <string>{{388,112},{104,268}}</string>
+                <string>{{351,382},{104,268}}</string>
                 <key>offset</key>
                 <string>{0,0}</string>
                 <key>rotated</key>
@@ -287,7 +287,7 @@
             <key>size</key>
             <string>{512,1024}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:a002ab587c9caca3efeb8dfac34495b0$</string>
+            <string>$TexturePacker:SmartUpdate:77939d249362778f171982136304210a$</string>
             <key>textureFileName</key>
             <string>plist_game.png</string>
         </dict>

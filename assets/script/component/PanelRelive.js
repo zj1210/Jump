@@ -17,13 +17,16 @@ export default class PanelRelive extends cc.Component {
     @property(cc.Node) //引导分享
     node_share = null;
 
+    @property(cc.Node)
+    sub_beyond = null;
+
     _timeCD = 6;
     _timeCount = 0;
 
     _toEnd = true;
 
     onLoad() {
-
+        this.initSubCanvas();
     }
 
     showRelive() {
@@ -50,6 +53,17 @@ export default class PanelRelive extends cc.Component {
         this.lab_time.runAction(cc.sequence(cc.repeat(cc.sequence(cc.delayTime(1), cc.callFunc(this.callChengNum, this)), 6), cc.delayTime(0.2), cc.callFunc(this.callEnd, this)));
 
         this.lab_relive.getComponent(cc.Label).string = "观看广告复活并回满生命值";
+
+        //微信排行
+        if (CC_WECHATGAME) {
+            //console.log("-- WECHAT Start.js subPostMessage --");
+            window.wx.postMessage({
+                messageType: 8,
+                MAIN_MENU_NUM: "scoreS",
+                myScore: cc.dataMgr.userData.countJump
+            });
+            this.scheduleOnce(this.updataSubCanvas, 0.4);
+        }
     }
 
     //圆形cd:总时间、百分比(0~1)
@@ -100,6 +114,28 @@ export default class PanelRelive extends cc.Component {
                 this._toEnd = false;
                 this.shareFriend();
             }
+        }
+    }
+
+    //------ 微信相关 ------
+
+    //初始化子域信息
+    initSubCanvas() {
+        if (!this.tex)
+            this.tex = new cc.Texture2D();
+        if (CC_WECHATGAME) {
+            //console.log("-- WECHAT Start.js initSubCanvas --");
+            window.sharedCanvas.width = 720;
+            window.sharedCanvas.height = 1280;
+        }
+    }
+
+    updataSubCanvas() {
+        if (CC_WECHATGAME ) {
+            //console.log("-- WECHAT Start.js updataSubCanvas --");
+            this.tex.initWithElement(window.sharedCanvas);
+            this.tex.handleLoadedTexture();
+            this.sub_beyond.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
         }
     }
 

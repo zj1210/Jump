@@ -190,6 +190,7 @@ export default class RankingView extends cc.Component {
                 query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
                     cc.dataMgr.shareSuccess("end");
+                    cc.director.loadScene("game");
                 }
             });
         } else {

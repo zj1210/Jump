@@ -10,7 +10,7 @@ export default class DataMgr extends cc.Component {
     openid = null;
     isShowShare = false; //显示引导分享
 
-    version = "20180828"; //不同的 version 版本会清空本地信息
+    version = "20180829A"; //不同的 version 版本会清空本地信息
 
     imageUrl = {
         urlGroup: "https://bpw.blyule.com/wxJump/res/jumpShare1.jpg",
@@ -24,7 +24,7 @@ export default class DataMgr extends cc.Component {
         bestScore: 0, //最高纪录
         reliveNum: 0, //复活币数目
         propGreenNum: 0, //获得游戏币道具个数
-        addHpMax: 1, //可添加的生命值 最大值
+        addHpMax: 0, //可添加的生命值 最大值
         //addHpNow:5,//可添加的生命值 (翻倍也是翻这个数) 用 reliveNum 代替了。。
 
         //用户使用的数据
@@ -34,6 +34,8 @@ export default class DataMgr extends cc.Component {
         useRoleName: "role_right1", //当前使用的角色下标  默认:role_right1
         useStreakColor: null, //使用拖尾的下标
 
+        showParticle: false,
+
         //游戏 game 中需要的数据
         isReady: true, //在主界面中 已准备完成
         loadOver: false, //加载背景音乐完成
@@ -41,9 +43,9 @@ export default class DataMgr extends cc.Component {
         onGaming: false, //游戏正在进行中(砖块 下落 和 场景移动))
 
         //移动相机相关变量(相机的目标位置即是角色的目标位置 aimRoleX aimRoleY)
-        baseSpeedY: 100, //相机移动的基础度
+        baseSpeedY: 160, //相机移动的基础度
         cameraSpeedX: 50, //相机的移动的基础速度
-        cameraSpeedY: 100, //相机的移动的Y速度
+        cameraSpeedY: 160, //相机的移动的Y速度
         dropPosY: 200, //当方块位置 小于摄像机位置这么多时消失
 
         lastBoxX: this.boxX, //最近生成的个 方块的X Y
@@ -84,37 +86,38 @@ export default class DataMgr extends cc.Component {
 
     //音乐改变背景相关参数
     changeTime = [12, 11, 25, 23, 37, 23, 12, 30];
-    changeSpeed = [1, 1.2, 1.3, 2, 1.3, 1.2, 1.4, 1.3];
+    //changeSpeed = [1, 1.2, 1.3, 2, 1.3, 1.2, 1.4, 1.3];
+    changeSpeed = [1, 1.2, 1.4, 1.8, 1.4, 1.2, 1.6, 1.4];
     changeBg = [0, 1, 2, 4, 2, 1, 4, 3];
 
     //角色的数据
     roleData = [{
         name: "role_right1",
         price: 0,
-        hp: 3
+        hp: 1
     },
     {
         name: "role_right2",
         price: 6,
-        hp: 3
+        hp: 1
     },
     {
         name: "role_right3",
         price: 24,
-        hp: 3
+        hp: 1
     },
     {
         name: "role_right4",
         price: 48,
-        hp: 3
+        hp: 1
     },
     {
         name: "role_right5",
         price: 99,
-        hp: 3
+        hp: 1
     }
     ];
-    //拖尾的颜色(idx 偶数是12h、奇数是24h)
+    //拖尾的颜色(idx 偶数是12h、奇数是24h) idx1 是梦幻气泡
     streakColor = [cc.color(255, 0, 0, 255), cc.color(0, 255, 0, 255), cc.color(0, 0, 255, 255), cc.color(255, 0, 255, 255)];
     //脚印的名称(idx 偶数是12h、奇数是24h)
     footName = ["jiaoyin01", "jiaoyin01"];
@@ -197,7 +200,7 @@ export default class DataMgr extends cc.Component {
 
         let addHpMax = cc.sys.localStorage.getItem("addHpMax");
         if (!addHpMax || reset)
-            cc.sys.localStorage.setItem("addHpMax", 2 * this.haveProp.countInvite);
+            cc.sys.localStorage.setItem("addHpMax", this.getAddHp_i());
         else
             this.userData.addHpMax = parseInt(addHpMax);
 
@@ -210,8 +213,8 @@ export default class DataMgr extends cc.Component {
         let reliveTime = cc.sys.localStorage.getItem("reliveTime")
         if (!reliveTime || reset) {
             cc.sys.localStorage.setItem("reliveTime", parseInt(Date.now() / 1000));
-            cc.sys.localStorage.setItem("reliveNum", this.userData.addHpMax);
-            this.userData.reliveNum = this.userData.addHpMax;
+            cc.sys.localStorage.setItem("reliveNum", 0);
+            this.userData.reliveNum = 0;
         } else {
             reliveTime = parseInt(reliveTime);
             let timeNow = parseInt(Date.now() / 1000);
@@ -236,25 +239,25 @@ export default class DataMgr extends cc.Component {
 
         let havePropStr = cc.sys.localStorage.getItem("haveProp");
         //console.log("-- haveProp : " + havePropStr);
+        if (!havePropStr || reset) {
+            // if (reset && havePropStr) {
+            //     console.log("--- reset 数据清空了 ---")
+            //     let haveProp = JSON.parse(havePropStr);
+            //     this.haveProp.countShareNum = haveProp.countShareNum;
+            //     this.haveProp.countShareToday = haveProp.countShareToday;
+            //     this.haveProp.countAdNum = haveProp.countAdNum;
+            //     this.haveProp.countInvite = haveProp.countInvite;
+            //     this.haveProp.freeTimes = 3;//haveProp.freeTimes;
 
-        if (!havePropStr)
+            //     if (this.haveProp.countInvite > 100)
+            //         this.haveProp.countInvite = 100;
+            //     this.userData.addHpMax = this.getAddHp_i();
+            //     cc.sys.localStorage.setItem("addHpMax", this.userData.addHpMax);
+            // }
             cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
+        }
         else {
-            if (reset) {
-                console.log("--- reset 数据清空了 ---")
-                let haveProp = JSON.parse(havePropStr);
-                this.haveProp.countShareNum = haveProp.countShareNum;
-                this.haveProp.countShareToday = haveProp.countShareToday;
-                this.haveProp.countAdNum = haveProp.countAdNum;
-                this.haveProp.countInvite = haveProp.countInvite;
-                this.haveProp.freeTimes = haveProp.freeTimes;
-
-                if (this.haveProp.countInvite > 100)
-                    this.haveProp.countInvite = 100;
-                this.userData.addHpMax = 2 * this.haveProp.countInvite;
-                cc.sys.localStorage.setItem("addHpMax", this.userData.addHpMax);
-            } else
-                this.haveProp = JSON.parse(havePropStr);
+            this.haveProp = JSON.parse(havePropStr);
         }
 
         console.log(this.userData);
@@ -278,10 +281,17 @@ export default class DataMgr extends cc.Component {
                 cc.dataMgr.bgFrame["cj04"] = frame;
         });
         cc.loader.loadRes("cj05", cc.SpriteFrame, function (err, frame) {
-            if (!err)
+            if (!err) {
                 cc.dataMgr.bgFrame["cj05"] = frame;
+                //变背景
+                let gameJs = cc.find("Canvas").getComponent("Game");
+                if (gameJs)
+                    gameJs.changeGameBg();
+            }
         });
 
+        //cc.loader.loadResDir()
+        
         this.getUerOpenID();
         this.getShowShare();
         this.getShareReward();
@@ -298,27 +308,28 @@ export default class DataMgr extends cc.Component {
     //每局开始 检查道具是否过期 并修改 userData 中对应的使用数据
     checkProp() {
         //加速冲刺道具
-        if (this.haveProp.isOwnSpeed) {
-            this.userData.useSpeedNum = 100;
-        } else {
-            if (this.haveProp.useSpeed.num < 0 || this.haveProp.useSpeed.beginTime + 3600 <= this.getTimeSecond_i()) {
-                //如果有道具使用一个新的
-                if (this.haveProp.haveSpeed.length > 0) {
-                    let num = this.haveProp.haveSpeed.shift();
-                    this.haveProp.useSpeed.num = num;
-                    this.haveProp.useSpeed.beginTime = this.getTimeSecond_i();
-                    this.haveProp.useSpeed.surplusTimes = 3;
-                }
-            }
-            if (this.haveProp.useSpeed.num > 0 && this.haveProp.useSpeed.beginTime + 3600 > this.getTimeSecond_i()) {
-                this.haveProp.useSpeed.surplusTimes--;
-                this.userData.useSpeedNum = this.haveProp.useSpeed.num;
-                if (this.haveProp.useSpeed.surplusTimes <= 0) {
-                    this.haveProp.useSpeed.num = 0;
-                    this.haveProp.useSpeed.beginTime = 0;
-                }
+        if (this.haveProp.useSpeed.num < 0 || this.haveProp.useSpeed.beginTime + 3600 <= this.getTimeSecond_i()) {
+            //如果有道具使用一个新的
+            if (this.haveProp.haveSpeed.length > 0) {
+                let num = this.haveProp.haveSpeed.shift();
+                this.haveProp.useSpeed.num = num;
+                this.haveProp.useSpeed.beginTime = this.getTimeSecond_i();
+                this.haveProp.useSpeed.surplusTimes = 3;
             }
         }
+        if (this.haveProp.useSpeed.num > 0 && this.haveProp.useSpeed.beginTime + 3600 > this.getTimeSecond_i()) {
+            this.haveProp.useSpeed.surplusTimes--;
+            this.userData.useSpeedNum = this.haveProp.useSpeed.num;
+            if (this.haveProp.useSpeed.surplusTimes <= 0) {
+                this.haveProp.useSpeed.num = 0;
+                this.haveProp.useSpeed.beginTime = 0;
+            }
+        }
+        //优先用一百阶的
+        if (this.haveProp.isOwnSpeed && this.userData.useSpeedNum <= 50) {
+            this.userData.useSpeedNum = 50;
+        }
+
 
         //减速道具
         if (this.haveProp.isOwnCut) {
@@ -371,6 +382,7 @@ export default class DataMgr extends cc.Component {
         }
 
         //光效效果
+        this.userData.showParticle = false;
         if (this.haveProp.isOwnStreak) {
             this.userData.useStreakColor = this.streakColor[0];
         } else {
@@ -384,6 +396,9 @@ export default class DataMgr extends cc.Component {
                         this.haveProp.useStreak.streakIdx = streakIdx;
                         this.haveProp.useStreak.beginTime = this.getTimeSecond_i();
                         this.haveProp.useStreak.continueTime = (streakIdx % 2 == 0 ? 12 : 24) * 3600;
+
+                        if (streakIdx == 1)
+                            this.userData.showParticle = true;
                     } else
                         this.userData.useStreakColor = null;
                 } else
@@ -394,6 +409,8 @@ export default class DataMgr extends cc.Component {
                     this.userData.useStreakColor = this.streakColor[this.haveProp.useStreak.streakIdx];
                 else
                     this.userData.useStreakColor = null;
+                if (this.haveProp.useStreak.streakIdx == 1)
+                    this.userData.showParticle = true;
             }
         }
 
@@ -439,6 +456,16 @@ export default class DataMgr extends cc.Component {
         this.userData.gameBgIdx = this.changeBg[this.userData.nextChangeIdx];
         this.userData.cameraSpeedY = this.changeSpeed[this.userData.nextChangeIdx] * this.userData.baseSpeedY * this.userData.cutSpeed;
         //console.log("-- speed " + this.userData.cameraSpeedY + " -- " + this.userData.nextChangeIdx + " -- " + (this.userData.gameBgIdx + 1));
+    }
+
+    //规则变化了。。
+    getAddHp_i() {
+        let addNum = 0;
+        if (this.haveProp.countInvite >= 5)
+            addNum = 2;
+        else if (this.haveProp.countInvite >= 2)
+            addNum = 1;
+        return addNum;
     }
 
     getStreakName() {
@@ -567,7 +594,7 @@ export default class DataMgr extends cc.Component {
         if (cc.dataMgr.haveProp.countInvite > 0) {
             if (cc.dataMgr.haveProp.countInvite > 100)
                 cc.dataMgr.haveProp.countInvite = 100;
-            cc.dataMgr.userData.addHpMax = 2 * cc.dataMgr.haveProp.countInvite;
+            cc.dataMgr.userData.addHpMax = this.getAddHp_i();
         }
         //邀请榜奖励 
         let inviteJs = cc.find("Canvas").getComponent("PanelInvite");
@@ -591,7 +618,7 @@ export default class DataMgr extends cc.Component {
         if (type == "end") {
             //这是分享成功给玩家的奖励 回满reliveNum 和 下局双倍
             this.userData.reliveNum = this.userData.addHpMax;
-            this.userData.shareDouble = 2;
+            this.userData.shareDouble = 1;
         } else if (type == "startAd") {
             //广告分享成功
             this.haveProp.adCDBegin = 0;

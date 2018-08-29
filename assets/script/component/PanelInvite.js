@@ -50,7 +50,7 @@ export default class PanelInvite extends cc.Component {
 
     takeReward(idx) {
         if (idx == 0) {
-            cc.dataMgr.haveProp.haveFoot.push(0);
+            cc.dataMgr.haveProp.isOwnSpeed = true;
         } else if (idx == 1) {
             cc.dataMgr.haveProp.haveStreak.push(0);
         } else if (idx == 2) {
@@ -66,15 +66,18 @@ export default class PanelInvite extends cc.Component {
         } else if (idx == 7) {
             cc.dataMgr.haveProp.haveStreak.push(1);
         } else if (idx == 8) {
-            cc.dataMgr.haveProp.isOwnSpeed = true;
+            cc.dataMgr.userData.addHpMax = 1;
         } else if (idx == 9) {
-            cc.dataMgr.haveProp.isOwnCut = true;
+            cc.dataMgr.haveProp.isOwnFoot = true;
         }
         else if (idx == 10) {
             cc.dataMgr.haveProp.isOwnStreak = true;
         }
         else if (idx == 11) {
-            cc.dataMgr.haveProp.isOwnFoot = true;
+            cc.dataMgr.userData.addHpMax = 2;
+        }
+        else if (idx == 12) {
+            cc.dataMgr.haveProp.isOwnCut = true;
         }
 
         cc.dataMgr.haveProp.inviteTake.push(idx);

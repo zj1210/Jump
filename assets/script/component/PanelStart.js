@@ -76,6 +76,16 @@ export default class Start extends cc.Component {
         }
 
         this.refreshStart();
+
+        //获取超越好友的数据
+        if (CC_WECHATGAME) {
+            //console.log("-- WECHAT Start.js subPostMessage --");
+            window.wx.postMessage({
+                messageType: 6,
+                MAIN_MENU_NUM: "scoreS",
+                myScore: cc.dataMgr.userData.countJump
+            });
+        }
     }
 
     refreshStart() {
