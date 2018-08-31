@@ -249,8 +249,13 @@ export default class PanelRandom extends cc.Component {
                 event.target.getComponent(cc.Button).interactable = false;
                 if (cc.dataMgr.haveProp.freeTimes > 0 || cc.dataMgr.haveProp.rewardTimes > 0)
                     this.randBegin();
-                else
+                else{
+                    //判断是否可以看广告
+                   if(this.getNextADTime_i()<=0){
+                       cc.dataMgr.showAd("random");
+                   }
                     this.initRand();
+                }
             } else if (btnN == "spr_bg") {
                 this.node_reward.active = false;
             }
@@ -264,8 +269,8 @@ export default class PanelRandom extends cc.Component {
                 withShareTicket: true
             });
             window.wx.shareAppMessage({
-                title: "我在这里，等你来。--境之边缘",
-                imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                title: cc.dataMgr.getShareDesc_s("random"),
+                imageUrl: cc.dataMgr.imageUrl.random,
                 query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
                     console.log("--- 大转盘微信分享 ---");
@@ -273,6 +278,9 @@ export default class PanelRandom extends cc.Component {
                     //改为分享到群立即抽奖
                     if (res.shareTickets != undefined && res.shareTickets.length >= 0) {
                         cc.dataMgr.shareSuccess("startAd");
+                    }
+                    else {
+                        cc.dataMgr.shareSuccess("startAdCd");
                     }
                 }
             });

@@ -120,8 +120,8 @@ export default class PanelInvite extends cc.Component {
                         withShareTicket: false
                     });
                     window.wx.shareAppMessage({
-                        title: "我在这里，等你来。--境之边缘",
-                        imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                        title: cc.dataMgr.getShareDesc_s("invite"),
+                        imageUrl: cc.dataMgr.imageUrl.invite,
                         query: "otherID=" + cc.dataMgr.openid,
                         success: (res) => { }
                     });

@@ -33,7 +33,7 @@ export default class PanelRelive extends cc.Component {
         this._toEnd = true;
         if (cc.dataMgr.isShowShare) {
             //修改为只有两次复活了
-            if (cc.dataMgr.userData.reliveTimes < 2) {
+            if (cc.dataMgr.userData.reliveTimes < cc.dataMgr.reliveAdNum - 1) {
                 this.node_share.active = true;
                 this.node_relive.active = false;
             } else {
@@ -62,7 +62,7 @@ export default class PanelRelive extends cc.Component {
                 MAIN_MENU_NUM: "scoreS",
                 myScore: cc.dataMgr.userData.countJump
             });
-            this.scheduleOnce(this.updataSubCanvas, 0.4);
+            this.scheduleOnce(this.updataSubCanvas, 1);
         }
     }
 
@@ -105,7 +105,9 @@ export default class PanelRelive extends cc.Component {
             let btnN = event.target.name;
             if (btnN == "btn_relive") {
                 //这里要观看广告复活了
-                this.lab_relive.getComponent(cc.Label).string = "敬请期待广告尚未开放"
+                //this.lab_relive.getComponent(cc.Label).string = "敬请期待广告尚未开放"
+                this._toEnd = false;
+                cc.dataMgr.showAd("relive");
             } else if (btnN == "btn_end") {
                 this.lab_time.stopAllActions();
                 //if (this._toEnd)
@@ -131,7 +133,7 @@ export default class PanelRelive extends cc.Component {
     }
 
     updataSubCanvas() {
-        if (CC_WECHATGAME ) {
+        if (CC_WECHATGAME) {
             //console.log("-- WECHAT Start.js updataSubCanvas --");
             this.tex.initWithElement(window.sharedCanvas);
             this.tex.handleLoadedTexture();
@@ -146,8 +148,8 @@ export default class PanelRelive extends cc.Component {
                 withShareTicket: false
             });
             window.wx.shareAppMessage({
-                title: "我在这里，等你来。--境之边缘",
-                imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                title: cc.dataMgr.getShareDesc_s("relive"),
+                imageUrl: cc.dataMgr.imageUrl.relive,
                 query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
                     cc.dataMgr.shareSuccess("endRelive");

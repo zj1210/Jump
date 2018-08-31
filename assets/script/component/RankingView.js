@@ -33,7 +33,7 @@ export default class RankingView extends cc.Component {
     start() {
         //微信子域相关
         this.initSubCanvas();
-        this.schedule(this.updataSubCanvas, 0.5);
+        this.schedule(this.updataSubCanvas, 0.1);
 
         this.subPostMessage("submit");
         this.subPostMessage("end");
@@ -57,14 +57,16 @@ export default class RankingView extends cc.Component {
             this.node_end.active = false;
             this.node_list.active = true;
             this.btn_qun.active = true;
-            this.node_list.getChildByName("spr_qun").active = true;
-            this.node_list.getChildByName("spr_friend").active = false;
+            this.node_list.getChildByName("spr_qun").active = false;
+            this.node_list.getChildByName("spr_friend").active = true;
+            this.updataSubCanvas();
         } else if (panelName == "group") {
             this.node_end.active = false;
             this.node_list.active = true;
             this.btn_qun.active = false;
-            this.node_list.getChildByName("spr_qun").active = false;
-            this.node_list.getChildByName("spr_friend").active = true;
+            this.node_list.getChildByName("spr_qun").active = true;
+            this.node_list.getChildByName("spr_friend").active = false;
+            this.updataSubCanvas();
         }
     }
 
@@ -112,9 +114,6 @@ export default class RankingView extends cc.Component {
             } else {
                 this.sub_list.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
                 this.sub_my.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.tex);
-
-                console.log("--- 微信子域 大小 ---" + this.sub_list.height);
-
                 this.node_content.height = this.sub_list.height;
             }
         }
@@ -153,24 +152,27 @@ export default class RankingView extends cc.Component {
         let self = this;
         if (CC_WECHATGAME) {
             window.wx.updateShareMenu({
-                withShareTicket: true
-            });
-            window.wx.shareAppMessage({
-                title: "我在这里，等你来超越。--境之边缘",
-                imageUrl: cc.dataMgr.imageUrl.urlGroup,
-                query: "otherID=" + cc.dataMgr.openid,
-                success: (res) => {
-                    //console.log("-- shareGroup success --");
-                    //console.log(res);
-                    cc.dataMgr.shareSuccess("end");
-                    if (res.shareTickets != undefined && res.shareTickets.length > 0) {
-                        window.wx.postMessage({
-                            messageType: 5,
-                            MAIN_MENU_NUM: "scoreS",
-                            shareTicket: res.shareTickets[0]
-                        });
-                        self.showPanel("group");
-                    }
+                withShareTicket: true,
+                success() {
+                    window.wx.shareAppMessage({
+                        title: cc.dataMgr.getShareDesc_s("qunRank"),
+                        imageUrl: cc.dataMgr.imageUrl.qunRank,
+                        query: "otherID=" + cc.dataMgr.openid,
+                        success: (res) => {
+                            console.log("-- shareGroup success --");
+                            console.log(res);
+                            cc.dataMgr.shareSuccess("end");
+                            if (res.shareTickets != undefined && res.shareTickets.length > 0) {
+                                cc.dataMgr.shareTicket = res.shareTickets[0];
+                                window.wx.postMessage({
+                                    messageType: 5,
+                                    MAIN_MENU_NUM: "scoreS",
+                                    shareTicket: res.shareTickets[0]
+                                });
+                            }
+                            self.showPanel("group");
+                        }
+                    });
                 }
             });
         } else {
@@ -185,8 +187,8 @@ export default class RankingView extends cc.Component {
                 withShareTicket: false
             });
             window.wx.shareAppMessage({
-                title: "我在这里，等你来。--境之边缘",
-                imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                title: cc.dataMgr.getShareDesc_s("end"),
+                imageUrl: cc.dataMgr.imageUrl.relive,
                 query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
                     cc.dataMgr.shareSuccess("end");
@@ -195,6 +197,7 @@ export default class RankingView extends cc.Component {
             });
         } else {
             //console.log("-- Not is wechatGame --");
+            cc.dataMgr.shareSuccess("end");
         }
     }
 }

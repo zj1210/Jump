@@ -67,6 +67,12 @@ export default class Game extends cc.Component {
             //let DataMgr = require("DataMgr");
             cc.dataMgr = new DataMgr();
             cc.dataMgr.initData();
+
+            //延迟一秒多,加载初始化广告
+            // this.scheduleOnce(cc.dataMgr.initAD, 1.8);
+        }
+        else {
+            cc.dataMgr.autoPopAd();
         }
         if (!cc.audioMgr) {
             //let AudioMgr = require("AudioMgr");
@@ -124,12 +130,15 @@ export default class Game extends cc.Component {
             window.wx.showShareMenu();
             window.wx.onShareAppMessage(function () {
                 return {
-                    title: "旋转、跳跃、永不停歇。--境之边境",
-                    imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                    title: cc.dataMgr.getShareDesc_s("forward"),
+                    imageUrl: cc.dataMgr.imageUrl.forward,
                     query: "otherID=" + cc.dataMgr.openid
                 }
             })
         }
+
+        if (cc.audioMgr)
+            cc.audioMgr.playBg();
     }
 
     showStart() {
@@ -160,19 +169,19 @@ export default class Game extends cc.Component {
         //animation.on("end", this.onPlayAnimation, this);
         this.scheduleOnce(this.onPlayAnimation, 1.8);
         this.node_start.getComponent("PanelStart").hideStart();
-        this.node_start.getChildByName("more_icon").active = false;
+        //this.node_start.getChildByName("more_icon").active = false;
     }
 
     //动画播放完成 initGame
     onPlayAnimation(type, state) {
-        cc.audioMgr.pauseAll();
+        //cc.audioMgr.pauseAll();
         this.initGame(false);
         cc.dataMgr.userData.isReady = false;
     }
 
     //这里是初始游戏,在点击就开始跳了(是否为复活)
     initGame(isRelive) {
-        cc.audioMgr.pauseAll();
+        //cc.audioMgr.pauseAll();
         cc.dataMgr.userData.onGaming = false;
         this.node_game.active = true;
 
@@ -425,15 +434,13 @@ export default class Game extends cc.Component {
             this.node.getChildByName("node_hint").getComponent("NodeHint").changeNum("speed");
         } else {
             //之前是 开局加速停止 现在事所有加速都停止
-            this._isInitGame = true; //this.node_game.getChildByName("node_hint").active;
+            this._isInitGame = this.node_game.getChildByName("node_hint").active;
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedEnd");
-
-            //且要跳到安全区域 (之前是只有复活跳到安全区域)
-            cc.dataMgr.userData.isReliveDrop = false;
-
             if (this._isInitGame) {
-                cc.audioMgr.pauseAll();
+                //cc.audioMgr.pauseAll();
                 cc.dataMgr.userData.onGaming = false;
+                //且要跳到安全区域 (之前是只有复活跳到安全区域)
+                cc.dataMgr.userData.isReliveDrop = false;
             } else {
                 cc.dataMgr.userData.onGaming = true;
             }
@@ -448,7 +455,7 @@ export default class Game extends cc.Component {
         let isLeft = (Math.random() > 0.5 || cc.dataMgr.userData.countBox == 1);
         let posX = cc.dataMgr.boxX * (isLeft ? -1 : 1) + cc.dataMgr.userData.lastBoxX;
         let posY = cc.dataMgr.boxY + cc.dataMgr.userData.lastBoxY;
-        let boxType = (cc.dataMgr.userData.countBox % 9 == 0 ? "prop" : "box");
+        let boxType = (cc.dataMgr.userData.countBox % 40 == 0 ? "prop" : "box");
 
         if (!nodeN) {
             nodeN = cc.instantiate(this.pre_box);
@@ -477,7 +484,7 @@ export default class Game extends cc.Component {
         //判断确定 idx
         let lastBgName = null;
         if (cc.dataMgr.userData.countJump == 0) {
-            cc.dataMgr.userData.gameBgIdx = 0;
+            cc.dataMgr.userData.gameBgIdx = cc.dataMgr.userData.mainBgIdx;
             //之前场景的颜色为 上一次的颜色
             lastBgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
         } else {
@@ -522,11 +529,11 @@ export default class Game extends cc.Component {
             spr_bg.opacity = 255;
 
         //所有柱子变色
-        // for (let i = 0; i < this.root_box.children.length; ++i) {
-        //     let nodeN = this.root_box.children[i];
-        //     if (nodeN)
-        //         nodeN.getComponent("NodeBox").setBoxFrame();
-        // }
+        for (let i = 0; i < this.root_box.children.length; ++i) {
+            let nodeN = this.root_box.children[i];
+            if (nodeN)
+                nodeN.getComponent("NodeBox").setBoxFrame();
+        }
     }
 
     callShowBg() {
@@ -600,7 +607,7 @@ export default class Game extends cc.Component {
         console.log("-- streakName --" + streakName);
         if (streakSf)
             this.node_streak.getComponent(cc.MotionStreak).texture = streakSf.getTexture();
-        //console.log("-- speedNum:" + cc.dataMgr.userData.speedNum + " -- " + cc.dataMgr.userData.cameraSpeedY);
+        console.log("-- speedNum:" + cc.dataMgr.userData.speedNum + " -- " + cc.dataMgr.userData.cameraSpeedY);
     }
 
     callCameraSpeedY() {
@@ -694,19 +701,19 @@ export default class Game extends cc.Component {
             this.node_particle.position = cc.v2(this.node_role.x, this.node_role.y + 48);
         }
 
-        //统计变色相关
-        if (cc.dataMgr.userData.onGaming) {
-            this._countTime += dt;
-            if (this._countTime >= 1) {
-                this._countSecond++;
-                this._countTime = 0;
-            }
-        }
+        // //统计变色相关
+        // if (cc.dataMgr.userData.onGaming) {
+        //     this._countTime += dt;
+        //     if (this._countTime >= 1) {
+        //         this._countSecond++;
+        //         this._countTime = 0;
+        //     }
+        // }
 
-        if (this._countSecond >= cc.dataMgr.userData.nextChangeTime) {
-            //console.log("-- countSecond -- " + this._countSecond + " -- " + this._countTime + " -- " + cc.dataMgr.userData.nextChangeTime);
-            this.changeToNextBg();
-            this._countSecond = 0;
-        }
+        // if (this._countSecond >= cc.dataMgr.userData.nextChangeTime) {
+        //     //console.log("-- countSecond -- " + this._countSecond + " -- " + this._countTime + " -- " + cc.dataMgr.userData.nextChangeTime);
+        //     this.changeToNextBg();
+        //     this._countSecond = 0;
+        // }
     }
 }

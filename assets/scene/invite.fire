@@ -1122,7 +1122,7 @@
     "_position": {
       "__type__": "cc.Vec2",
       "x": 0,
-      "y": 400
+      "y": 0
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -2007,7 +2007,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 192.38,
+      "width": 165.38,
       "height": 30
     },
     "_rotationX": 0,
@@ -2044,7 +2044,7 @@
     },
     "_isSystemFontUsed": false,
     "_spacingX": 0,
-    "_N$string": "额外生命值下x1",
+    "_N$string": "额外生命值x1",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
@@ -4385,7 +4385,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 192.38,
+      "width": 165.38,
       "height": 30
     },
     "_rotationX": 0,
@@ -4422,7 +4422,7 @@
     },
     "_isSystemFontUsed": false,
     "_spacingX": 0,
-    "_N$string": "额外生命值下x1",
+    "_N$string": "额外生命值x1",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",

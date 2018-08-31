@@ -4,20 +4,68 @@ const {
 } = cc._decorator;
 @ccclass
 export default class DataMgr extends cc.Component {
-    boxX = 64; //砖块平铺时 据上一个砖块位置的X 和 Y
-    boxY = 64;
+    boxX = 72; //砖块平铺时 据上一个砖块位置的X 和 Y
+    boxY = 72;
 
     openid = null;
-    isShowShare = false; //显示引导分享
+    version = "20180831"; //不同的 version 版本会清空本地信息
 
-    version = "20180829A"; //不同的 version 版本会清空本地信息
+    shareTicket = null;//群分享标签
+
+    //服务器配置信息
+    isShowShare = false; //显示引导分享
+    isShowAd = false;
+    isPopAd = false;//弹出广告
+    popTime = 300;//弹出间隔时间
+    shareQunRand = true;//是否分享群就立即抽奖
+    reliveAdNum = 10;//第几次复活是弹出广告复活
+    showAdType = null;//再那个界面 看的广告需要返回
 
     imageUrl = {
         urlGroup: "https://bpw.blyule.com/wxJump/res/jumpShare1.jpg",
         urlFriend: "https://bpw.blyule.com/wxJump/res/jumpShare2.jpg",
         urlMore: "https://bpw.blyule.com/wxJump/res/jumpShare3.jpg",
         urlXml: "https://bpw.blyule.com/wxJump/res/share.xml",
-    }
+        urlJson: "https://bpw.blyule.com/wxJump/res/jump.json",
+        random: "https://bpw.blyule.com/wxJump/res/end.jpg",
+        sound: "https://bpw.blyule.com/wxJump/res/sound.jpg",
+        invite: "https://bpw.blyule.com/wxJump/res/invite.jpg",
+        relive: "https://bpw.blyule.com/wxJump/res/relive.jpg",
+        end: "https://bpw.blyule.com/wxJump/res/end.jpg",
+        qunRank: "https://bpw.blyule.com/wxJump/res/qunRank.jpg",
+        forward: "https://bpw.blyule.com/wxJump/res/forward.jpg",
+    };
+
+    shareDesc = {
+        random: [
+            "点击这个杨超越，你会心想事成",
+            "点击助我抽大奖",
+        ],
+        sound: [
+            "我就是电音碑谷MVP~",
+            "让我们一起摇摆~",
+            "老年蹦蹦乐了解一下?",
+        ],
+        invite: [
+            //为空说明要根据当前的信息动态生成。。。
+        ],
+        relive: [
+            "左右脑并用，臣妾做不到啊~",
+            "玩这个游戏戒掉了淘宝，因为手已经剁了…",
+            "快拉我一把，我要掉下悬崖啦~"
+        ],
+        end: [
+
+        ],
+        qunRank: [
+            "看看群里你能排第几？",
+            "群里谁最高，点进来就知道~"
+        ],
+        forward: [
+            "迁跃之地，以太阶梯，千回百转，境之边缘。",
+            "旋转跳跃，永不停歇。--境之边缘"
+        ]
+    };
 
     userData = {
         //用户相关需要储存的数据
@@ -33,6 +81,7 @@ export default class DataMgr extends cc.Component {
         useFootName: null, //当前使用的脚印下标 默认:prop_foot1
         useRoleName: "role_right1", //当前使用的角色下标  默认:role_right1
         useStreakColor: null, //使用拖尾的下标
+        useSoundName: null,//
 
         showParticle: false,
 
@@ -46,7 +95,7 @@ export default class DataMgr extends cc.Component {
         baseSpeedY: 160, //相机移动的基础度
         cameraSpeedX: 50, //相机的移动的基础速度
         cameraSpeedY: 160, //相机的移动的Y速度
-        dropPosY: 200, //当方块位置 小于摄像机位置这么多时消失
+        dropPosY: 320, //当方块位置 小于摄像机位置这么多时消失
 
         lastBoxX: this.boxX, //最近生成的个 方块的X Y
         lastBoxY: -this.boxY, //确保第一个在 (0,0);
@@ -122,6 +171,29 @@ export default class DataMgr extends cc.Component {
     //脚印的名称(idx 偶数是12h、奇数是24h)
     footName = ["jiaoyin01", "jiaoyin01"];
 
+    soundData = [
+        {
+            name: "bg_1",
+            desc: "卡农",
+        },
+        {
+            name: "bg_2",
+            desc: "Flower",
+        },
+        {
+            name: "bg_3",
+            desc: "Flash Funk",
+        },
+        {
+            name: "bg_4",
+            desc: "V3",
+        },
+        {
+            name: "bg_5",
+            desc: "Skyland",
+        }
+    ]
+
     //玩家拥有的道具等
     haveProp = {
         haveSpeed: [], //50 和 100两种
@@ -151,6 +223,7 @@ export default class DataMgr extends cc.Component {
             continueTime: 12 * 3600,
         },
         useRoleIdx: 0, //使用的角色下标
+        useSoundIdx: 0,//使用的背景歌曲
 
         countShareNum: 0, //统计总的分享次数
         countShareToday: 0, //统计今天的分享次数
@@ -161,6 +234,7 @@ export default class DataMgr extends cc.Component {
         adCDBegin: 0, //看广告转转盘 冷却时间
         rewardTimes: 0, //观看视频获得的 转盘机会
         todayShareBegin: 0, //今日开始分享计数的时间
+        autoAdTime: 0,
 
         inviteTake: [], //邀请有礼里领取的奖励
         isOwnSpeed: false, //永久加速
@@ -240,20 +314,21 @@ export default class DataMgr extends cc.Component {
         let havePropStr = cc.sys.localStorage.getItem("haveProp");
         //console.log("-- haveProp : " + havePropStr);
         if (!havePropStr || reset) {
-            // if (reset && havePropStr) {
-            //     console.log("--- reset 数据清空了 ---")
-            //     let haveProp = JSON.parse(havePropStr);
-            //     this.haveProp.countShareNum = haveProp.countShareNum;
-            //     this.haveProp.countShareToday = haveProp.countShareToday;
-            //     this.haveProp.countAdNum = haveProp.countAdNum;
-            //     this.haveProp.countInvite = haveProp.countInvite;
-            //     this.haveProp.freeTimes = 3;//haveProp.freeTimes;
+            if (reset && havePropStr) {
+                console.log("--- reset 数据清空了 ---")
+                let haveProp = JSON.parse(havePropStr);
+                //this.haveProp.countShareNum = haveProp.countShareNum;
+                //this.haveProp.countShareToday = haveProp.countShareToday;
+                //this.haveProp.countAdNum = haveProp.countAdNum;
+                this.haveProp.countInvite = haveProp.countInvite;
+                //this.haveProp.freeTimes = 3;//haveProp.freeTimes;
 
-            //     if (this.haveProp.countInvite > 100)
-            //         this.haveProp.countInvite = 100;
-            //     this.userData.addHpMax = this.getAddHp_i();
-            //     cc.sys.localStorage.setItem("addHpMax", this.userData.addHpMax);
-            // }
+                if (this.haveProp.countInvite > 100)
+                    this.haveProp.countInvite = 100;
+                this.userData.addHpMax = this.getAddHp_i();
+                cc.sys.localStorage.setItem("addHpMax", this.userData.addHpMax);
+            }
+            this.haveProp.autoAdTime = this.getTimeSecond_i();
             cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
         }
         else {
@@ -291,10 +366,12 @@ export default class DataMgr extends cc.Component {
         });
 
         //cc.loader.loadResDir()
-        
+
         this.getUerOpenID();
         this.getShowShare();
         this.getShareReward();
+
+        this.scheduleOnce(cc.dataMgr.initAD, 1.8);
     }
 
     //重大改变之前 如扣钱口金币等 要保存数据 
@@ -424,6 +501,16 @@ export default class DataMgr extends cc.Component {
             this.userData.baseHp = this.roleData[this.haveProp.useRoleIdx].hp;
         }
 
+        //背景歌曲
+        if (this.haveProp.useSoundIdx < this.soundData.length) {
+            this.userData.useSoundName = this.soundData[this.haveProp.useSoundIdx].name;
+        }
+        else {
+            this.haveProp.useSoundIdx = 0;
+            this.userData.useSoundName = this.soundData[this.haveProp.useSoundIdx].name;
+        }
+
+
         //console.log("--- checkProp over ---");
         //console.log(this.haveProp);
         cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
@@ -445,6 +532,18 @@ export default class DataMgr extends cc.Component {
         }
     }
 
+    changeSound(idx) {
+        this.haveProp.useSoundIdx = idx;
+        if (this.haveProp.useSoundIdx < this.soundData.length) {
+            this.userData.useSoundName = this.soundData[this.haveProp.useSoundIdx].name;
+        }
+        else {
+            this.haveProp.useSoundIdx = 0;
+            this.userData.useSoundName = this.soundData[this.haveProp.useSoundIdx].name;
+        }
+        cc.audioMgr.playBg();
+    }
+
     //只改变改变颜色的数据
     changeToNextBg() {
         ++this.userData.nextChangeIdx;
@@ -456,6 +555,47 @@ export default class DataMgr extends cc.Component {
         this.userData.gameBgIdx = this.changeBg[this.userData.nextChangeIdx];
         this.userData.cameraSpeedY = this.changeSpeed[this.userData.nextChangeIdx] * this.userData.baseSpeedY * this.userData.cutSpeed;
         //console.log("-- speed " + this.userData.cameraSpeedY + " -- " + this.userData.nextChangeIdx + " -- " + (this.userData.gameBgIdx + 1));
+    }
+
+    getShareDesc_s(type) {
+        let shareStr = "千回百转，境之边缘。";
+        if (type == "end") {
+            //我才跳了10步，求大神帮我接力继续跑~
+            //哇哈哈~一口气跳了1000步，你肯定跳不过我！
+            if (cc.dataMgr.userData.countJump < 100) {
+                shareStr = "我才跳了" + cc.dataMgr.userData.countJump + "步，求大神帮我接力继续跑~";
+            }
+            else {
+                shareStr = "哇哈哈~一口气跳了" + cc.dataMgr.userData.countJump + "步，你肯定跳不过我！";
+            }
+        }
+        else if (type == "invite") {
+            //我想要道具/特效，帮忙解锁下！
+            //帮我解锁XXX，送你一个么么哒~
+            let prop = ["开局冲刺", "额外生命值+1", "脚印特效", "光效礼包", "额外生命值+1", "下坠减速"];
+            let strProp = "无欲无求,只是想分享一下。 >_< "
+            if (cc.dataMgr.haveProp.countInvite < prop.length)
+                strProp = prop[cc.dataMgr.haveProp.countInvite];
+            else
+                return strProp;
+            if (Math.random() > 0.5) {
+                shareStr = "我想要" + strProp + "，帮忙解锁下！";
+            }
+            else
+                shareStr = "帮我解锁" + strProp + "，送你一个么么哒~";
+        }
+        else {
+            let descD = cc.dataMgr.shareDesc[type];
+            console.log(descD);
+            if (descD && descD.length > 0) {
+                let idx = parseInt(Math.random() * descD.length);
+                if (idx >= descD.length)
+                    idx = 0;
+                shareStr = descD[idx];
+            }
+        }
+        console.log("--- shar：" + type + " -- " + shareStr);
+        return shareStr;
     }
 
     //规则变化了。。
@@ -494,6 +634,97 @@ export default class DataMgr extends cc.Component {
             name = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
         return this.bgFrame[name];
     }
+
+    //------ 广告相关 ------
+
+    initAD() {
+        console.log("--- initAD ---");
+        console.log(cc.videoAd);
+        if (!cc.videoAd && CC_WECHATGAME) {
+            console.log("--- 加载广告 ---");
+            cc.videoAd = wx.createRewardedVideoAd({
+                adUnitId: 'adunit-6f2d1e64526046d9'
+            });
+            cc.videoAd.load();
+
+            cc.videoAd.onClose(res => {
+                console.log("广告onClose~！");
+                console.log(res);
+
+                if (res && res.isEnded || res === undefined) {
+                    // 正常播放结束，可以下发游戏奖励
+                    console.log("--- 发放奖励 ---");
+                    cc.dataMgr.videoAdOver(true);
+                }
+                else {
+                    // 播放中途退出，不下发游戏奖励
+                    console.log("--- 中途退出，没有奖励---");
+                    cc.dataMgr.videoAdOver(false);
+                }
+            });
+        }
+    }
+
+    showAd(type) {
+        this.showAdType = type;
+        if (cc.videoAd && this.isShowAd) {
+            cc.videoAd.show();
+        }
+    }
+
+    autoPopAd() {
+        if (!this.isPopAd)
+            return;
+        console.log("--- 自动弹出广告了 ---");
+        if (this.getTimeSecond_i() > this.haveProp.autoAdTime + this.popTime) {
+            this.haveProp.autoAdTime = this.getTimeSecond_i();
+            this.showAd(null);
+        }
+    }
+
+    //isSuccess 是否播放完成
+    videoAdOver(isSuccess) {
+        console.log("--- videoAdOver -- " + isSuccess + " -- " + this.showAdType);
+        let hintStr = "感谢您的支持。";
+        if (this.showAdType) {
+            if (isSuccess) {
+                hintStr = "已获得奖励,再接再厉。";
+                if (this.showAdType == "random") {
+                    //获得转转盘次数
+                    this.haveProp.adCDBegin = this.getTimeSecond_i();
+                    cc.dataMgr.haveProp.rewardTimes += 1;
+                    //刷新界面
+                    let nodeN = cc.find("Canvas/node_random");
+                    if (nodeN && nodeN.getComponent("PanelRandom")) {
+                        nodeN.getComponent("PanelRandom").initRand();
+                    }
+                }
+                else if (this.showAdType == "relive") {
+                    //看视频复活
+                    cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.baseHp + cc.dataMgr.userData.addHpMax;
+
+                    let nodeN = cc.find("Canvas/node_relive");
+                    if (nodeN && nodeN.getComponent("PanelRelive")) {
+                        nodeN.getComponent("PanelRelive").reliveRole();
+                    }
+                }
+            }
+            else {
+                hintStr = "中途推出,离奖励只差一步。"
+            }
+        }
+        else {
+            hintStr = "感谢您的支持。"
+        }
+
+        let node_hint = cc.find("Canvas/node_hint");
+        if (node_hint) {
+            //显示提示
+        }
+        this.showAdType = null;
+    }
+
+    //------ 账号奖励等相关 ------
 
     getUerOpenID() {
         if (CC_WECHATGAME) {
@@ -574,19 +805,23 @@ export default class DataMgr extends cc.Component {
     getShowShare() {
         if (CC_WECHATGAME) {
             wx.request({
-                url: this.imageUrl.urlXml,
+                url: this.imageUrl.urlJson,
                 success: (obj, statusCode, header) => {
-                    console.log("--- getShowShare success ---");
+                    console.log("--- 游戏配置文件 getShowShare success ---");
                     console.log(obj);
-                    if (obj.data == 0)
-                        cc.dataMgr.isShowShare = false;
-                    else
-                        cc.dataMgr.isShowShare = true;
+                    if (obj.data && obj.data.reliveAdNum) {
+                        cc.dataMgr.isShowShare = obj.data.showShare;
+                        cc.dataMgr.isShowAd = obj.data.showAd;
+                        cc.dataMgr.shareQunRand = obj.data.shareQunRand;
+                        cc.dataMgr.reliveAdNum = obj.data.reliveAdNum;
+                        cc.dataMgr.isPopAd = obj.data.popAd;
+                        cc.dataMgr.popTime = obj.data.popTime;
+                    }
                     //console.log("--- 关闭分享：--- " + cc.dataMgr.isShowShare);
                 },
             });
         } else
-            cc.dataMgr.isShowShare = true;
+            cc.dataMgr.isShowShare = false;
     }
 
     //刷新邀请奖励
@@ -619,10 +854,11 @@ export default class DataMgr extends cc.Component {
             //这是分享成功给玩家的奖励 回满reliveNum 和 下局双倍
             this.userData.reliveNum = this.userData.addHpMax;
             this.userData.shareDouble = 1;
-        } else if (type == "startAd") {
+        } else if (type == "startAd" || type == "startAdCd") {
             //广告分享成功
             this.haveProp.adCDBegin = 0;
-            cc.dataMgr.haveProp.rewardTimes += 1;
+            if (type == "startAd" && this.shareQunRand)//这里是分享到群，立即抽奖一次
+                cc.dataMgr.haveProp.rewardTimes += 1;
             //刷新界面
             let nodeNJs = cc.find("Canvas/node_random").getComponent("PanelRandom");
             if (nodeNJs) {
