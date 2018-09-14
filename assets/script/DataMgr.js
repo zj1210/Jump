@@ -1,3 +1,4 @@
+import adSdk from 'adSdk';
 const {
     ccclass,
     property
@@ -8,7 +9,8 @@ export default class DataMgr extends cc.Component {
     boxY = 72;
 
     openid = null;
-    version = "20180831"; //不同的 version 版本会清空本地信息
+    nickName = null;
+    version = "20180911"; //不同的 version 版本会清空本地信息
 
     shareTicket = null;//群分享标签
 
@@ -21,19 +23,29 @@ export default class DataMgr extends cc.Component {
     reliveAdNum = 10;//第几次复活是弹出广告复活
     showAdType = null;//再那个界面 看的广告需要返回
 
+    //第三方sdk 用到的东西
+    adUserInfo = {
+        placeid: "1003",
+        appid: "1001",
+        appwxuserid: 3,
+        appwxusername: 'aaa'
+    };
+
+    adInfo = null;
+
     imageUrl = {
-        urlGroup: "https://bpw.blyule.com/wxJump/res/jumpShare1.jpg",
-        urlFriend: "https://bpw.blyule.com/wxJump/res/jumpShare2.jpg",
-        urlMore: "https://bpw.blyule.com/wxJump/res/jumpShare3.jpg",
-        urlXml: "https://bpw.blyule.com/wxJump/res/share.xml",
-        urlJson: "https://bpw.blyule.com/wxJump/res/jump.json",
-        random: "https://bpw.blyule.com/wxJump/res/end.jpg",
-        sound: "https://bpw.blyule.com/wxJump/res/sound.jpg",
-        invite: "https://bpw.blyule.com/wxJump/res/invite.jpg",
-        relive: "https://bpw.blyule.com/wxJump/res/relive.jpg",
-        end: "https://bpw.blyule.com/wxJump/res/end.jpg",
-        qunRank: "https://bpw.blyule.com/wxJump/res/qunRank.jpg",
-        forward: "https://bpw.blyule.com/wxJump/res/forward.jpg",
+        urlGroup: "https://bpw.blyule.com/wxJumpC/res/jumpShare1.jpg",
+        urlFriend: "https://bpw.blyule.com/wxJumpC/res/jumpShare2.jpg",
+        urlMore: "https://bpw.blyule.com/wxJumpC/res/jumpShare3.jpg",
+        urlXml: "https://bpw.blyule.com/wxJumpC/res/share.xml",
+        urlJson: "https://bpw.blyule.com/wxJumpC/res/jump.json",
+        random: "https://bpw.blyule.com/wxJumpC/res/random.jpg",
+        sound: "https://bpw.blyule.com/wxJumpC/res/sound.jpg",
+        invite: "https://bpw.blyule.com/wxJumpC/res/invite.jpg",
+        relive: "https://bpw.blyule.com/wxJumpC/res/relive.jpg",
+        end: "https://bpw.blyule.com/wxJumpC/res/end.jpg",
+        qunRank: "https://bpw.blyule.com/wxJumpC/res/qunRank.jpg",
+        forward: "https://bpw.blyule.com/wxJumpC/res/forward.jpg",
     };
 
     shareDesc = {
@@ -91,6 +103,9 @@ export default class DataMgr extends cc.Component {
         pauseGame: false, //暂停游戏
         onGaming: false, //游戏正在进行中(砖块 下落 和 场景移动))
 
+        isFirstIn: false,//第一次进入游戏强制弹窗
+        firstCountTime: 3,//倒计时
+
         //移动相机相关变量(相机的目标位置即是角色的目标位置 aimRoleX aimRoleY)
         baseSpeedY: 160, //相机移动的基础度
         cameraSpeedX: 50, //相机的移动的基础速度
@@ -136,35 +151,38 @@ export default class DataMgr extends cc.Component {
     //音乐改变背景相关参数
     changeTime = [12, 11, 25, 23, 37, 23, 12, 30];
     //changeSpeed = [1, 1.2, 1.3, 2, 1.3, 1.2, 1.4, 1.3];
-    changeSpeed = [1, 1.2, 1.4, 1.8, 1.4, 1.2, 1.6, 1.4];
-    changeBg = [0, 1, 2, 4, 2, 1, 4, 3];
+    //changeSpeed = [1, 1.2, 1.4, 1.8, 1.4, 1.2, 1.6, 1.4];
+    changeSpeed = [1, 1.2, 1.4, 1.6, 1.8, 1.2, 1.6, 1.4];
+    //changeBg = [0, 1, 2, 4, 2, 1, 4, 3];
+    changeBg = [0, 1, 2, 3, 4, 1, 4, 3];
 
     //角色的数据
-    roleData = [{
-        name: "role_right1",
-        price: 0,
-        hp: 1
-    },
-    {
-        name: "role_right2",
-        price: 6,
-        hp: 1
-    },
-    {
-        name: "role_right3",
-        price: 24,
-        hp: 1
-    },
-    {
-        name: "role_right4",
-        price: 48,
-        hp: 1
-    },
-    {
-        name: "role_right5",
-        price: 99,
-        hp: 1
-    }
+    roleData = [
+        {
+            name: "role_right1",
+            price: 0,
+            hp: 1
+        },
+        {
+            name: "role_right2",
+            price: 6,
+            hp: 1
+        },
+        {
+            name: "role_right3",
+            price: 24,
+            hp: 1
+        },
+        {
+            name: "role_right4",
+            price: 48,
+            hp: 1
+        },
+        {
+            name: "role_right5",
+            price: 99,
+            hp: 1
+        }
     ];
     //拖尾的颜色(idx 偶数是12h、奇数是24h) idx1 是梦幻气泡
     streakColor = [cc.color(255, 0, 0, 255), cc.color(0, 255, 0, 255), cc.color(0, 0, 255, 255), cc.color(255, 0, 255, 255)];
@@ -251,14 +269,21 @@ export default class DataMgr extends cc.Component {
             reset = true;
             cc.sys.localStorage.setItem("version", this.version);
         }
-        console.log("--- initData ---");
+        console.log("--- initData ---" + cc.dataMgr.imageUrl.end);
 
         //玩家openid
         let openid = cc.sys.localStorage.getItem("openid");
-        if (!openid || reset)
+        if (!openid /*|| reset*/) {
+            this.userData.isFirstIn = true;
             cc.sys.localStorage.setItem("openid", 0);
+            cc.sys.localStorage.setItem("nickName", 0);
+        }
+
         cc.dataMgr.openid = cc.sys.localStorage.getItem("openid");
-        console.log(cc.dataMgr.openid);
+        cc.dataMgr.nickName = cc.sys.localStorage.getItem("nickName");
+        if (!cc.dataMgr.nickName)
+            cc.dataMgr.nickName = "***";
+        console.log("--opendid " + cc.dataMgr.openid + " -- " + cc.dataMgr.nickName);
 
         let score = cc.sys.localStorage.getItem("bestScore");
         if (!score)
@@ -313,8 +338,8 @@ export default class DataMgr extends cc.Component {
 
         let havePropStr = cc.sys.localStorage.getItem("haveProp");
         //console.log("-- haveProp : " + havePropStr);
-        if (!havePropStr || reset) {
-            if (reset && havePropStr) {
+        if (!havePropStr/* || reset*/) {
+            /*if (reset && havePropStr) {
                 console.log("--- reset 数据清空了 ---")
                 let haveProp = JSON.parse(havePropStr);
                 //this.haveProp.countShareNum = haveProp.countShareNum;
@@ -322,12 +347,9 @@ export default class DataMgr extends cc.Component {
                 //this.haveProp.countAdNum = haveProp.countAdNum;
                 this.haveProp.countInvite = haveProp.countInvite;
                 //this.haveProp.freeTimes = 3;//haveProp.freeTimes;
-
-                if (this.haveProp.countInvite > 100)
-                    this.haveProp.countInvite = 100;
                 this.userData.addHpMax = this.getAddHp_i();
                 cc.sys.localStorage.setItem("addHpMax", this.userData.addHpMax);
-            }
+            }*/
             this.haveProp.autoAdTime = this.getTimeSecond_i();
             cc.sys.localStorage.setItem("haveProp", JSON.stringify(this.haveProp));
         }
@@ -367,7 +389,7 @@ export default class DataMgr extends cc.Component {
 
         //cc.loader.loadResDir()
 
-        this.getUerOpenID();
+        this.getUerOpenID(reset);
         this.getShowShare();
         this.getShareReward();
 
@@ -409,26 +431,25 @@ export default class DataMgr extends cc.Component {
 
 
         //减速道具
-        if (this.haveProp.isOwnCut) {
+        if (this.haveProp.useCut.num < 0 || this.haveProp.useCut.beginTime + 3600 <= this.getTimeSecond_i()) {
+            //如果有道具使用一个新的
+            if (this.haveProp.haveCut.length > 0) {
+                let num = this.haveProp.haveCut.shift();
+                this.haveProp.useCut.num = num;
+                this.haveProp.useCut.beginTime = this.getTimeSecond_i();
+                this.haveProp.useCut.surplusTimes = 3;
+            }
+        }
+        if (this.haveProp.useCut.num > 0 && this.haveProp.useCut.beginTime + 3600 > this.getTimeSecond_i()) {
+            this.haveProp.useCut.surplusTimes--;
+            this.userData.useCutNum = this.haveProp.useCut.num;
+            if (this.haveProp.useCut.surplusTimes <= 0) {
+                this.haveProp.useCut.num = 0;
+                this.haveProp.useCut.beginTime = 0;
+            }
+        }
+        if (this.haveProp.isOwnCut && this.userData.useCutNum < 0.3) {
             this.userData.useCutNum = 0.3;
-        } else {
-            if (this.haveProp.useCut.num < 0 || this.haveProp.useCut.beginTime + 3600 <= this.getTimeSecond_i()) {
-                //如果有道具使用一个新的
-                if (this.haveProp.haveCut.length > 0) {
-                    let num = this.haveProp.haveCut.shift();
-                    this.haveProp.useCut.num = num;
-                    this.haveProp.useCut.beginTime = this.getTimeSecond_i();
-                    this.haveProp.useCut.surplusTimes = 3;
-                }
-            }
-            if (this.haveProp.useCut.num > 0 && this.haveProp.useCut.beginTime + 3600 > this.getTimeSecond_i()) {
-                this.haveProp.useCut.surplusTimes--;
-                this.userData.useCutNum = this.haveProp.useCut.num;
-                if (this.haveProp.useCut.surplusTimes <= 0) {
-                    this.haveProp.useCut.num = 0;
-                    this.haveProp.useCut.beginTime = 0;
-                }
-            }
         }
 
         //脚印效果
@@ -460,35 +481,35 @@ export default class DataMgr extends cc.Component {
 
         //光效效果
         this.userData.showParticle = false;
-        if (this.haveProp.isOwnStreak) {
-            this.userData.useStreakColor = this.streakColor[0];
-        } else {
-            if (this.haveProp.useStreak.beginTime + this.haveProp.useStreak.continueTime <= this.getTimeSecond_i()) {
-                //过期了换个新的
-                if (this.haveProp.haveStreak.length > 0) {
-                    let streakIdx = this.haveProp.haveStreak.shift();
-                    if (streakIdx < this.streakColor.length) {
-                        this.userData.useStreakColor = this.streakColor[streakIdx];
 
-                        this.haveProp.useStreak.streakIdx = streakIdx;
-                        this.haveProp.useStreak.beginTime = this.getTimeSecond_i();
-                        this.haveProp.useStreak.continueTime = (streakIdx % 2 == 0 ? 12 : 24) * 3600;
+        if (this.haveProp.useStreak.beginTime + this.haveProp.useStreak.continueTime <= this.getTimeSecond_i()) {
+            //过期了换个新的
+            if (this.haveProp.haveStreak.length > 0) {
+                let streakIdx = this.haveProp.haveStreak.shift();
+                if (streakIdx < this.streakColor.length) {
+                    this.userData.useStreakColor = this.streakColor[streakIdx];
 
-                        if (streakIdx == 1)
-                            this.userData.showParticle = true;
-                    } else
-                        this.userData.useStreakColor = null;
+                    this.haveProp.useStreak.streakIdx = streakIdx;
+                    this.haveProp.useStreak.beginTime = this.getTimeSecond_i();
+                    this.haveProp.useStreak.continueTime = (streakIdx % 2 == 0 ? 12 : 24) * 3600;
+
+                    if (streakIdx == 1)
+                        this.userData.showParticle = true;
                 } else
                     this.userData.useStreakColor = null;
-            } else {
-                //没过期
-                if (this.haveProp.useStreak.streakIdx < this.streakColor.length)
-                    this.userData.useStreakColor = this.streakColor[this.haveProp.useStreak.streakIdx];
-                else
-                    this.userData.useStreakColor = null;
-                if (this.haveProp.useStreak.streakIdx == 1)
-                    this.userData.showParticle = true;
-            }
+            } else
+                this.userData.useStreakColor = null;
+        } else {
+            //没过期
+            if (this.haveProp.useStreak.streakIdx < this.streakColor.length)
+                this.userData.useStreakColor = this.streakColor[this.haveProp.useStreak.streakIdx];
+            else
+                this.userData.useStreakColor = null;
+            if (this.haveProp.useStreak.streakIdx == 1)
+                this.userData.showParticle = true;
+        }
+        if (this.haveProp.isOwnStreak && !this.userData.showParticle) {
+            this.userData.useStreakColor = this.streakColor[0];
         }
 
         //角色
@@ -549,7 +570,7 @@ export default class DataMgr extends cc.Component {
         ++this.userData.nextChangeIdx;
         if (this.userData.nextChangeIdx >= this.changeTime.length) {
             this.userData.nextChangeIdx = 0;
-            cc.audioMgr.playBg();
+            //cc.audioMgr.playBg();
         }
         this.userData.nextChangeTime = this.changeTime[this.userData.nextChangeIdx];
         this.userData.gameBgIdx = this.changeBg[this.userData.nextChangeIdx];
@@ -618,6 +639,14 @@ export default class DataMgr extends cc.Component {
 
     getTimeSecond_i() {
         return parseInt(Date.now() / 1000);
+    }
+
+    //获取当前所在的 周 0~6 剩余日期
+    getTimeWeek_i() {
+        let dayNum = parseInt(Date.now() / (1000 * 3600 * 24));
+        let weekNum = parseInt((dayNum - 4) / 7);
+        console.log("-- week --" + weekNum + " -- " + parseInt((dayNum - 4) % 7));
+        return weekNum;
     }
 
     //比较储存历史最高纪录
@@ -698,6 +727,8 @@ export default class DataMgr extends cc.Component {
                     if (nodeN && nodeN.getComponent("PanelRandom")) {
                         nodeN.getComponent("PanelRandom").initRand();
                     }
+
+                    adSdk.adshowlog(this.adUserInfo, this.adInfo);
                 }
                 else if (this.showAdType == "relive") {
                     //看视频复活
@@ -707,6 +738,8 @@ export default class DataMgr extends cc.Component {
                     if (nodeN && nodeN.getComponent("PanelRelive")) {
                         nodeN.getComponent("PanelRelive").reliveRole();
                     }
+
+                    adSdk.adshowlog(this.adUserInfo, this.adInfo);
                 }
             }
             else {
@@ -724,13 +757,45 @@ export default class DataMgr extends cc.Component {
         this.showAdType = null;
     }
 
+    createAdInfo(createPos) {
+        console.log("-- createAdInfo --" + createPos);
+        if (true) {
+            console.log("-- 第三方sdk C check --");
+            this.adUserInfo.appwxuserid = this.openid;
+            this.adUserInfo.appwxusername = this.nickName;
+            console.log(cc.dataMgr.adUserInfo);
+            adSdk.creatAdInfo(this.adUserInfo, function (adInfo) {
+                console.log("--- 第三方 back ---");
+                console.log(adInfo);
+                cc.dataMgr.adInfo = adInfo;
+            });
+        }
+    }
+
+    adJump() {
+        if (!this.adInfo) {
+            console.log(this.adInfo);
+            return;
+        }
+        adSdk.adjump(this.adUserInfo, this.adInfo);
+    }
+
+    adarrivelog(pathPara) {
+        console.log("-- adarrivelog -- " + pathPara);
+        adSdk.adarrivelog(pathPara, this.openid);
+    }
+
+    adgivelog(pathPara) {
+        console.log("-- adgivelog -- " + pathPara);
+        adSdk.adgivelog(pathPara, this.openid, this.nickName);
+    }
+
     //------ 账号奖励等相关 ------
 
-    getUerOpenID() {
+    getUerOpenID(reset) {
         if (CC_WECHATGAME) {
-
             let openid = cc.sys.localStorage.getItem("openid");
-            if (!openid || openid - 1 == -1 || openid == "0") { //保证用户是第一次进游戏
+            if (!openid || openid - 1 == -1 || openid == "0" || reset) { //保证用户是第一次进游戏
                 console.log("发送wx.login请求!");
                 wx.login({
                     success: (res) => {
@@ -744,11 +809,13 @@ export default class DataMgr extends cc.Component {
                                     code: res.code,
                                 },
                                 success: (obj, statusCode, header) => {
-                                    console.log("请求openid,服务器返回的数据！！--> " + obj);
-                                    console.log(obj.data.openid);
+                                    console.log("请求openid,服务器返回的数据！！--> ");
+                                    console.log(obj);
 
                                     cc.dataMgr.openid = obj.data.openid;
+                                    cc.dataMgr.adUserInfo.appwxuserid = cc.dataMgr.openid;
                                     cc.sys.localStorage.setItem("openid", obj.data.openid); //之所以要存，是在分享的时候放入query中
+
                                     //微信官方文档那里写的调用函数是getLaunchInfoSync，但是根本搜不到这个API，应该是下面这个。
                                     let launchOption = wx.getLaunchOptionsSync();
                                     console.log(launchOption);
@@ -775,6 +842,95 @@ export default class DataMgr extends cc.Component {
                     }
                 });
             }
+
+            console.log("-- 微信昵称 --" + cc.dataMgr.nickName + " -- " + this.nickName);
+            if (cc.dataMgr.nickName == "aaa" || cc.dataMgr.nickName == "***" || !cc.dataMgr.nickName || cc.dataMgr.nickName == "0") {
+                console.log("-- 开始 userInfoButton --");
+                cc.dataMgr.createUserInfoButton();
+            }
+            else
+                cc.dataMgr.createAdInfo("getUerOpenID");
+            // //判断登陆请求是否过期
+            // wx.checkSession({
+            //     success: (res) => {
+            //         console.log("-- 检查登陆是否过期 success--");
+            //         console.log(res);
+            //     },
+            //     fail: (res) => {
+            //         console.log("-- 检查登陆是否过期 fail--");
+            //         console.log(res);
+            //     }
+            // });
+
+            //console.log("-- 用户信息 wx.getUserInfo Then  --");
+            //if (this.nickName == "***" || !this.nickName) {
+            // console.log("--- 获取权限 ---");
+            // wx.authorize({
+            //     scope: "scope.userInfo",
+            //     success: (res) => {
+            //         //这个基本上没用了
+            //         wx.getUserInfo({
+            //             success: function (res) {
+            //                 console.log("-- 获取成功 userInfo --");
+            //                 console.log(res)
+            //                 cc.dataMgr.nickName = res.userInfo.nickName;
+            //                 cc.sys.localStorage.setItem("nickName", cc.dataMgr.nickName);
+            //             },
+            //             fail: function (res) {
+            //                 console.log("--- 获取用户信息失败 ---");
+            //                 console.log(res);
+            //             }
+            //         })
+            //     },
+            //     fail: (res) => {
+            //         console.log("--- 获取授权失败 ---");
+            //         console.log(res);
+            //     },
+            // });
+            //}
+        }
+    }
+
+    //>_< 微信大大该接口了 getUserInfo 不能直接用了
+    createUserInfoButton() {
+        console.log("-- 微信 改接口了 --");
+        if (CC_WECHATGAME) {
+            let nodeN = cc.find("Canvas/node_userInfo");
+            if (nodeN)
+                nodeN.active = true;
+            console.log("-- 开始创建 --");
+            let button = wx.createUserInfoButton({
+                type: 'text',
+                text: '获取昵称信息',
+                style: {
+                    left: 120,
+                    top: 360,//微信和 这像素不一样。。。
+                    width: 120,
+                    height: 40,
+                    lineHeight: 40,
+                    backgroundColor: '#ffffff',
+                    color: '#000000',
+                    textAlign: 'center',
+                    fontSize: 16,
+                    borderRadius: 4
+                },
+                withCredentials: true
+            });
+            button.onTap((res) => {
+                console.log("-- 点击授权了 --");
+                console.log(res)
+
+                let nodeN = cc.find("Canvas/node_userInfo");
+                if (nodeN)
+                    nodeN.active = false;
+                button.hide();
+
+                console.log(res.userInfo.nickName);
+
+                cc.dataMgr.nickName = res.userInfo.nickName;
+                cc.sys.localStorage.setItem("nickName", cc.dataMgr.nickName);
+                cc.dataMgr.createAdInfo("button");
+            })
         }
     }
 
@@ -821,7 +977,7 @@ export default class DataMgr extends cc.Component {
                 },
             });
         } else
-            cc.dataMgr.isShowShare = false;
+            cc.dataMgr.isShowShare = true;
     }
 
     //刷新邀请奖励

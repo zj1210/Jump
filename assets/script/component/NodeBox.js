@@ -115,7 +115,7 @@ export default class NodeBox extends cc.Component {
         }
     }
 
-    leaveFrist() {
+    leaveFirst() {
         this.node.active = true;
         this.node.opacity = 255;
         this.spr_box.opacity = 255;
@@ -127,7 +127,7 @@ export default class NodeBox extends cc.Component {
         this.node.opacity = 255;
         if (this._boxType == "prop") {
             ++cc.dataMgr.userData.propGreenNum;
-            //cc.audioMgr.playEffect("prop_score");
+            cc.audioMgr.playEffect("prop_score");
             this.spr_prop.active = false;
             //吃到道具换背景
             let gameJs = cc.find("Canvas").getComponent("Game");
@@ -138,6 +138,7 @@ export default class NodeBox extends cc.Component {
             if (cc.dataMgr.userData.speedNum < num)
                 cc.dataMgr.userData.speedNum = num;
             this.spr_prop.active = false;
+            cc.audioMgr.playEffect("prop_speed");
 
             let node_hint = cc.find("Canvas/node_hint");
             if (node_hint && node_hint.getComponent("NodeHint")) {

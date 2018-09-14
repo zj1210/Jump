@@ -24,6 +24,7 @@ export default class PanelRelive extends cc.Component {
     _timeCount = 0;
 
     _toEnd = true;
+    _haveToEnd = false;
 
     onLoad() {
         this.initSubCanvas();
@@ -59,7 +60,7 @@ export default class PanelRelive extends cc.Component {
             //console.log("-- WECHAT Start.js subPostMessage --");
             window.wx.postMessage({
                 messageType: 8,
-                MAIN_MENU_NUM: "scoreS",
+                MAIN_MENU_NUM: "score",
                 myScore: cc.dataMgr.userData.countJump
             });
             this.scheduleOnce(this.updataSubCanvas, 1);
@@ -87,8 +88,10 @@ export default class PanelRelive extends cc.Component {
     }
 
     callEnd() {
-        if (this._toEnd)
+        if (this._toEnd && !this._haveToEnd) {
+            this._haveToEnd = true;
             cc.director.loadScene("end");
+        }
     }
 
     reliveRole() {
@@ -110,8 +113,10 @@ export default class PanelRelive extends cc.Component {
                 cc.dataMgr.showAd("relive");
             } else if (btnN == "btn_end") {
                 this.lab_time.stopAllActions();
-                //if (this._toEnd)
-                cc.director.loadScene("end");
+                if (!this._haveToEnd) {
+                    this._haveToEnd = true;
+                    cc.director.loadScene("end");
+                }
             } else if (btnN == "anniu_weixin") {
                 this._toEnd = false;
                 this.shareFriend();

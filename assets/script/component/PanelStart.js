@@ -5,7 +5,7 @@ const {
     property
 } = cc._decorator;
 @ccclass
-export default class Start extends cc.Component {
+export default class PanelStart extends cc.Component {
     @property(cc.Node)
     spr_light = null;
     @property(cc.Node)
@@ -26,6 +26,9 @@ export default class Start extends cc.Component {
     @property(cc.Node) //显示列表的content
     node_content = null;
 
+    @property(cc.Node)
+    btn_qq = null;
+
     onLoad() {
         //console.log("--- onLoad Start ---");
         this.spr_point.active = false;
@@ -45,6 +48,10 @@ export default class Start extends cc.Component {
                 cc.dataMgr.shareTicket = obj.shareTicket;
                 this.showGroup();
             }
+            let path = obj.path;
+            console.log("--- 游戏 path --" + path);
+            if (!path)
+                path = "";
         }
     }
 
@@ -95,9 +102,19 @@ export default class Start extends cc.Component {
             //console.log("-- WECHAT Start.js subPostMessage --");
             window.wx.postMessage({
                 messageType: 6,
-                MAIN_MENU_NUM: "scoreS",
+                MAIN_MENU_NUM: "score",
                 myScore: cc.dataMgr.userData.countJump
             });
+        }
+
+        this.btn_qq.getChildByName("btn_qq").runAction(cc.repeatForever(cc.sequence(cc.spawn(cc.moveBy(0.6, cc.v2(0, 30)), cc.fadeIn(0.6)), cc.delayTime(0.4), cc.spawn(cc.moveBy(0.6, cc.v2(0, -30)), cc.fadeOut(0.6)))));
+    }
+
+    showRandom() {
+        let nodeRandom = cc.find("Canvas/node_random");
+        if (nodeRandom) {
+            nodeRandom.getComponent("PanelRandom").initRand();
+            cc.find("Canvas/node_start").active = false;
         }
     }
 
@@ -110,7 +127,7 @@ export default class Start extends cc.Component {
             if (cc.dataMgr.shareTicket) {
                 window.wx.postMessage({
                     messageType: 5,
-                    MAIN_MENU_NUM: "scoreS",
+                    MAIN_MENU_NUM: "score",
                     shareTicket: cc.dataMgr.shareTicket
                 });
             }
@@ -128,7 +145,7 @@ export default class Start extends cc.Component {
             //console.log("-- WECHAT Start.js subPostMessage --");
             window.wx.postMessage({
                 messageType: 1,
-                MAIN_MENU_NUM: "scoreS",
+                MAIN_MENU_NUM: "score",
                 myScore: cc.dataMgr.userData.countJump
             });
             this.node.runAction(cc.sequence(cc.delayTime(0.1), cc.callFunc(this.updataSubCanvas, this)));
@@ -155,6 +172,8 @@ export default class Start extends cc.Component {
             let randY = Math.random() * 20 + 10;
             nodeN.runAction(cc.sequence(cc.moveBy(Math.random() * 0.5 + 0.5, cc.v2(0, -640)), cc.fadeOut(0.3)));
         }
+
+        this.btn_qq.runAction(cc.sequence(cc.moveBy(Math.random() * 0.5 + 0.5, cc.v2(0, -640)), cc.fadeOut(0.3)));
     }
 
     onClickBtn(event, customeData) {
@@ -163,12 +182,11 @@ export default class Start extends cc.Component {
             let btnN = event.target.name;
             if (btnN == "anniu_paiming") {
                 this.showFriend();
+                console.log("-- 测试数据 胡同有无 --");
+                let wxsubStr = cc.sys.localStorage.getItem("wxSub");
+                console.log(wxsubStr);
             } else if (btnN == "anniu_weixin") {
-                let nodeRandom = cc.find("Canvas/node_random");
-                if (nodeRandom) {
-                    nodeRandom.getComponent("PanelRandom").initRand();
-                    cc.find("Canvas/node_start").active = false;
-                }
+                this.showRandom();
             } else if (btnN == "anniu_yinyue") {
                 cc.director.loadScene("store");
             } else if (btnN == "anniu_shezhi") {
@@ -177,22 +195,27 @@ export default class Start extends cc.Component {
             } else if (btnN == "anniu_backEnd") {
                 this.rankingView.active = false;
             } else if (btnN == "more_icon") {
-                if (CC_WECHATGAME) {
-                    wx.navigateToMiniProgram({
-                        appId: 'wx93fc27bed64ce802',
-                        path: '',
-                        extraData: '',
-                        success(res) {
-                        },
-                        fail() {
-                            let str_imageUrl = cc.dataMgr.imageUrl.urlMore
-                            wx.previewImage({
-                                current: str_imageUrl, // 当前显示图片的http链接
-                                urls: [str_imageUrl] // 需要预览的图片http链接列表
-                            });
-                        }
-                    })
-                }
+                cc.dataMgr.adJump();
+                // if (CC_WECHATGAME) {
+                //     wx.navigateToMiniProgram({
+                //         appId: 'wx93fc27bed64ce802',//本铺魔方
+                //         //appId: 'wx6d1dad3f330bac2b',
+                //         path: '',
+                //         extraData: '',
+                //         //envVersion: 'trial',
+                //         success(res) {
+                //             console.log("--- 跳转成功 ---");
+                //             console.log(res);
+                //         },
+                //         fail() {
+                //             let str_imageUrl = cc.dataMgr.imageUrl.urlMore
+                //             wx.previewImage({
+                //                 current: str_imageUrl, // 当前显示图片的http链接
+                //                 urls: [str_imageUrl] // 需要预览的图片http链接列表
+                //             });
+                //         }
+                //     })
+                // }
             }
             else if (btnN == "ziti_chakanqun") {
                 let self = this;
@@ -224,6 +247,26 @@ export default class Start extends cc.Component {
             }
             else if (btnN == "anniu_share") {
                 this.shareFriend();
+            }
+            else if (btnN == "btn_qq") {
+                if (CC_WECHATGAME) {
+                    wx.navigateToMiniProgram({
+                        appId: 'wxc2cd6f55732dc1f2',
+                        path: '',
+                        extraData: '',
+                        success(res) {
+                            console.log("--- 跳转成功 ---");
+                            console.log(res);
+                        },
+                        fail() {
+                            let str_imageUrl = cc.dataMgr.imageUrl.urlMore
+                            wx.previewImage({
+                                current: str_imageUrl, // 当前显示图片的http链接
+                                urls: [str_imageUrl] // 需要预览的图片http链接列表
+                            });
+                        }
+                    })
+                }
             }
         }
     }

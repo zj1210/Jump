@@ -9,6 +9,7 @@ export default class PanelEnd extends cc.Component {
 
     start() {
         this.initEnd();
+        cc.audioMgr.playBg(false);
     }
 
     initEnd() {

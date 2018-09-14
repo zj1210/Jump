@@ -30,7 +30,7 @@
   "title": "Jump",
   "webOrientation": "portrait",
   "wechatgame": {
-    "REMOTE_SERVER_ROOT": "https://bpw.blyule.com/wxJump/",
+    "REMOTE_SERVER_ROOT": "https://bpw.blyule.com/wxJumpC/",
     "appid": "wxd0a430fea9731a89",
     "isSubdomain": false,
     "orientation": "portrait",

@@ -35,7 +35,6 @@ export default class RankingView extends cc.Component {
         this.initSubCanvas();
         this.schedule(this.updataSubCanvas, 0.1);
 
-        this.subPostMessage("submit");
         this.subPostMessage("end");
     }
 
@@ -126,20 +125,20 @@ export default class RankingView extends cc.Component {
             if (type == "submit") {
                 window.wx.postMessage({
                     messageType: 2,
-                    MAIN_MENU_NUM: "scoreS",
+                    MAIN_MENU_NUM: "score",
                     myScore: cc.dataMgr.userData.countJump
                 });
             } else if (type == "end") {
                 window.wx.postMessage({
                     messageType: 3,
-                    MAIN_MENU_NUM: "scoreS",
+                    MAIN_MENU_NUM: "score",
                     myScore: cc.dataMgr.userData.countJump
                 });
                 this.showPanel("end")
             } else if (type == "friend") {
                 window.wx.postMessage({
                     messageType: 1,
-                    MAIN_MENU_NUM: "scoreS",
+                    MAIN_MENU_NUM: "score",
                     myScore: cc.dataMgr.userData.countJump
                 });
                 this.showPanel("friend");
@@ -166,7 +165,7 @@ export default class RankingView extends cc.Component {
                                 cc.dataMgr.shareTicket = res.shareTickets[0];
                                 window.wx.postMessage({
                                     messageType: 5,
-                                    MAIN_MENU_NUM: "scoreS",
+                                    MAIN_MENU_NUM: "score",
                                     shareTicket: res.shareTickets[0]
                                 });
                             }

@@ -163,9 +163,11 @@ export default class PanelRandom extends cc.Component {
         }
 
         let aimAngle = this.getAimAngle_i();
-        let rotaTo = cc.rotateTo(6.2 + Math.random(), 720 + 720 + 720 + aimAngle);
-        rotaTo.easing(cc.easeElasticInOut(4));
+        let rotaTo = cc.rotateTo(4.2 + Math.random(), 720 + 720 + 720 + aimAngle);
+        //rotaTo.easing(cc.easeElasticInOut(4));
+        rotaTo.easing(cc.easeElasticOut(4));
         this.node_panBg.runAction(cc.sequence(rotaTo, cc.delayTime(0.4), cc.callFunc(this.randEnd, this)));
+        cc.audioMgr.playEffect("random_rand");
     }
 
     //转盘结束奖励商品
@@ -211,11 +213,15 @@ export default class PanelRandom extends cc.Component {
         cc.dataMgr.saveData();
 
         this.node_reward.active = true;
+        let spr_kuang = this.node_reward.getChildByName("spr_kuang");
+        spr_kuang.opacity = 0;
+        spr_kuang.runAction(cc.sequence(cc.delayTime(0.6), cc.fadeIn(0.3)));
         this.node_label.scale = 2.4;
         this.node_label.getChildByName("lab_reward").getComponent(cc.Label).string = rewardStr;
         this.node_label.getChildByName("lab_num").getComponent(cc.Label).string = numStr;
         this.node_label.runAction(cc.sequence(cc.fadeIn(0.2), cc.scaleTo(0.3, 0.9), cc.scaleTo(0.1, 1)));
         this.scheduleOnce(this.initRand, 0.8);
+        cc.audioMgr.playEffect("random_take");
     }
 
     getAimAngle_i() {
@@ -249,11 +255,11 @@ export default class PanelRandom extends cc.Component {
                 event.target.getComponent(cc.Button).interactable = false;
                 if (cc.dataMgr.haveProp.freeTimes > 0 || cc.dataMgr.haveProp.rewardTimes > 0)
                     this.randBegin();
-                else{
+                else {
                     //判断是否可以看广告
-                   if(this.getNextADTime_i()<=0){
-                       cc.dataMgr.showAd("random");
-                   }
+                    if (this.getNextADTime_i() <= 0) {
+                        cc.dataMgr.showAd("random");
+                    }
                     this.initRand();
                 }
             } else if (btnN == "spr_bg") {
@@ -266,22 +272,24 @@ export default class PanelRandom extends cc.Component {
     shareFriend() {
         if (CC_WECHATGAME) {
             window.wx.updateShareMenu({
-                withShareTicket: true
-            });
-            window.wx.shareAppMessage({
-                title: cc.dataMgr.getShareDesc_s("random"),
-                imageUrl: cc.dataMgr.imageUrl.random,
-                query: "otherID=" + cc.dataMgr.openid,
-                success: (res) => {
-                    console.log("--- 大转盘微信分享 ---");
-                    console.log(res);
-                    //改为分享到群立即抽奖
-                    if (res.shareTickets != undefined && res.shareTickets.length >= 0) {
-                        cc.dataMgr.shareSuccess("startAd");
-                    }
-                    else {
-                        cc.dataMgr.shareSuccess("startAdCd");
-                    }
+                withShareTicket: true,
+                success() {
+                    window.wx.shareAppMessage({
+                        title: cc.dataMgr.getShareDesc_s("random"),
+                        imageUrl: cc.dataMgr.imageUrl.random,
+                        query: "otherID=" + cc.dataMgr.openid,
+                        success: (res) => {
+                            console.log("--- 大转盘微信分享 ---");
+                            console.log(res);
+                            //改为分享到群立即抽奖
+                            if (res.shareTickets != undefined && res.shareTickets.length >= 0) {
+                                cc.dataMgr.shareSuccess("startAd");
+                            }
+                            else {
+                                cc.dataMgr.shareSuccess("startAdCd");
+                            }
+                        }
+                    });
                 }
             });
         } else {

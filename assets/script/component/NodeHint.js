@@ -3,7 +3,7 @@ const {
     property
 } = cc._decorator;
 @ccclass
-export default class NodeRole extends cc.Component {
+export default class NodeHint extends cc.Component {
     //控件的透明度 都设置为0 用fadeIn等操作显示
 
     @property(cc.Node)
@@ -19,7 +19,7 @@ export default class NodeRole extends cc.Component {
 
     //speedBegin 开局加速 speed 冲刺 cut 减速
     showHint(type) {
-       //console.log("--- showHint --- " + type);
+        //console.log("--- showHint --- " + type);
         this.node.active = true;
         if (type == "speedBegin") {
             //提示开局冲刺
