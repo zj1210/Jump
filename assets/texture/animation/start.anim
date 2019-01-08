@@ -2,7 +2,7 @@
   "__type__": "cc.AnimationClip",
   "_name": "start",
   "_objFlags": 0,
-  "_rawFiles": null,
+  "_native": "",
   "_duration": 1.5,
   "sample": 60,
   "speed": 1,
@@ -77,6 +77,54 @@
         "props": {
           "scale": [
             {
+              "frame": 0.6666666666666666,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 1,
+                "y": 1
+              }
+            },
+            {
+              "frame": 0.75,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 1.1,
+                "y": 0.9
+              }
+            },
+            {
+              "frame": 0.8333333333333334,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 1,
+                "y": 1
+              }
+            },
+            {
+              "frame": 1.25,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 0,
+                "y": 2
+              }
+            }
+          ],
+          "opacity": [
+            {
+              "frame": 0.6666666666666666,
+              "value": 255
+            },
+            {
+              "frame": 1.25,
+              "value": 0
+            }
+          ]
+        }
+      },
+      "anniu_yinyue": {
+        "props": {
+          "scale": [
+            {
               "frame": 0.5,
               "value": {
                 "__type__": "cc.Vec2",
@@ -116,54 +164,6 @@
             },
             {
               "frame": 1.0833333333333333,
-              "value": 0
-            }
-          ]
-        }
-      },
-      "anniu_yinyue": {
-        "props": {
-          "scale": [
-            {
-              "frame": 0.3333333333333333,
-              "value": {
-                "__type__": "cc.Vec2",
-                "x": 1,
-                "y": 1
-              }
-            },
-            {
-              "frame": 0.4166666666666667,
-              "value": {
-                "__type__": "cc.Vec2",
-                "x": 1.1,
-                "y": 0.9
-              }
-            },
-            {
-              "frame": 0.5,
-              "value": {
-                "__type__": "cc.Vec2",
-                "x": 1,
-                "y": 1
-              }
-            },
-            {
-              "frame": 0.9166666666666666,
-              "value": {
-                "__type__": "cc.Vec2",
-                "x": 0,
-                "y": 2
-              }
-            }
-          ],
-          "opacity": [
-            {
-              "frame": 0.3333333333333333,
-              "value": 255
-            },
-            {
-              "frame": 0.9166666666666666,
               "value": 0
             }
           ]
@@ -476,6 +476,54 @@
             },
             {
               "frame": 0.6666666666666666,
+              "value": 0
+            }
+          ]
+        }
+      },
+      "more_icon": {
+        "props": {
+          "scale": [
+            {
+              "frame": 0.3333333333333333,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 1,
+                "y": 1
+              }
+            },
+            {
+              "frame": 0.4166666666666667,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 1.1,
+                "y": 0.9
+              }
+            },
+            {
+              "frame": 0.5,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 1,
+                "y": 1
+              }
+            },
+            {
+              "frame": 0.9166666666666666,
+              "value": {
+                "__type__": "cc.Vec2",
+                "x": 0,
+                "y": 2
+              }
+            }
+          ],
+          "opacity": [
+            {
+              "frame": 0.3333333333333333,
+              "value": 255
+            },
+            {
+              "frame": 0.9166666666666666,
               "value": 0
             }
           ]

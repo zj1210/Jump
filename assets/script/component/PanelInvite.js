@@ -36,9 +36,17 @@ export default class PanelInvite extends cc.Component {
             //console.log("-- invite --" + nodeN.name);
             if (i < cc.dataMgr.haveProp.countInvite) {
                 //这里是可领取 或 已领取的
-                let isTake = this.isHaveTake_b(i);
-                nodeN.getChildByName("anniu_lingqu").active = !isTake;
-                nodeN.getChildByName("anniu_yilingqu").active = isTake;
+                let isHaveTake = this.isHaveTake_b(i);
+                console.log("--- isCanTake ---" + isHaveTake);
+                nodeN.getChildByName("anniu_lingqu").active = !isHaveTake;
+                nodeN.getChildByName("anniu_yilingqu").active = isHaveTake;
+                if (isHaveTake) {
+                    let isUser = this.isUsedProp_b(i);
+                    let toggle = nodeN.getChildByName("anniu_yilingqu").getComponent(cc.Toggle);
+                    if (toggle) {
+                        toggle.isChecked = isUser;
+                    }
+                }
             } else {
                 nodeN.getChildByName("anniu_lingqu").active = false;
                 nodeN.getChildByName("anniu_yilingqu").active = false;
@@ -48,29 +56,25 @@ export default class PanelInvite extends cc.Component {
         this.lab_inviteNum.getComponent(cc.Label).string = ("已邀请好友" + cc.dataMgr.haveProp.countInvite);
     }
 
-    takeReward(idx) {
+    takeReward(idx, isTake) {
         if (idx == 0) {
-            cc.dataMgr.haveProp.haveFoot.push(0);
-        } else if (idx == 1) {
-            cc.dataMgr.haveProp.haveStreak.push(0);
+            cc.dataMgr.haveProp.isOwnSpeed = isTake;
+        }
+        else if (idx == 1) {
+            cc.dataMgr.userData.addHpMax = 1;
+            cc.dataMgr.userData.reliveNum = cc.dataMgr.userData.addHpMax;
         } else if (idx == 2) {
-            cc.dataMgr.haveProp.haveSpeed.push(50);
-        } else if (idx == 3) {
-            cc.dataMgr.haveProp.haveCut.push(0.7);
-        } else if (idx == 4) {
-            cc.dataMgr.haveProp.haveFoot.push(1);
-        } else if (idx == 5) {
-            cc.dataMgr.haveProp.haveSpeed.push(100);
-        } else if (idx == 6) {
-            cc.dataMgr.haveProp.haveCut.push(0.3);
-        } else if (idx == 7) {
-            cc.dataMgr.haveProp.haveStreak.push(1);
-        } else if (idx == 8) {
-            cc.dataMgr.haveProp.isOwnSpeed = true;
-            cc.dataMgr.haveProp.isOwnCut = true;
-        } else if (idx == 9) {
-            cc.dataMgr.haveProp.isOwnFoot = true;
-            cc.dataMgr.haveProp.isOwnStreak = true;
+            cc.dataMgr.haveProp.isOwnFoot = isTake;
+        }
+        else if (idx == 3) {
+            cc.dataMgr.haveProp.isOwnStreak = isTake;
+        }
+        else if (idx == 4) {
+            cc.dataMgr.userData.addHpMax = 2;
+            cc.dataMgr.userData.reliveNum = cc.dataMgr.userData.addHpMax;
+        }
+        else if (idx == 5) {
+            cc.dataMgr.haveProp.isOwnCut = isTake;
         }
 
         cc.dataMgr.haveProp.inviteTake.push(idx);
@@ -80,21 +84,38 @@ export default class PanelInvite extends cc.Component {
     }
 
     isHaveTake_b(idx) {
+        console.log("-- isHaveTake --" + idx);
+        console.log(cc.dataMgr.haveProp.inviteTake);
         let haveTake = false;
         for (let i = 0; i < cc.dataMgr.haveProp.inviteTake.length; ++i) {
             if (cc.dataMgr.haveProp.inviteTake[i] == idx) {
                 haveTake = true;
-                //恢复数据 保证永久永久的东西一定能用
-                if (i == 8) {
-                    cc.dataMgr.haveProp.isOwnSpeed = true;
-                    cc.dataMgr.haveProp.isOwnCut = true;
-                } else if (i == 9) {
-                    cc.dataMgr.haveProp.isOwnFoot = true;
-                    cc.dataMgr.haveProp.isOwnStreak = true;
-                }
+                break;
             }
         }
         return haveTake;
+    }
+
+    isUsedProp_b(idx) {
+        let isUser = true;
+        if (idx == 0) {
+            isUser = cc.dataMgr.haveProp.isOwnSpeed;
+        }
+        else if (idx == 1) {
+            cc.dataMgr.userData.addHpMax = 1;
+        } else if (idx == 2) {
+            isUser = cc.dataMgr.haveProp.isOwnFoot;
+        }
+        else if (idx == 3) {
+            isUser = cc.dataMgr.haveProp.isOwnStreak;
+        }
+        else if (idx == 4) {
+            cc.dataMgr.userData.addHpMax = 2;
+        }
+        else if (idx == 5) {
+            isUser = cc.dataMgr.haveProp.isOwnCut;
+        }
+        return isUser;
     }
 
     onClickBtn(event, customeData) {
@@ -105,18 +126,28 @@ export default class PanelInvite extends cc.Component {
                 cc.director.loadScene("game");
             } else if (btnN == "anniu_lingqu") {
                 if (customeData != null) {
-                    this.takeReward(customeData);
+                    this.takeReward(customeData, true);
                 }
             } else if (btnN == "anniu_weixin") {
                 if (CC_WECHATGAME) {
+                    window.wx.updateShareMenu({
+                        withShareTicket: false
+                    });
                     window.wx.shareAppMessage({
-                        title: "我在这里，等你来。--境之边缘",
-                        imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                        title: cc.dataMgr.getShareDesc_s("invite"),
+                        imageUrl: cc.dataMgr.imageUrl.invite,
                         query: "otherID=" + cc.dataMgr.openid,
-                        success: (res) => {}
+                        success: (res) => { }
                     });
                 } else {
                     //console.log("-- Not is wechatGame PanelRelive --");
+                }
+            }
+            else if (btnN == "anniu_yilingqu") {
+                let toggle = event.target.getComponent(cc.Toggle);
+                if (toggle) {
+                    let isChecked = toggle.isChecked;
+                    this.takeReward(customeData, isChecked);
                 }
             }
         }

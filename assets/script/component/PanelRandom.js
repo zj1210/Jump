@@ -12,7 +12,7 @@ export default class PanelRandom extends cc.Component {
     @property(cc.Node)
     btn_share = null;
     @property(cc.Node) //引导提示
-    lab_share = null;
+    spr_share = null;
 
     @property(cc.Node) //最后的提示获得。
     node_reward = null;
@@ -21,46 +21,46 @@ export default class PanelRandom extends cc.Component {
 
     //转盘的奖励及 角度(所有判断都包含边界)
     _randData = [{
-            rotaMax: 90,
-            rotaMin: 30,
-            rewardName: "cut30",
-            prob: 0.2, //概率
-        },
-        {
-            rotaMax: 150,
-            rotaMin: 90,
-            rewardName: "cut70",
-            prob: 0.15, //概率
-        },
-        {
-            rotaMax: 210,
-            rotaMin: 150,
-            rewardName: "foot",
-            prob: 0.05, //概率
-        },
-        {
-            rotaMax: 270,
-            rotaMin: 210,
-            rewardName: "speed100",
-            prob: 0.15, //概率
-        },
-        {
-            rotaMax: 330,
-            rotaMin: 270,
-            rewardName: "speed50",
-            prob: 0.4, //概率
-        },
-        {
-            rotaMax: 30,
-            rotaMin: 330,
-            rewardName: "streak",
-            prob: 0.05, //概率
-        },
+        rotaMax: 90,
+        rotaMin: 30,
+        rewardName: "cut30",
+        prob: 0.2, //概率
+    },
+    {
+        rotaMax: 150,
+        rotaMin: 90,
+        rewardName: "cut70",
+        prob: 0.15, //概率
+    },
+    {
+        rotaMax: 210,
+        rotaMin: 150,
+        rewardName: "foot",
+        prob: 0.05, //概率
+    },
+    {
+        rotaMax: 270,
+        rotaMin: 210,
+        rewardName: "speed100",
+        prob: 0.15, //概率
+    },
+    {
+        rotaMax: 330,
+        rotaMin: 270,
+        rewardName: "streak1",
+        prob: 0.4, //概率
+    },
+    {
+        rotaMax: 30,
+        rotaMin: 330,
+        rewardName: "streak",
+        prob: 0.05, //概率
+    },
     ]
 
-    _freeReward = ["streak", "cut70", "speed100"];
+    _freeReward = ["streak1", "cut70", "speed100"];
 
-    _cdTime = 300; //冷却时间为 五分钟
+    _cdTime = 3600; //冷却时间为 五分钟
 
     _rewardName = null;
 
@@ -80,15 +80,15 @@ export default class PanelRandom extends cc.Component {
         //是否显示分享引导
         this.node.active = true;
         this.btn_share.active = cc.dataMgr.isShowShare;
-        this.lab_share.active = cc.dataMgr.isShowShare;
+        this.spr_share.active = cc.dataMgr.isShowShare;
         this.node.getChildByName("anniu_zhuyie").x = (cc.dataMgr.isShowShare ? 100 : 0);
         this.btn_share.x = (cc.dataMgr.isShowShare ? -100 : 0);
-        this.lab_share.x = -100;
+        this.spr_share.x = -100;
 
         if (cc.dataMgr.haveProp.freeTimes > 0 || cc.dataMgr.haveProp.rewardTimes > 0) {
             this.node_point.getComponent(cc.Button).interactable = true;
             this.node_point.getChildByName("lab_title").getComponent(cc.Label).string = "点击抽奖";
-            this.node_point.getChildByName("lab_num").getComponent(cc.Label).string = ("x" + cc.dataMgr.haveProp.freeTimes);
+            this.node_point.getChildByName("lab_num").getComponent(cc.Label).string = ("x" + (cc.dataMgr.haveProp.freeTimes + cc.dataMgr.haveProp.rewardTimes));
         } else if (cc.dataMgr.getTimeSecond_i() >= cc.dataMgr.haveProp.adCDBegin + this._cdTime) {
             //广告接口暂时 不用
             this.node_point.getComponent(cc.Button).interactable = true;
@@ -128,6 +128,17 @@ export default class PanelRandom extends cc.Component {
         return -cc.dataMgr.getTimeSecond_i() + cc.dataMgr.haveProp.adCDBegin + this._cdTime;
     }
 
+    getShowTime_s() {
+        let nextTime = this.getNextADTime_i();
+        let hour = parseInt(nextTime / 3600);
+        let miu = parseInt(nextTime / 60);
+        let second = parseInt(nextTime % 60);
+        if (hour > 0)
+            return (hour + ":" + (miu > 9 ? miu : "0" + miu) + ":" + (second > 9 ? second : "0" + second))
+        else
+            return (miu > 9 ? miu : "0" + miu) + ":" + (second > 9 ? second : "0" + second);
+    }
+
     //开始转转盘
     randBegin() {
         //确定奖励那个东西
@@ -152,9 +163,11 @@ export default class PanelRandom extends cc.Component {
         }
 
         let aimAngle = this.getAimAngle_i();
-        let rotaTo = cc.rotateTo(6.2 + Math.random(), 720 + 720 + 720 + aimAngle);
-        rotaTo.easing(cc.easeElasticInOut(4));
+        let rotaTo = cc.rotateTo(4.2 + Math.random(), 720 + 720 + 720 + aimAngle);
+        //rotaTo.easing(cc.easeElasticInOut(4));
+        rotaTo.easing(cc.easeElasticOut(4));
         this.node_panBg.runAction(cc.sequence(rotaTo, cc.delayTime(0.4), cc.callFunc(this.randEnd, this)));
+        cc.audioMgr.playEffect("random_rand");
     }
 
     //转盘结束奖励商品
@@ -188,10 +201,10 @@ export default class PanelRandom extends cc.Component {
             cc.dataMgr.haveProp.haveSpeed.push(100);
             rewardStr = "开局冲刺";
             numStr = "100阶x3";
-        } else if (this._rewardName == "speed50") {
-            cc.dataMgr.haveProp.haveSpeed.push(50);
-            rewardStr = "开局冲刺";
-            numStr = "50阶x3";
+        } else if (this._rewardName == "streak1") {
+            cc.dataMgr.haveProp.haveStreak.push(1);
+            rewardStr = "动态光效";
+            numStr = "12小时";
         } else if (this._rewardName == "streak") {
             cc.dataMgr.haveProp.haveStreak.push(0);
             rewardStr = "动态光效";
@@ -200,11 +213,15 @@ export default class PanelRandom extends cc.Component {
         cc.dataMgr.saveData();
 
         this.node_reward.active = true;
+        let spr_kuang = this.node_reward.getChildByName("spr_kuang");
+        spr_kuang.opacity = 0;
+        spr_kuang.runAction(cc.sequence(cc.delayTime(0.6), cc.fadeIn(0.3)));
         this.node_label.scale = 2.4;
         this.node_label.getChildByName("lab_reward").getComponent(cc.Label).string = rewardStr;
         this.node_label.getChildByName("lab_num").getComponent(cc.Label).string = numStr;
         this.node_label.runAction(cc.sequence(cc.fadeIn(0.2), cc.scaleTo(0.3, 0.9), cc.scaleTo(0.1, 1)));
         this.scheduleOnce(this.initRand, 0.8);
+        cc.audioMgr.playEffect("random_take");
     }
 
     getAimAngle_i() {
@@ -238,8 +255,13 @@ export default class PanelRandom extends cc.Component {
                 event.target.getComponent(cc.Button).interactable = false;
                 if (cc.dataMgr.haveProp.freeTimes > 0 || cc.dataMgr.haveProp.rewardTimes > 0)
                     this.randBegin();
-                else
+                else {
+                    //判断是否可以看广告
+                    if (this.getNextADTime_i() <= 0) {
+                        cc.dataMgr.showAd("random");
+                    }
                     this.initRand();
+                }
             } else if (btnN == "spr_bg") {
                 this.node_reward.active = false;
             }
@@ -249,12 +271,25 @@ export default class PanelRandom extends cc.Component {
     //分享给好友
     shareFriend() {
         if (CC_WECHATGAME) {
-            window.wx.shareAppMessage({
-                title: "我在这里，等你来。--境之边缘",
-                imageUrl: cc.dataMgr.imageUrl.urlFriend,
-                query: "otherID=" + cc.dataMgr.openid,
-                success: (res) => {
-                    cc.dataMgr.shareSuccess("startAd");
+            window.wx.updateShareMenu({
+                withShareTicket: true,
+                success() {
+                    window.wx.shareAppMessage({
+                        title: cc.dataMgr.getShareDesc_s("random"),
+                        imageUrl: cc.dataMgr.imageUrl.random,
+                        query: "otherID=" + cc.dataMgr.openid,
+                        success: (res) => {
+                            console.log("--- 大转盘微信分享 ---");
+                            console.log(res);
+                            //改为分享到群立即抽奖
+                            if (res.shareTickets != undefined && res.shareTickets.length >= 0) {
+                                cc.dataMgr.shareSuccess("startAd");
+                            }
+                            else {
+                                cc.dataMgr.shareSuccess("startAdCd");
+                            }
+                        }
+                    });
                 }
             });
         } else {

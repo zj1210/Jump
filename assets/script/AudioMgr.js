@@ -7,37 +7,78 @@ const {
 export default class AudioMgr extends cc.Component {
 
     _audioSource_o = {
-        bg: null,
+        bg_1: null,
+        bg_2: null,
+        bg_3: null,
+        bg_4: null,
+        bg_5: null,
         btn_click: null,
         prop_block: null,
         prop_empy: null,
-        prop_score: null,
-        role_jump1: null,
-        role_jump2: null
+        prop_score: null
     };
 
     _jumpID = null;
+    _loadBgNum = 0;
 
     init() {
-       console.log("--- onLoad AudioMgr ---")
+        console.log("--- onLoad AudioMgr ---")
         cc.game.on(cc.game.EVENT_HIDE, function () {
-           //console.log("cc.audioEngine.pauseAll");
+            //console.log("cc.audioEngine.pauseAll");
             cc.audioEngine.pauseAll();
         });
         cc.game.on(cc.game.EVENT_SHOW, function () {
-           //console.log("cc.audioEngine.resumeAll");
+            //console.log("cc.audioEngine.resumeAll");
             if (cc.dataMgr.userData.onGaming)
                 cc.audioEngine.resumeAll();
         });
+
+        // let node_sound = cc.find("Canvas/node_sound");
+        // if (node_sound) {
+        //     for (let i = 0; i < node_sound.children.length; ++i) {
+        //         let nodeN = node_sound.children[i];
+        //         let adClip = nodeN.getComponent(cc.AudioSource)
+        //         if (adClip) {
+        //             this._audioSource_o[nodeN.name] = adClip.clip;
+        //         }
+        //     }
+        // }
+        cc.dataMgr.userData.loadOver = true;
 
         let self = this;
         cc.loader.loadRes("sound/bg", cc.AudioClip, function (err, clip) {
             if (!err) {
                 self._audioSource_o.bg = clip;
-                //主界面中会 加载完成直接播放
-                if (cc.dataMgr.userData.isReady)
-                    self.playBg();
-                cc.dataMgr.userData.loadOver = true;
+                self.playBg(false);
+                // cc.dataMgr.userData.loadOver = true;
+            }
+        });
+        cc.loader.loadRes("sound/bg_1", cc.AudioClip, function (err, clip) {
+            if (!err) {
+                self._audioSource_o.bg_1 = clip;
+                // //主界面中会 加载完成直接播放
+                // if (cc.dataMgr.userData.isReady)
+                //     self.playBg();
+                // cc.dataMgr.userData.loadOver = true;
+            }
+        });
+        cc.loader.loadRes("sound/bg_2", cc.AudioClip, function (err, clip) {
+            if (!err) {
+                self._audioSource_o.bg_2 = clip;
+            }
+        });
+        cc.loader.loadRes("sound/bg_3", cc.AudioClip, function (err, clip) {
+            if (!err) {
+                self._audioSource_o.bg_3 = clip;
+            }
+        }); cc.loader.loadRes("sound/bg_4", cc.AudioClip, function (err, clip) {
+            if (!err) {
+                self._audioSource_o.bg_4 = clip;
+            }
+        });
+        cc.loader.loadRes("sound/bg_5", cc.AudioClip, function (err, clip) {
+            if (!err) {
+                self._audioSource_o.bg_5 = clip;
             }
         });
         cc.loader.loadRes("sound/btn_click", cc.AudioClip, function (err, clip) {
@@ -56,13 +97,21 @@ export default class AudioMgr extends cc.Component {
             if (!err)
                 self._audioSource_o.prop_score = clip;
         });
-        cc.loader.loadRes("sound/role_jump1", cc.AudioClip, function (err, clip) {
+        cc.loader.loadRes("sound/prop_speed", cc.AudioClip, function (err, clip) {
             if (!err)
-                self._audioSource_o.role_jump1 = clip;
+                self._audioSource_o.prop_speed = clip;
         });
         cc.loader.loadRes("sound/role_jump1", cc.AudioClip, function (err, clip) {
             if (!err)
                 self._audioSource_o.role_jump1 = clip;
+        });
+        cc.loader.loadRes("sound/random_rand", cc.AudioClip, function (err, clip) {
+            if (!err)
+                self._audioSource_o.random_rand = clip;
+        });
+        cc.loader.loadRes("sound/random_take", cc.AudioClip, function (err, clip) {
+            if (!err)
+                self._audioSource_o.random_take = clip;
         });
 
         cc.audioEngine.setMaxAudioInstance(20);
@@ -71,16 +120,19 @@ export default class AudioMgr extends cc.Component {
 
     //type_s 为这个音乐的名称
     playEffect(type_s) {
+        console.log("-- playEffect -- " + type_s);
         let source = this._audioSource_o[type_s];
         if (source) {
             if (type_s == "role_jump1") {
-                cc.audioEngine.setEffectsVolume(0.8);
+                //cc.audioEngine.setEffectsVolume(0.6);
                 if (this._jumpID)
                     cc.audioEngine.stopEffect(this._jumpID);
                 this._jumpID = cc.audioEngine.playEffect(source, false);
+                cc.audioEngine.setVolume(this._jumpID, 0.8);
             } else {
-                cc.audioEngine.setEffectsVolume(1.2);
-                cc.audioEngine.playEffect(source, false);
+                //cc.audioEngine.setEffectsVolume(1);
+                let id = cc.audioEngine.playEffect(source, false);
+                cc.audioEngine.setVolume(id, 1);
             }
         }
     }
@@ -89,11 +141,21 @@ export default class AudioMgr extends cc.Component {
 
     }
 
-    playBg() {
-        let source = this._audioSource_o["bg"];
+    playBg(isGame) {
+        let soundName = "bg";
+        if (isGame) {
+            if (cc.dataMgr && cc.dataMgr.userData.useSoundName) {
+                soundName = cc.dataMgr.userData.useSoundName;
+            }
+        }
+        let source = this._audioSource_o[soundName];
+        if (!source)
+            source = this._audioSource_o["bg"];
         if (source) {
-            cc.audioEngine.playMusic(source, true);
-            cc.audioEngine.setMusicVolume(0.64);
+            //cc.audioEngine.setMusicVolume(0);
+            let id = cc.audioEngine.playMusic(source, true);
+            //cc.audioEngine.setMusicVolume(0);
+            cc.audioEngine.setVolume(id, 0.6);
         }
     }
 

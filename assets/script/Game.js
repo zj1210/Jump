@@ -25,6 +25,9 @@ export default class Game extends cc.Component {
     @property(cc.Prefab) //预置box
     pre_box = null;
 
+    @property(cc.Node) //背景图片
+    node_bg = null;
+
     @property(cc.Node) //复活界面
     node_relive = null;
 
@@ -36,6 +39,8 @@ export default class Game extends cc.Component {
     node_role = null;
     @property(cc.Node) //加速拖尾效果实验
     node_streak = null;
+    @property(cc.Node)//梦幻气泡
+    node_particle = null;
     @property(cc.Node)
     node_ui = null;
     @property(cc.Node) //相机
@@ -62,12 +67,27 @@ export default class Game extends cc.Component {
             //let DataMgr = require("DataMgr");
             cc.dataMgr = new DataMgr();
             cc.dataMgr.initData();
+
+            //延迟一秒多,加载初始化广告
+            // this.scheduleOnce(cc.dataMgr.initAD, 1.8);
+        }
+        else {
+            cc.dataMgr.autoPopAd();
         }
         if (!cc.audioMgr) {
             //let AudioMgr = require("AudioMgr");
             cc.audioMgr = new AudioMgr();
             cc.audioMgr.init();
         }
+
+        console.log("--- 试验区 ---");
+        let strTry1 = "123";
+        console.log(JSON.parse(strTry1));
+        console.log("-- type :" + typeof (strTry1) + " -- " + typeof (JSON.parse(strTry1)));
+        let strTry2 = "{\"value\":123}";
+        console.log(JSON.parse(strTry2));
+        console.log("-- type :" + typeof (strTry2) + " -- " + typeof (JSON.parse(strTry2)));
+        console.log("-- arr " + typeof (["aa"]));
     }
 
     start() {
@@ -87,10 +107,10 @@ export default class Game extends cc.Component {
                     self.jumpRole(touchPos.x < 360);
                 } else if (self._isInitGame) {
                     //背景音乐(两处播放音乐 一处这里 一处 在开局冲刺时)
-                    if (cc.dataMgr.userData.countJump == 0)
-                        cc.audioMgr.playBg();
-                    else
-                        cc.audioMgr.resumeAll();
+                    // if (cc.dataMgr.userData.countJump == 0)
+                    //     cc.audioMgr.playBg();
+                    // else
+                    //     cc.audioMgr.resumeAll();
 
                     self._isInitGame = false;
                     cc.dataMgr.userData.onGaming = true;
@@ -103,16 +123,35 @@ export default class Game extends cc.Component {
                     for (let i = 0; i < self.root_box.children.length; ++i) {
                         let nodeN = self.root_box.children[i];
                         if (nodeN.getComponent("NodeBox"))
-                            nodeN.getComponent("NodeBox").leaveFrist();
+                            nodeN.getComponent("NodeBox").leaveFirst();
                     }
                 }
                 return true;
             },
-            onTouchMoved: function (touch, event) {},
-            onTouchEnded: function (touch, event) {}
+            onTouchMoved: function (touch, event) { },
+            onTouchEnded: function (touch, event) { }
         }, self.node);
 
         this.showStart();
+
+        //微信转发定义
+        if (CC_WECHATGAME) {
+            window.wx.showShareMenu();
+            window.wx.onShareAppMessage(function () {
+                return {
+                    title: cc.dataMgr.getShareDesc_s("forward"),
+                    imageUrl: cc.dataMgr.imageUrl.forward,
+                    query: "otherID=" + cc.dataMgr.openid
+                }
+            })
+        }
+
+        // if (cc.audioMgr)
+        //     cc.audioMgr.playBg();
+
+        // if (cc.dataMgr.haveProp.freeTimes > 0) {
+        //     this.node_start.getComponent("PanelStart").showRandom();
+        // }
     }
 
     showStart() {
@@ -121,14 +160,19 @@ export default class Game extends cc.Component {
 
         this.node_start.active = true;
         this.node_game.active = false;
+        this.node.getChildByName("node_first").active = false;
 
         this.node_start.getComponent("PanelStart").initStartBox();
+        this.changeGameBg();
+    }
 
+    changeGameBg() {
         let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
-        let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
+        let spr_bg = this.node_bg.getChildByName("node_mask1").getChildByName("spr_bg");
         spr_bg.opacity = 255;
-        this.node.getChildByName("node_bg").getChildByName("spr_bg2").opacity = 0;
+        this.node_bg.getChildByName("node_mask2").getChildByName("spr_bg").opacity = 0;
         let frameBg = cc.dataMgr.getBgFrame_sf(bgName);
+        console.log(frameBg);
         if (frameBg)
             spr_bg.getComponent(cc.Sprite).spriteFrame = frameBg;
     }
@@ -139,25 +183,27 @@ export default class Game extends cc.Component {
         //animation.on("end", this.onPlayAnimation, this);
         this.scheduleOnce(this.onPlayAnimation, 1.8);
         this.node_start.getComponent("PanelStart").hideStart();
-        this.node_start.getChildByName("more_icon").active = false;
+        //this.node_start.getChildByName("more_icon").active = false;
+        cc.audioMgr.stopBg();
     }
 
     //动画播放完成 initGame
     onPlayAnimation(type, state) {
-        cc.audioMgr.pauseAll();
+        //cc.audioMgr.pauseAll();
         this.initGame(false);
         cc.dataMgr.userData.isReady = false;
     }
 
     //这里是初始游戏,在点击就开始跳了(是否为复活)
     initGame(isRelive) {
-        cc.audioMgr.pauseAll();
+        //cc.audioMgr.pauseAll();
         cc.dataMgr.userData.onGaming = false;
         this.node_game.active = true;
 
         console.log("--- initGame ---" + isRelive);
 
         if (!isRelive) {
+            cc.audioMgr.playBg(true);
             //初始化数据
             cc.dataMgr.userData.lastBoxX = cc.dataMgr.boxX;
             cc.dataMgr.userData.lastBoxY = -cc.dataMgr.boxY;
@@ -178,7 +224,7 @@ export default class Game extends cc.Component {
             cc.dataMgr.userData.isReliveDrop = true;
 
             if (cc.dataMgr.userData.shareDouble > 0) {
-                cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.reliveNum * 2 + cc.dataMgr.userData.baseHp;
+                cc.dataMgr.userData.reliveHp = (cc.dataMgr.userData.reliveNum + cc.dataMgr.userData.baseHp) * 2;
                 cc.dataMgr.userData.shareDouble--;
             } else
                 cc.dataMgr.userData.reliveHp = cc.dataMgr.userData.baseHp + cc.dataMgr.userData.reliveNum;
@@ -219,10 +265,25 @@ export default class Game extends cc.Component {
             //开局自动使用道具 冲刺 减速 光效效果
             this.useProp();
             if (cc.dataMgr.userData.speedNum > 0) {
-                this.scheduleOnce(this.callBeginSpeed, 1.2);
+                if (!cc.dataMgr.userData.isFirstIn)//不是第一次才1.2 秒后自动跳
+                    this.scheduleOnce(this.callBeginSpeed, 1.2);
             } else {
                 //标识初始化完成 在点击屏幕可以开始跳跃了
                 this._isInitGame = true;
+            }
+
+            //第一次强制显示提示
+            if (cc.dataMgr.userData.isFirstIn) {
+                cc.dataMgr.userData.isFirstIn = false;
+                let node_first = this.node.getChildByName("node_first");
+                node_first.active = true;
+                node_first.runAction(cc.repeat(cc.sequence(cc.delayTime(1), cc.callFunc(function () {
+                    --cc.dataMgr.userData.firstCountTime;
+                    if (cc.dataMgr.userData.firstCountTime == 0)
+                        this.node.getChildByName("node_first").getChildByName("lab_hintClose").getComponent(cc.Label).string = "任意点击关闭提示";
+                    else
+                        this.node.getChildByName("node_first").getChildByName("lab_hintClose").getComponent(cc.Label).string = ("点击关闭:" + cc.dataMgr.userData.firstCountTime + "s");
+                }, this)), 3));
             }
         } else {
             //确定复活点目标位置Y
@@ -286,6 +347,14 @@ export default class Game extends cc.Component {
         this.changeStreak();
     }
 
+    callFirstCount() {
+        --cc.dataMgr.userData.firstCountTime;
+        if (cc.dataMgr.userData.firstCountTime == 0)
+            this.node.getChildByName("node_first").getChildByName("lab_hintClose").getComponent(cc.Label).string = "任意点击关闭提示";
+        else
+            this.node.getChildByName("node_first").getChildByName("lab_hintClose").getComponent(cc.Label).string = ("点击关闭:" + cc.dataMgr.userData.firstCountTime + "s");
+    }
+
     //开局加速
     callBeginSpeed() {
         //开始跳跃之后 在隐藏主界面
@@ -296,14 +365,15 @@ export default class Game extends cc.Component {
         this._isInitGame = false;
 
         //背景音乐
-        cc.audioMgr.playBg();
+        // cc.audioMgr.playBg();
         cc.dataMgr.userData.onGaming = true;
 
         for (let i = 0; i < this.root_box.children.length; ++i) {
             let nodeN = this.root_box.children[i];
             if (nodeN.getComponent("NodeBox"))
-                nodeN.getComponent("NodeBox").leaveFrist();
+                nodeN.getComponent("NodeBox").leaveFirst();
         }
+        cc.audioMgr.playEffect("prop_speed");
     }
 
     showRelive() {
@@ -317,9 +387,14 @@ export default class Game extends cc.Component {
             //直接结束游戏
             //cc.director.loadScene("end");
 
-            this.node_relive.active = true;
-            this.node_relive.getComponent("PanelRelive").showRelive();
-            cc.dataMgr.saveData();
+            //修改为只有两次复活了 等有广告了再加
+            if (cc.dataMgr.userData.reliveTimes < 2) {
+                this.node_relive.active = true;
+                this.node_relive.getComponent("PanelRelive").showRelive();
+                cc.dataMgr.saveData();
+            }
+            else
+                cc.director.loadScene("end");
         }
     }
 
@@ -349,8 +424,8 @@ export default class Game extends cc.Component {
         aimY = data.aimPosY;
 
         //落到空 box 上才有声音
-        // if (data && data.boxType == "box")
-        //     cc.audioMgr.playEffect("role_jump1");
+        if (data && data.boxType == "box")
+            cc.audioMgr.playEffect("role_jump1");
 
         if (data.dieType > 0) {
             //加速的时候是不让死的
@@ -361,7 +436,7 @@ export default class Game extends cc.Component {
                 this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.35, 1), cc.callFunc(this.autoJump, this)));
             } else {
                 cc.dataMgr.userData.roleDieType = data.dieType;
-                cc.audioMgr.pauseAll();
+                //cc.audioMgr.pauseAll();
                 cc.dataMgr.userData.onGaming = false;
                 let roleJs = this.node_role.getComponent("NodeRole");
                 this.node_role.runAction(cc.sequence(cc.jumpTo(cc.dataMgr.userData.jumpTime, cc.v2(aimX, aimY), (aimY - this.node_role.y) * 0.35, 1), cc.callFunc(roleJs.toDie, roleJs)));
@@ -399,15 +474,13 @@ export default class Game extends cc.Component {
             this.node.getChildByName("node_hint").getComponent("NodeHint").changeNum("speed");
         } else {
             //之前是 开局加速停止 现在事所有加速都停止
-            this._isInitGame = true; //this.node_game.getChildByName("node_hint").active;
+            this._isInitGame = this.node_game.getChildByName("node_hint").active;
             this.node.getChildByName("node_hint").getComponent("NodeHint").showHint("speedEnd");
-
-            //且要跳到安全区域 (之前是只有复活跳到安全区域)
-            cc.dataMgr.userData.isReliveDrop = false;
-
             if (this._isInitGame) {
-                cc.audioMgr.pauseAll();
+                //cc.audioMgr.pauseAll();
                 cc.dataMgr.userData.onGaming = false;
+                //且要跳到安全区域 (之前是只有复活跳到安全区域)
+                cc.dataMgr.userData.isReliveDrop = false;
             } else {
                 cc.dataMgr.userData.onGaming = true;
             }
@@ -422,7 +495,7 @@ export default class Game extends cc.Component {
         let isLeft = (Math.random() > 0.5 || cc.dataMgr.userData.countBox == 1);
         let posX = cc.dataMgr.boxX * (isLeft ? -1 : 1) + cc.dataMgr.userData.lastBoxX;
         let posY = cc.dataMgr.boxY + cc.dataMgr.userData.lastBoxY;
-        let boxType = (cc.dataMgr.userData.countBox % 9 == 0 ? "prop" : "box");
+        let boxType = (cc.dataMgr.userData.countBox % 40 == 0 ? "prop" : "box");
 
         if (!nodeN) {
             nodeN = cc.instantiate(this.pre_box);
@@ -451,7 +524,7 @@ export default class Game extends cc.Component {
         //判断确定 idx
         let lastBgName = null;
         if (cc.dataMgr.userData.countJump == 0) {
-            cc.dataMgr.userData.gameBgIdx = 0;
+            cc.dataMgr.userData.gameBgIdx = cc.dataMgr.userData.mainBgIdx;
             //之前场景的颜色为 上一次的颜色
             lastBgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.mainBgIdx];
         } else {
@@ -466,7 +539,8 @@ export default class Game extends cc.Component {
         cc.dataMgr.userData.boxName = cc.dataMgr.boxName[cc.dataMgr.userData.gameBgIdx];
 
         let bgName = cc.dataMgr.gameBgName[cc.dataMgr.userData.gameBgIdx];
-        let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
+        this.node_bg.getChildByName("node_mask1").size = cc.v2(2000, 2000);
+        let spr_bg = this.node_bg.getChildByName("node_mask1").getChildByName("spr_bg");
         spr_bg.opacity = 0;
         let frameBg = cc.dataMgr.getBgFrame_sf(bgName);
         if (frameBg)
@@ -474,7 +548,18 @@ export default class Game extends cc.Component {
 
         //console.log("--- " + bgName + " -- " + lastBgName);
         if (lastBgName) {
-            let spr_bg2 = this.node.getChildByName("node_bg").getChildByName("spr_bg2");
+            let node_mask2 = this.node_bg.getChildByName("node_mask2");
+            node_mask2.size = cc.v2(0, 0);
+            let delayTime = cc.delayTime(0.6);
+            delayTime.update = function (dt) {
+                let node = delayTime.getTarget();
+                if (node) {
+                    node.size = cc.v2(2000 * dt, 2000 * dt);
+                }
+            };
+            node_mask2.runAction(delayTime);
+
+            let spr_bg2 = node_mask2.getChildByName("spr_bg");
             let frameLast = cc.dataMgr.getBgFrame_sf(lastBgName);
             if (frameLast)
                 spr_bg2.getComponent(cc.Sprite).spriteFrame = frameLast;
@@ -484,15 +569,16 @@ export default class Game extends cc.Component {
             spr_bg.opacity = 255;
 
         //所有柱子变色
-        // for (let i = 0; i < this.root_box.children.length; ++i) {
-        //     let nodeN = this.root_box.children[i];
-        //     if (nodeN)
-        //         nodeN.getComponent("NodeBox").setBoxFrame();
-        // }
+        for (let i = 0; i < this.root_box.children.length; ++i) {
+            let nodeN = this.root_box.children[i];
+            if (nodeN)
+                nodeN.getComponent("NodeBox").setBoxFrame();
+        }
     }
 
     callShowBg() {
-        let spr_bg = this.node.getChildByName("node_bg").getChildByName("spr_bg1");
+        this.node_bg.getChildByName("node_mask1").size = cc.v2(0, 0);
+        let spr_bg = this.node_bg.getChildByName("node_mask1").getChildByName("spr_bg");
         spr_bg.opacity = 255;
     }
 
@@ -561,7 +647,7 @@ export default class Game extends cc.Component {
         console.log("-- streakName --" + streakName);
         if (streakSf)
             this.node_streak.getComponent(cc.MotionStreak).texture = streakSf.getTexture();
-        //console.log("-- speedNum:" + cc.dataMgr.userData.speedNum + " -- " + cc.dataMgr.userData.cameraSpeedY);
+        console.log("-- speedNum:" + cc.dataMgr.userData.speedNum + " -- " + cc.dataMgr.userData.cameraSpeedY);
     }
 
     callCameraSpeedY() {
@@ -571,10 +657,13 @@ export default class Game extends cc.Component {
     }
 
     changeStreak() {
+        //梦幻气泡
+        this.node_particle.active = cc.dataMgr.userData.showParticle;
+
         let stroke = this.node_streak.getComponent(cc.MotionStreak).stroke;
         if (cc.dataMgr.userData.speedNum > 0) {
-            if (stroke != 80) {
-                this.node_streak.getComponent(cc.MotionStreak).stroke = 80;
+            if (stroke != 60) {
+                this.node_streak.getComponent(cc.MotionStreak).stroke = 60;
                 this.node_streak.color = cc.Color.WHITE;
                 this.node_streak.getComponent(cc.MotionStreak).color = cc.Color.WHITE;
             }
@@ -609,7 +698,14 @@ export default class Game extends cc.Component {
         if (event.target) {
             cc.audioMgr.playEffect("btn_click");
             let btnN = event.target.name;
-            if (btnN == "") {}
+            if (btnN == "btn_closeFirst") {
+                if (cc.dataMgr.userData.firstCountTime == 0) {
+                    this.node.getChildByName("node_first").active = false;
+                    if (cc.dataMgr.userData.speedNum > 0) {
+                        this.callBeginSpeed();
+                    }
+                }
+            }
         }
     }
 
@@ -648,22 +744,23 @@ export default class Game extends cc.Component {
                 }
             }
 
-            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 64);
+            this.node_streak.position = cc.v2(this.node_role.x, this.node_role.y + 54);
+            this.node_particle.position = cc.v2(this.node_role.x, this.node_role.y + 48);
         }
 
-        //统计变色相关
-        if (cc.dataMgr.userData.onGaming) {
-            this._countTime += dt;
-            if (this._countTime >= 1) {
-                this._countSecond++;
-                this._countTime = 0;
-            }
-        }
+        // //统计变色相关
+        // if (cc.dataMgr.userData.onGaming) {
+        //     this._countTime += dt;
+        //     if (this._countTime >= 1) {
+        //         this._countSecond++;
+        //         this._countTime = 0;
+        //     }
+        // }
 
-        if (this._countSecond >= cc.dataMgr.userData.nextChangeTime) {
-            //console.log("-- countSecond -- " + this._countSecond + " -- " + this._countTime + " -- " + cc.dataMgr.userData.nextChangeTime);
-            this.changeToNextBg();
-            this._countSecond = 0;
-        }
+        // if (this._countSecond >= cc.dataMgr.userData.nextChangeTime) {
+        //     //console.log("-- countSecond -- " + this._countSecond + " -- " + this._countTime + " -- " + cc.dataMgr.userData.nextChangeTime);
+        //     this.changeToNextBg();
+        //     this._countSecond = 0;
+        // }
     }
 }

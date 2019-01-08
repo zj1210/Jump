@@ -25,6 +25,10 @@ export default class PanelStore extends cc.Component {
     @property(cc.Node)
     lab_hp = null;
 
+    //歌曲列表
+    @property(cc.Node)
+    node_contentSound = null;
+
     _firstPosX = -512; //界面中摆放的第一个 player 的位置
     _playerDis = 256; //两个player 之间的距离
 
@@ -58,6 +62,8 @@ export default class PanelStore extends cc.Component {
         this.node.getChildByName("anniu_weixin").active = cc.dataMgr.isShowShare;
 
         this.refreshShareNum();
+
+        this.refreshSound();
     }
 
     refreshShareNum() {
@@ -179,6 +185,63 @@ export default class PanelStore extends cc.Component {
         }
     }
 
+    refreshSound() {
+        for (let i = 0; i < this.node_contentSound.children.length; ++i) {
+            let nodeN = this.node_contentSound.children[i];
+            if (i < cc.dataMgr.soundData.length) {
+                nodeN.active = true;
+                let soundD = cc.dataMgr.soundData[i];
+                nodeN.getChildByName("name").getComponent(cc.Label).string = soundD.desc;
+                let btnN = nodeN.getChildByName("butten_buy");
+
+                let isLock = this.getIsLock(i);
+                btnN.getChildByName("ziti_xuanze").active = (i != cc.dataMgr.haveProp.useSoundIdx && isLock == null);
+                btnN.getChildByName("ziti_yixuanze").active = (i == cc.dataMgr.haveProp.useSoundIdx);
+                btnN.getChildByName("lab_desc").active = (isLock != null);
+                if (isLock != null) {
+                    btnN.getChildByName("lab_desc").getComponent(cc.Label).string = isLock;
+                    btnN.getChildByName("btn_sound").getComponent(cc.Button).interactable = false;
+                }
+                else
+                    btnN.getChildByName("btn_sound").getComponent(cc.Button).interactable = true;
+
+                nodeN.getChildByName("progress").getComponent(cc.ProgressBar).progress = this.getProgressNow_i(i);
+            }
+            else {
+                nodeN.active = false;
+            }
+        }
+    }
+
+    //返回 null 则是可以使用
+    getIsLock(soundIdx) {
+        let isLock = null;
+        if (soundIdx == 1 && cc.dataMgr.haveProp.countShareNum < 19)
+            isLock = (cc.dataMgr.isShowShare ? "分享x19" : "视频x9");
+        if (soundIdx == 2 && cc.dataMgr.haveProp.countShareNum < 39)
+            isLock = (cc.dataMgr.isShowShare ? "分享x39" : "视频x19");//"分享x39";
+        if (soundIdx == 3 && cc.dataMgr.haveProp.countAdNum < 29)
+            isLock = "视频x29";
+        if (soundIdx == 4 && cc.dataMgr.haveProp.countInvite < 3)
+            isLock = (cc.dataMgr.isShowShare ? "邀请x3" : "视频x99");//"邀请x3";
+        return isLock;
+    }
+
+    getProgressNow_i(soundIdx) {
+        let pro = 1;
+        if (soundIdx == 1 && cc.dataMgr.haveProp.countShareNum < 19)
+            pro = cc.dataMgr.haveProp.countShareNum / 19;
+        if (soundIdx == 2 && cc.dataMgr.haveProp.countShareNum < 39)
+            pro = cc.dataMgr.haveProp.countShareNum / 39;
+        if (soundIdx == 3 && cc.dataMgr.haveProp.countAdNum < 29)
+            pro = cc.dataMgr.haveProp.countAdNum / 29;
+        if (soundIdx == 4 && cc.dataMgr.haveProp.countInvite < 3)
+            pro = cc.dataMgr.haveProp.countInvite / 3;
+        if (pro > 1)
+            pro = 1;
+        return pro;
+    }
+
     onClickBtn(event, customeData) {
         if (event.target) {
             cc.audioMgr.playEffect("btn_click");
@@ -200,6 +263,11 @@ export default class PanelStore extends cc.Component {
             } else if (btnN == "anniu_weixin") {
                 this.shareFriend();
             }
+            else if (btnN == "btn_sound") {
+                //选择歌曲
+                cc.dataMgr.changeSound(customeData);
+                this.refreshSound();
+            }
         }
     }
 
@@ -211,8 +279,8 @@ export default class PanelStore extends cc.Component {
     shareFriend() {
         if (CC_WECHATGAME) {
             window.wx.shareAppMessage({
-                title: "我在这里，等你来。--境之边缘",
-                imageUrl: cc.dataMgr.imageUrl.urlFriend,
+                title: cc.dataMgr.getShareDesc_s("sound"),
+                imageUrl: cc.dataMgr.imageUrl.sound,
                 query: "otherID=" + cc.dataMgr.openid,
                 success: (res) => {
                     cc.dataMgr.shareSuccess("store");

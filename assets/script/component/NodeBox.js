@@ -35,6 +35,7 @@ export default class NodeBox extends cc.Component {
             this.node.runAction(cc.fadeIn(0.15));
             this.node.runAction(cc.moveTo(0.2, aimPos));
         } else {
+            boxType = "box";
             this.node.setPosition(aimPos);
             //为了无缝衔接 第一个为 node_start 中的台阶 游戏中第一个不显示
             if (countBox != 1)
@@ -114,7 +115,7 @@ export default class NodeBox extends cc.Component {
         }
     }
 
-    leaveFrist() {
+    leaveFirst() {
         this.node.active = true;
         this.node.opacity = 255;
         this.spr_box.opacity = 255;
@@ -126,13 +127,18 @@ export default class NodeBox extends cc.Component {
         this.node.opacity = 255;
         if (this._boxType == "prop") {
             ++cc.dataMgr.userData.propGreenNum;
-            //cc.audioMgr.playEffect("prop_score");
+            cc.audioMgr.playEffect("prop_score");
             this.spr_prop.active = false;
+            //吃到道具换背景
+            let gameJs = cc.find("Canvas").getComponent("Game");
+            if (gameJs)
+                gameJs.changeToNextBg();
         } else if (this._boxType == "speed") {
             let num = parseInt(Math.random() * 10 + 10);
             if (cc.dataMgr.userData.speedNum < num)
                 cc.dataMgr.userData.speedNum = num;
             this.spr_prop.active = false;
+            cc.audioMgr.playEffect("prop_speed");
 
             let node_hint = cc.find("Canvas/node_hint");
             if (node_hint && node_hint.getComponent("NodeHint")) {
